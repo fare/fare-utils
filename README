@@ -1,0 +1,30 @@
+fare-utils is a package full of miscellaneous code that I've used at one point
+or the other while hacking Common Lisp code: macros, functions, classes,
+offering a variety of classic utilities and datastructures, plus management of package.
+
+LICENSE:
+This software is released under the bugroff license. Use at your own risk.
+	http://www.geocities.com/SoHo/Cafe/5947/bugroff.html
+At the insistence of several hackers, I hereby state what is obvious to me,
+that they can reuse any software released under the bugroff license
+and publish it as part or totality of packages under any other license
+they see fit, if it really matters to them, including a BSD-style license
+or a MIT license. Yes they can. Of course, if they choose a proprietary
+software license, they only deserve scorn. But even that, they may do!
+
+
+Debugged:
+* binary-heaps
+
+Untested:
+* binomial-heaps
+
+Work In Progress:
+* basic-utilities
+* containers
+
+Mostly Unusable:
+
+Empty:
+* avl trees
+* pure data structures

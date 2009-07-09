@@ -1,0 +1,12 @@
+TODO
+* document what works and what doesn't
+* document all those functions, classes, etc., that do work.
+* export all the symbols correctly.
+* complete avl-tree -- or maybe just package the trees thing from Nathan Froyd?
+* import trie from pangram thingie
+
+
+* DECLAIM - distributed execution of common-lisp agents with intent and mobility
+
+* Ensure that you can merge-tail calls, in SBCL:
+(declare (optimize (SB-C::MERGE-TAIL-CALLS 3) (DEBUG 2))) ; still doesn't override DEBUG 3
