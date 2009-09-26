@@ -5,6 +5,7 @@
 
 (in-package :fare-utils)
 
+(eval-now
 (exporting-definitions
 
 (defun conc-symbol-in (package &rest rest)
@@ -27,7 +28,7 @@
   (let ((n (conc-string s)))
     (conc-symbol n (if (every #'alphanumericp n) :p :-p))))
 
-)
+))
 
 #| ;;; I never actually used that
 (defun do-begin-gensym* ()

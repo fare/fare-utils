@@ -16,9 +16,10 @@
   (typep c 'base-char))
 
 (defun null-string-p (x)
-  (and (stringp x) (zerop (length x))))
+  (and (stringp x) (zerop (length x)))))
 
-
+(eval-now
+(exporting-definitions
 (defun stuff->string (stuff)
   "transform some stuff into a string"
   (typecase stuff
@@ -33,10 +34,9 @@
 (defun conc-string (&rest rest)
   "make a string by concatenating stuff"
   (apply #'strcat (mapcar #'stuff->string rest)))
+))
 
-)
-
-
+(eval-now
 #+#.fare-utils:+all-chars-base-feature+
 (exporting-definitions
 
@@ -51,9 +51,6 @@
 (defun simplify-string (s)
   (check-type s string)
   s)
-
-(defun strcat (&rest strings)
-  (apply #'concatenate 'string strings))
 
 )
 
@@ -76,9 +73,11 @@
            (string-all-base-char-p s))
       (coerce s 'simple-base-string)
       s)
-  s)
+  s)))
 
+(eval-now
+ (exporting-definitions
 (defun strcat (&rest strings)
   (let ((basicp (every #'string-basic-p strings)))
     (apply #'concatenate (if basicp 'base-string 'string) strings)))
-)
+))
