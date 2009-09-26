@@ -1,6 +1,8 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;;;; Utilities dealing with atomicity wrt concurrency in various lisps
 
+#+xcvb (module (:depends-on ("package")))
+
 (in-package #:fare-utils)
 
 

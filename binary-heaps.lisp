@@ -13,6 +13,9 @@
 ;;; * document it
 ;;; * write a better function that gives you node handles for editing/removal purposes
 
+#+xcvb
+(module (:depends-on ("package" "basic-utils" "basic-macros" "containers")))
+
 (in-package :fare-utils)
 
 (def*class binary-heap (heap vector-container-mixin sized-container-mixin)

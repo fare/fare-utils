@@ -1,5 +1,7 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;;;; doubly-linked lists
+#+xcvb (module (:depends-on ("package" "containers")))
+
 #|
 doubly-linked-mixin and doubly-linked list.
 

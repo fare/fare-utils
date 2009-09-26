@@ -2,6 +2,8 @@
 ;;;;; Magic special variables: kind of like define-symbol-macro,
 ;;;;; but with cacheing (by default, read but not write)
 
+#+xcvb (module (:depends-on ("package" "basic-macros" "hash-tables")))
+
 (in-package :fare-utils)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)

@@ -1,6 +1,9 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;;;; Generic heap interface
 
+#+xcvb
+(module (:depends-on ("package" "basic-utils" "basic-macros" "comparators")))
+
 (in-package :fare-utils)
 
 (exporting-definitions

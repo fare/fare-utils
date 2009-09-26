@@ -1,6 +1,8 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;;;; Miscellaneous utilities related to hash-tables
 
+#+xcvb (module (:depends-on ("package" "basic-macros")))
+
 (in-package :fare-utils)
 
 (defun alist->hash-table (alist &key (test #'eql))

@@ -9,6 +9,8 @@
 ;;; * a binomial tree of rank n has a node with n children of ranks 0 to n-1 sorted by size,
 ;;;  with a total number of nodes 2**n
 
+#+xcvb (module (:depends-on ("package" "basic-utils" "containers")))
+
 (in-package :fare-utils)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)

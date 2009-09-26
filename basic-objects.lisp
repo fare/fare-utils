@@ -1,6 +1,8 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;;;; Miscellaneous object-related utilities by Fare
 
+#+xcvb (module (:depends-on ("package" "basic-utils" "basic-macros")))
+
 (in-package :fare-utils)
 
 (def*macro accessors-equal-p ((&key (test '#'equal) (prefix "")) accessors obj1 obj2)

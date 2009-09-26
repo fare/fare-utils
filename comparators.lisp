@@ -1,6 +1,8 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;;; Comparison and ordered structures
 
+#+xcvb (module (:depends-on ("package" "basic-macros")))
+
 (in-package :fare-utils)
 
 (defun-inline nonzerop (x)

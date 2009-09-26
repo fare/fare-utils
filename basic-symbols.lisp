@@ -1,6 +1,8 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;;;; Basic Utilities about Symbols
 
+#+xcvb (module (:depends-on ("package" "basic-utils" "basic-strings")))
+
 (in-package :fare-utils)
 
 (exporting-definitions

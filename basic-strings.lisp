@@ -1,6 +1,8 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;;;; Basic String Manipulation
 
+#+xcvb (module (:depends-on ("package" "basic-utils")))
+
 (in-package :fare-utils)
 
 

@@ -1,6 +1,10 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;;;; Miscellaneous small utility definitions by Fare (formerly fare.lisp)
 
+#+xcvb
+(module
+ (:depends-on ("package" "basic-strings" "basic-symbols" "basic-macros")))
+
 (in-package :fare-utils)
 
 ;; Pairs to alist

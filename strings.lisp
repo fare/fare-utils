@@ -1,6 +1,8 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;;;; String utilities
 
+#+xcvb (module (:depends-on ("package" "basic-utils" "streams")))
+
 (in-package :fare-utils)
 
 (def*fun join-strings (list &key stream separator)

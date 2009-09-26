@@ -1,5 +1,7 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 
+#+xcvb (module (:depends-on nil))
+
 (in-package #:cl-user)
 
 #|;; After a mismatch warning, regenerate with

@@ -1,0 +1,30 @@
+#+xcvb
+(module
+ (:fullname
+  "fare-utils"
+  :depends-on
+  ("package"
+   "basic-utils"
+   "basic-strings"
+   "basic-symbols"
+   "basic-macros"
+   "basic-lists"
+   "basic-packages"
+   "basic-objects"
+   "comparators"
+   "containers"
+   "hash-tables"
+   "binary-heaps"
+   "binomial-heaps"
+   "avl-trees"
+   "fifo"
+   "dllist"
+   "pathnames"
+   "streams"
+   "strings"
+   "files"
+   "sorting"
+   "atomic"
+   "msv")
+  :supersedes-asdf
+  ("fare-utils")))

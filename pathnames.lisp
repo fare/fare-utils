@@ -1,5 +1,7 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 
+#+xcvb (module (:depends-on ("package" "basic-utils")))
+
 (in-package :fare-utils)
 
 (def*fun absolute-pathname-p (p)

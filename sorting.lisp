@@ -1,6 +1,8 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;; Sorting Algorithms.
 
+#+xcvb (module (:depends-on ("package" "comparators")))
+
 (in-package :fare-utils)
 
 (defun stable-bucket-sort/ordinals (size vector)

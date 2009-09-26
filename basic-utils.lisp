@@ -1,6 +1,8 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;;;; Miscellaneous small utility definitions by Fare (formerly fare.lisp)
 
+#+xcvb (module (:depends-on ("package")))
+
 (in-package :fare-utils)
 
 ; -----------------------------------------------------------------------------
@@ -165,15 +167,16 @@
 (define-exporter def*fun defun)
 (define-exporter def*var defvar))
 
-
+(eval-now
 (exporting-definitions
 
 (defun featurify (bool)
   (if #+common-lisp bool #-common-lisp (not bool)
       'common-lisp '(not common-lisp)))
 (defun unfeaturify (bool-feature)
-  (equal bool-feature (featurity t)))
+  (equal bool-feature (featurity t)))))
 
+(exporting-definitions
 
 (defun nilf (&rest args)
   (declare (ignore args))

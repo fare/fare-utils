@@ -1,6 +1,8 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;;;; FIFO queues
 
+#+xcvb (module (:depends-on ("package" "basic-utils")))
+
 (in-package :fare-utils)
 
 (exporting-definitions
