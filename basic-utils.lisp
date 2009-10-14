@@ -170,7 +170,7 @@
   (if #+common-lisp bool #-common-lisp (not bool)
       'common-lisp '(not common-lisp)))
 (defun unfeaturify (bool-feature)
-  (equal bool-feature (featurity t)))))
+  (equal bool-feature (featurify t)))))
 
 (exporting-definitions
 
