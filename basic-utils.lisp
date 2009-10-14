@@ -9,10 +9,6 @@
 ;;; Optimization settings
 
 ;(pushnew :do-test *features*) ; enable tests
-(declaim (optimize (speed 3) (space 1) (safety 1)
-		   #-genera (debug 0)
-		   #+sbcl (sb-ext:inhibit-warnings 3)
-		   #+cmu (ext:inhibit-warnings 3)))
 
 (defmacro eval-now (&body body)
   `(eval-when (:compile-toplevel :load-toplevel :execute)
