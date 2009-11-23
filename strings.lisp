@@ -8,7 +8,7 @@
 (def*fun join-strings (list &key stream separator)
   (with-output (stream)
     (loop
-        with sep = (stuff->string separator)
+        with sep = (->string separator)
         for first = t then nil
         for i in list
         unless first do (write-sequence sep stream)

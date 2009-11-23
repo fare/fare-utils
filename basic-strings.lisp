@@ -10,30 +10,29 @@
 (eval-now
  (def*parameter +all-chars-base-feature+ (featurify (subtypep 'character 'base-char))))
 
+(eval-now
 (exporting-definitions
 
 (defun base-char-p (c)
   (typep c 'base-char))
 
 (defun null-string-p (x)
-  (and (stringp x) (zerop (length x)))))
+  (and (stringp x) (zerop (length x))))
 
-(eval-now
-(exporting-definitions
-(defun stuff->string (stuff)
+(defun ->string (x)
   "transform some stuff into a string"
-  (typecase stuff
-    (character (make-string 1
-                            :initial-element stuff
-                            :element-type (type-of stuff)))
-    (string stuff)
+  (typecase x
+    (character (make-string
+                1 :initial-element x
+                :element-type (if (base-char-p x) 'base-char 'character)))
+    (string x)
     (null "")
-    (symbol (symbol-name stuff))
-    (t (format nil "~A" stuff))))
+    (symbol (symbol-name x))
+    (t (format nil "~A" x))))
 
 (defun conc-string (&rest rest)
   "make a string by concatenating stuff"
-  (apply #'strcat (mapcar #'stuff->string rest)))
+  (apply #'strcat (mapcar #'->string rest)))
 ))
 
 (eval-now
@@ -69,14 +68,13 @@
 
 (defun simplify-string (s)
   (check-type s string)
-  (if (and (not (typep s 'base-char))
+  (if (and (not (typep s 'base-string))
            (string-all-base-char-p s))
       (coerce s 'simple-base-string)
-      s)
-  s)))
+      s))))
 
 (eval-now
- (exporting-definitions
+(exporting-definitions
 (defun strcat (&rest strings)
   (let ((basicp (every #'string-basic-p strings)))
     (apply #'concatenate (if basicp 'base-string 'string) strings)))

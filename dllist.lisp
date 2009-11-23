@@ -26,6 +26,8 @@ TODO:
 (defmethod container-empty-p ((container doubly-linked-mixin))
   (eq container (doubly-linked-next container)))
 
+(defgeneric isolate-node! (node))
+
 (defmethod isolate-node! ((node doubly-linked-mixin))
   (setf (doubly-linked-next node) node
         (doubly-linked-previous node) node)
@@ -34,6 +36,8 @@ TODO:
 (defmethod empty-container! ((container doubly-linked-mixin))
   (isolate-node! container)
   container)
+
+(defgeneric unlink-node! (node))
 
 (defmethod unlink-node! ((container doubly-linked-mixin))
   (let ((previous (doubly-linked-previous container))
@@ -69,6 +73,8 @@ TODO:
       (isolate-node! new)
       (join-dl-chains new new (doubly-linked-next container) container)
       new)))
+
+(defgeneric pop-item! (container))
 
 (defmethod pop-item! ((container doubly-linked-list))
   (check-not-empty container)

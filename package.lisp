@@ -73,7 +73,7 @@
            #:set-container-contents-from-list! #:simplify-string
            #:single-arg #:single-arg-form-p #:sized-container-mixin
            #:strcat #:string-all-base-char-p #:string-basic-p
-           #:stuff->string #:style-warn #:test-form #:test-forms
+           #:->string #:style-warn #:test-form #:test-forms
            #:test-only #:the* #:ttest #:ttest* #:unfeaturify
            #:vector->list #:vector-container-mixin
            #:vector-container-ref #:with-buffered-file-contents

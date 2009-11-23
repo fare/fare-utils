@@ -37,14 +37,14 @@
   (do-symbols (l :tmp) (unintern l :tmp))
   (delete-package :tmp))
 (defun gensym* (&optional foo)
-  (let ((s (stuff->string (or foo '#:g))))
+  (let ((s (->string (or foo '#:g))))
     (if (find-package :tmp)
 	(gentemp s :tmp)
 	(gensym s))))
 (defmacro begin-gensym* ()
-  `(eval-when (:compile-toplevel :load-toplevel) ;;; :execute
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
     (do-begin-gensym*)))
 (defmacro end-gensym* ()
-  `(eval-when (:compile-toplevel :load-toplevel) ;;; :execute
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
     (do-end-gensym*)))
 |#
