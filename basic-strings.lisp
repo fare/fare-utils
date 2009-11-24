@@ -76,6 +76,10 @@
 (eval-now
 (exporting-definitions
 (defun strcat (&rest strings)
-  (let ((basicp (every #'string-basic-p strings)))
-    (apply #'concatenate (if basicp 'base-string 'string) strings)))
+  (apply #'concatenate 'string strings))
+;; The below definition would save space, but makes debugging hell,
+;; because SLIME borks at the first string when it tries to print it
+;; readably yet without read-eval.
+;;    (let ((basicp (every #'string-basic-p strings)))
+;;    (apply #'concatenate (if basicp 'base-string 'string) strings))
 ))

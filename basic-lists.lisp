@@ -109,11 +109,14 @@ returning the two lists of the values returned by the function."
 	  (setf x (cdr x) y (cdr y)))))))
 (defun length=n-p (x n)
   ;(= (length x) n)
+  (check-type n (integer 0 *))
   (loop
-    (let ((nx (atom x)) (zn (zerop n)))
-      (if nx (return zn)
-	(if zn (return nil)
-	  (setf x (cdr x) n (1- n)))))))
+    :for l = x :then (cdr l)
+    :for i :downfrom n :do
+    (cond
+      ((zerop i) (return (null l)))
+      ((not (consp l)) (return nil)))))
+
 (defun length<-p (x y)
   ;(= (length x) (length y))
   (loop
@@ -206,4 +209,3 @@ May alter the cons cells that constitute the spine of the alist"
 			   ,al-setter))
 		       ,store)
                `(cdr ,cons)))))
-

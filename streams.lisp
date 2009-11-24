@@ -5,18 +5,25 @@
 (in-package :fare-utils)
 
 (def*generic call-with-output (x thunk)
+  (:documentation
+   "Calls FUN with an actual stream argument, behaving like FORMAT with respect to stream'ing:
+If OBJ is a stream, use it as the stream.
+If OBJ is NIL, use a STRING-OUTPUT-STREAM as the stream, and return the resulting string.
+If OBJ is T, use *STANDARD-OUTPUT* as the stream.
+If OBJ is a string with a fill-pointer, use it as a string-output-stream.
+Otherwise, signal an error.")
   (:method ((x null) thunk)
-           (with-output-to-string (s) (funcall thunk s)))
+    (with-output-to-string (s) (funcall thunk s)))
   (:method ((x (eql t)) thunk)
-           (funcall thunk *standard-output*) nil)
+    (funcall thunk *standard-output*) nil)
   (:method ((x stream) thunk)
-           (funcall thunk x) nil)
+    (funcall thunk x) nil)
   (:method ((x string) thunk)
-           (assert (fill-pointer x))
-           (with-output-to-string (s x) (funcall thunk s)))
+    (assert (fill-pointer x))
+    (with-output-to-string (s x) (funcall thunk s)))
   (:method (x thunk)
-           (declare (ignore thunk))
-           (error "not a valid stream designator ~S" x)))
+    (declare (ignore thunk))
+    (error "not a valid stream designator ~S" x)))
 
 (def*macro with-output ((x &optional (value x)) &body body)
   `(call-with-output ,value #'(lambda (,x) ,@body)))
@@ -38,8 +45,17 @@
   (with-standard-io-syntax
     (let ((*read-eval* nil)
           (*read-default-float-format* 'single-float)
-          (*print-readably* t)
+          (*print-readably* nil)
           (*print-pretty* nil)
           (*print-circle* t)
           (*package* (find-package *safe-package*)))
       (apply #'write x r))))
+
+(defun call-with-user-output-file (f fun)
+  (if (equal f "-")
+    (funcall fun *standard-output*)
+    (with-open-file (o f :direction :output :if-exists :supersede)
+      (funcall fun o))))
+
+(def*macro with-user-output-file ((s f) &body body)
+  `(call-with-user-output-file ,f (lambda (,s) ,@body)))

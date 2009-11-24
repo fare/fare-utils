@@ -68,7 +68,7 @@
            #:null-string-p #:plist->alist #:pop-last-item
            #:pop-last-item! #:pop-least-item #:pop-least-item!
            #:post-decf #:post-incf #:propmacro #:propmacros
-           #:prune-node! #:push-last-item! #:quit #:quotep #:rcons
+           #:prune-node! #:push-last-item! #:quit-lisp #:quotep #:rcons
            #:remove-nth #:rlist* #:safe-read #:safe-write #:search-tree
            #:set-container-contents-from-list! #:simplify-string
            #:single-arg #:single-arg-form-p #:sized-container-mixin
@@ -79,4 +79,30 @@
            #:vector-container-ref #:with-buffered-file-contents
            #:with-gensyms #:with-magic-special-variables
            #:with-magic-special-variables-safely #:with-msv #:with-msv*
-           #:with-output #:xtime #:_))
+           #:with-output #:with-user-output-file #:xtime #:_
+           #:first-char #:last-char #:but-last-char
+           #:proper-list-p
+           #:make-hashset
+           #:string-prefix-p #:string-postfix-p #:string-enclosed-p
+           #:+root-path+ #:+back-path+
+           #:pathname-directory-pathname #:pathname-base-pathname
+           #:pathname-parent #:top-level-name #:DIRECTORY-NAME-P
+           #:PORTABLE-PATHNAME-STRING-COMPONENT-CHAR-P
+           #:PORTABLE-PATHNAME-STRING-COMPONENT-P
+           #:PORTABLE-PATHNAME-TYPE-COMPONENT-P
+           #:PORTABLE-PATHNAME-DIRECTORY-OUTPUT
+           #:PORTABLE-PATHNAME-NAME-OUTPUT
+           #:PORTABLE-PATHNAME-TYPE-OUTPUT
+           #:PORTABLE-PATHNAME-OUTPUT
+           #:PORTABLE-NAMESTRING
+           #:PORTABLE-PATHNAME-FROM-STRING
+           #:SUBPATHNAME
+           #:PATHNAME-ABSOLUTE-P
+           #:PORTABLE-NAMESTRING-ABSOLUTE-P
+           #:PORTABLE-PATHNAME-ABSOLUTE-P
+           #:ABSOLUTE-PORTABLE-NAMESTRING-P
+           #:PORTABLE-NAMESTRING-P
+           #:ENSURE-ABSOLUTE-PATHNAME
+           #:PORTABLE-NAMESTRING-PREFIX<=
+           #:ENSURE-PATHNAME-IS-DIRECTORY
+           ))

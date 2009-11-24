@@ -13,7 +13,8 @@
   "Replaces given symbols with gensyms. Useful for creating macros.
 This version by Paul Graham in On Lisp.
 Mostly the same as cliki's WITH-UNIQUE-NAMES."
-  `(let ,(mapcar #'(lambda (s) `(,s (gensym))) syms) ,@body))
+  ;; Note: we probably should be using it from alexandria or something
+  `(let ,(mapcar #'(lambda (s) `(,s (gensym ,(symbol-name s)))) syms) ,@body))
 
 (def*macro evaluating-once (vars &body body)
   "Macro to use while defining a macro that needs to enforce that the
@@ -387,7 +388,21 @@ is invoked as an ERROR-BEHAVIOUR."
 	   (error-behaviour on-error tag x))))
 
 (defun proper-list-p (x)
-  (and (consp x) (null (cdr (last x)))))
+  "Returns T if X is a proper list, NIL if it isn't. Checks for circularity"
+  (labels
+      ((ret (b)
+         (return-from proper-list-p b))
+       (check (x y)
+         (cond
+           ((null x) (ret t))
+           ((eq x y) (ret nil))
+           ((not (consp x)) (ret nil))))
+       (recurse (x y)
+         (check x y)
+         (check (cdr x) y)
+         (recurse (cddr x) (cdr y))))
+    (check x nil)
+    (recurse (cdr x) x)))
 
 (defun single-arg (x) (cadr x))
 (defmacro make-single-arg-form (name &optional

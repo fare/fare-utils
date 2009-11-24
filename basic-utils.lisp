@@ -178,11 +178,11 @@
   (declare (ignore args))
   nil)
 
-(defun NIY ()
+(defun NIY (&rest args)
   "fallback function for unimplemented functionality"
-  (error "Function Not Implemented Yet."))
+  (error "Not Implemented Yet~@[: ~S~]" args))
 
-(defun quit ()
+(defun quit-lisp ()
   "Quit the lisp implementation"
   #+cmu (extensions:quit)
   #+sbcl (sb-ext:quit)
