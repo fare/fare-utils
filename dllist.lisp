@@ -48,7 +48,7 @@ TODO:
     (isolate-node! node)
     nil))
 
-(defmethod delete-node! ((container doubly-linked-list) node)
+(defmethod delete-node! ((container doubly-linked-mixin) node)
   (declare (ignorable container))
   (unlink-node! node)
   (values))

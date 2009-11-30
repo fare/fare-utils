@@ -66,7 +66,7 @@
            #:ndolist-with-rest #:ndolist-with-rest-fun #:nilf #:niy
            #:node-container-mixin #:node-item #:node-mixin #:nop
            #:null-string-p #:plist->alist #:pop-last-item
-           #:pop-last-item! #:pop-least-item #:pop-least-item!
+           #:pop-last-item! #:pop-least-item #:pop-least-item! #:pop-item!
            #:post-decf #:post-incf #:propmacro #:propmacros
            #:prune-node! #:push-last-item! #:quit-lisp #:quotep #:rcons
            #:remove-nth #:rlist* #:safe-read #:safe-write #:search-tree
