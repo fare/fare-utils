@@ -104,7 +104,7 @@
     (pop-last-item! heap)
     (unless (= index last-index)
       (setf (node-item heap index) last-item)))
-  nil)
+  (values))
 
 (defmethod (setf node-item) (item (heap binary-heap) index)
   (let ((old-key (bhref heap index)))

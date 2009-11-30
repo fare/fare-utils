@@ -86,23 +86,23 @@
            #:string-prefix-p #:string-postfix-p #:string-enclosed-p
            #:+root-path+ #:+back-path+
            #:pathname-directory-pathname #:pathname-base-pathname
-           #:pathname-parent #:top-level-name #:DIRECTORY-NAME-P
-           #:PORTABLE-PATHNAME-STRING-COMPONENT-CHAR-P
-           #:PORTABLE-PATHNAME-STRING-COMPONENT-P
-           #:PORTABLE-PATHNAME-TYPE-COMPONENT-P
-           #:PORTABLE-PATHNAME-DIRECTORY-OUTPUT
-           #:PORTABLE-PATHNAME-NAME-OUTPUT
-           #:PORTABLE-PATHNAME-TYPE-OUTPUT
-           #:PORTABLE-PATHNAME-OUTPUT
-           #:PORTABLE-NAMESTRING
-           #:PORTABLE-PATHNAME-FROM-STRING
-           #:SUBPATHNAME
-           #:PATHNAME-ABSOLUTE-P
-           #:PORTABLE-NAMESTRING-ABSOLUTE-P
-           #:PORTABLE-PATHNAME-ABSOLUTE-P
-           #:ABSOLUTE-PORTABLE-NAMESTRING-P
-           #:PORTABLE-NAMESTRING-P
-           #:ENSURE-ABSOLUTE-PATHNAME
-           #:PORTABLE-NAMESTRING-PREFIX<=
-           #:ENSURE-PATHNAME-IS-DIRECTORY
+           #:pathname-parent #:top-level-name #:directory-name-p
+           #:portable-pathname-string-component-char-p
+           #:portable-pathname-string-component-p
+           #:portable-pathname-type-component-p
+           #:portable-pathname-directory-output
+           #:portable-pathname-name-output
+           #:portable-pathname-type-output
+           #:portable-pathname-output
+           #:portable-namestring
+           #:portable-pathname-from-string
+           #:subpathname
+           #:pathname-absolute-p
+           #:portable-namestring-absolute-p
+           #:portable-pathname-absolute-p
+           #:absolute-portable-namestring-p
+           #:portable-namestring-p
+           #:ensure-absolute-pathname
+           #:portable-namestring-prefix<=
+           #:ensure-pathname-is-directory
            ))
