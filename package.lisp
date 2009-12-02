@@ -50,7 +50,7 @@
            #:fifo-head #:fifo-nconc2 #:fifo-tail
            #:file-contents-equal-vector-p #:fill-array #:find-item
            #:find-least-item #:find-node #:firstn #:get-file-contents
-           #:hash-table->alist #:hashmacro #:hashmacros #:heap #:if-bind
+           #:hash-table->alist #:hashmacro #:hashmacros #:heap #:if-bind #:when-bind
            #:if-testing #:if2 #:initialize-instance #:insert-item!
            #:insert-node! #:integers-below #:integers-between #:it
            #:join-strings #:kwote #:least-item #:length<-p #:length<=-p

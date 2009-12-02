@@ -342,6 +342,9 @@ outputs a tag plus a list of variable and their values, returns the last value"
 (defmacro if-bind (bindings test then &optional else)
   `(multiple-value-bind ,bindings ,test
       (if ,(first-binding bindings) ,then ,else)))
+(defmacro when-bind (bindings test &body body)
+  `(multiple-value-bind ,bindings ,test
+      (when ,(first-binding bindings) ,@body)))
 
 (defmacro defxcond (name ifform)
   `(defmacro ,name (&rest clauses)
