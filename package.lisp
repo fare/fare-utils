@@ -105,4 +105,5 @@
            #:ensure-absolute-pathname
            #:portable-namestring-prefix<=
            #:ensure-pathname-is-directory
+           #:unwilden
            ))

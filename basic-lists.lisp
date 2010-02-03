@@ -63,15 +63,15 @@ returning the two lists of the values returned by the function."
 (defun remove-nth (n list)
   "remove Nth element from LIST, keeping the tail and yielding a new head"
   (loop
-    with head = (cons t nil)
-    with link = head
-    for tail on list
-    for elt in list
-    for i below n do
+    :with head = (cons t nil)
+    :with link = head
+    :for tail :on list
+    :for elt :in list
+    :for i :below n :do
     (let ((cons (cons elt nil)))
       (rplacd link cons)
       (setf link cons))
-    finally
+    :finally
     (progn (rplacd link (cdr tail))
 	   (return (cdr head)))))
 (TEST-FORM (remove-nth 3 '(a b c 3 d e f)) '(a b c d e f))

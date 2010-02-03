@@ -21,12 +21,12 @@ Mostly the same as cliki's WITH-UNIQUE-NAMES."
 evaluation some of its arguments happens but once. See also PCL::ONCE-ONLY,
 Genera's SCL::ONCE-ONLY or CL-UTILITIES:ONCE-ONLY.
 CMUCL's EXT:ONCE-ONLY has a different interface."
-  (loop for var in vars for sym = (gensym)
-    collect ``(,',sym ,,var) into rt-bindings
-    collect `(,var ',sym) into et-bindings
-    finally (return
-	     ``(let (,,@rt-bindings)
-		 ,(let ,et-bindings ,@body)))))
+  (loop :for var :in vars :for sym = (gensym)
+    :collect ``(,',sym ,,var) :into rt-bindings
+    :collect `(,var ',sym) :into et-bindings
+    :finally (return
+               ``(let (,,@rt-bindings)
+                   ,(let ,et-bindings ,@body)))))
 
 
 ; -----------------------------------------------------------------------------
@@ -34,8 +34,8 @@ CMUCL's EXT:ONCE-ONLY has a different interface."
 
 (def*macro define-abbrevs (&rest abbrevs)
   "Declare a series of abbreviations."
-  `(progn ,@(loop for (new old) on abbrevs by #'cddr collect
-                  `(defmacro ,new (&rest rest) `(,',old ,@rest)))))
+  `(progn ,@(loop :for (new old) :on abbrevs :by #'cddr :collect
+              `(defmacro ,new (&rest rest) `(,',old ,@rest)))))
 
 (def*macro defun-inline (name arglist &body body)
   "Declare an inline defun."
@@ -256,7 +256,7 @@ outputs a tag plus a list of variable and their values, returns the last value"
 (defun copy-array (array)
   "make a fresh (shallow) copy of an array"
   (let ((new-array (copy-array-shape array)))
-    (loop for i below (array-total-size array) do
+    (loop :for i :below (array-total-size array) :do
       (setf (row-major-aref new-array i) (row-major-aref array i)))
     new-array))
 (defun fill-array (array value)
@@ -267,7 +267,7 @@ outputs a tag plus a list of variable and their values, returns the last value"
 	       :displaced-to array)
    value))
 (defun vector->list (vector)
-  (loop for x across vector collect x))
+  (loop :for x :across vector :collect x))
 (defun list->vector (list)
   (apply #'vector list))
 

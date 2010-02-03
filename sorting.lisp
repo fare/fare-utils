@@ -9,11 +9,11 @@
   ;; in: a vector mapping its indices to numbers below size
   ;; out: a sorted list of lists of numbers having the same mapped value
   (loop
-      with buckets = (make-array size :initial-element nil)
-      for x from (1- (length vector)) downto 0
-      for y = (aref vector x) do
-      (push x (svref buckets y))
-      finally (return (loop for b across buckets when b collect b))))
+    :with buckets = (make-array size :initial-element nil)
+    :for x :from (1- (length vector)) :downto 0
+    :for y = (aref vector x) :do
+    (push x (svref buckets y))
+    :finally (return (loop :for b :across buckets :when b :collect b))))
 
 
 (defun adjacency-table/ordinals (size arcs)
@@ -21,10 +21,10 @@
   ;;     a list of (origin . destination) pairs for arcs of the graph
   ;; out: an array giving for each node the list of destinations for that origin
   (loop
-      with table = (make-array size :initial-element nil)
-      for arc in arcs
-      do (push (cdr arc) (aref table (car arc)))
-      finally (return table)))
+      :with table = (make-array size :initial-element nil)
+      :for arc :in arcs
+      :do (push (cdr arc) (aref table (car arc)))
+      :finally (return table)))
 
 (defun transpose-cons (x)
   (cons (cdr x) (car x)))
@@ -51,35 +51,35 @@
     (labels ((dfs1 (node)
                (setf (aref color node) t)
                (loop
-                   for next in (aref adjacency-table node)
-                   unless (aref color next)
-                   do (dfs1 next))
+                 :for next :in (aref adjacency-table node)
+                 :unless (aref color next)
+                 :do (dfs1 next))
                (setf (aref finishers (decf current-finisher)) node))
              (dfs2 (node)
                (setf current-least node)
                (dfs2-1 node node)
                (setf (aref least node) current-least))
              (dfs2-1 (node forefather)
-               (setf (aref color node) nil)  
+               (setf (aref color node) nil)
                (loop
-                   for next in (aref reverse-adjacency-table node)
-                   when (aref color next)
-                   do (progn
-                        (when (< node current-least) (setf current-least node))
-                        (dfs2-1 next forefather)))
+                 :for next :in (aref reverse-adjacency-table node)
+                 :when (aref color next) :do
+                 (progn
+                   (when (< node current-least) (setf current-least node))
+                   (dfs2-1 next forefather)))
                (setf (aref buckets node) forefather)))
       (loop
-          for i below size
-          unless (aref color i) do ;; When the node is white
-          (dfs1 i))
+        :for i :below size
+        :unless (aref color i) :do ;; When the node is white
+        (dfs1 i))
       (loop
-          for i below size
-          for j = (aref finishers i)
-          when (aref color j) do ;; When the node is black
-          (dfs2 j))
+        :for i :below size
+        :for j = (aref finishers i)
+        :when (aref color j) :do ;; When the node is black
+        (dfs2 j))
       (loop
-          for i below size do
-          (setf (aref buckets i) (aref least (aref buckets i))))
+        :for i :below size :do
+        (setf (aref buckets i) (aref least (aref buckets i))))
       (values (stable-bucket-sort/ordinals size buckets)
               buckets))))
 
@@ -107,37 +107,36 @@
          (dependency-count (make-array size :initial-element 0))
          (result nil))
     (loop
-        for dep in dependencies do
+        :for dep :in dependencies :do
         (incf (aref dependency-count (cdr dep))))
     (loop
-        for i below size
-        when (zerop (aref dependency-count i)) do
-        (insert-item! minimals i))
-    (loop repeat size do
-        (progn
-          (when (container-empty-p minimals)
-            (error "Cyclic dependencies"))
-          (let ((min (pop-least-item! minimals)))
-            (push min result)
-            (loop
-                for dep in (aref adjacency-table min)
-                for count = (decf (aref dependency-count dep))
-                when (zerop count) do
-                (insert-item! minimals dep)))))
+      :for i :below size
+      :when (zerop (aref dependency-count i)) :do
+      (insert-item! minimals i))
+    (loop :repeat size :do
+      (when (container-empty-p minimals)
+        (error "Cyclic dependencies"))
+      (let ((min (pop-least-item! minimals)))
+        (push min result)
+        (loop
+          :for dep :in (aref adjacency-table min)
+          :for count = (decf (aref dependency-count dep))
+          :when (zerop count) :do
+          (insert-item! minimals dep))))
     (nreverse result)))
 
 (defun map-graph-to-ordinals (sequence arcs &key (test 'equal))
     (let* ((elements (coerce sequence 'vector))
            (size (length elements))
            (hash (make-hash-table :test test)))
-      (loop for x across elements for i from 0 do
+      (loop :for x :across elements :for i :from 0 :do
             (setf (gethash x hash) i))
       (values
        size
-       (loop for (x . y) in arcs
-             for xi = (gethash x hash)
-             for yi = (gethash y hash)
-             collect (cons xi yi))
+       (loop :for (x . y) :in arcs
+             :for xi = (gethash x hash)
+             :for yi = (gethash y hash)
+             :collect (cons xi yi))
        elements)))
 
 (defun stable-topological-sort (sequence dependencies &key (test 'equal))
@@ -158,31 +157,30 @@
            (minimals (make-instance 'binary-heap :comparator comparator))
            (nonmins (make-instance 'binary-heap :comparator comparator))
            (results nil))
-      (loop for x across elements for i from 0 do
+      (loop :for x :across elements :for i :from 0 :do
             (setf (gethash x hash) i)
             (setf (aref equivs i) (singleton-binomial-heap i :comparator #'number-comparator))
             (setf (aref incoming i) (make-instance 'binomial-heap :comparator #'number-comparator))
             (setf (aref outgoing i) (make-instance 'binomial-heap :comparator #'number-comparator)))
-      (loop for (x . y) in dependencies
-            for xi = (gethash x hash)
-            for yi = (gethash y hash) do
+      (loop :for (x . y) :in dependencies
+            :for xi = (gethash x hash)
+            :for yi = (gethash y hash) do
             (insert-item! (aref incoming xi) yi)
             (insert-item! (aref incoming yi) xi))
-      (loop for i from 0 for o across outgoing do
+      (loop :for i :from 0 :for o :across outgoing :do
             (if (container-empty-p o)
                 (insert-item! minimals i)
                 (insert-item! nonmins i)))
       (loop
-          (cond
-            ((not (container-empty-p minimals))
-             (let* ((min (pop-least-item! minimals))
-                    (equivs (list-from-container! (aref equivs min))))
-               (loop for x in equivs do
-                     (loop for y in 
-                     (delete-item! 
-               (push equivs results)))
-            ((not (container-empty-p nonmins))
+        (cond
+          ((not (container-empty-p minimals))
+           (let* ((min (pop-least-item! minimals))
+                  (equivs (list-from-container! (aref equivs min))))
+             (loop :for x :in equivs :do
+               (loop :for y :in
+                 (delete-item!
+                  (push equivs results)))
+               ((not (container-empty-p nonmins))
              ;; do some cycles detection
-            
   ...)
 |#

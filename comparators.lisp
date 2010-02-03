@@ -37,19 +37,19 @@
 
 (defun vector-comparator (ec)
   #'(lambda (x1 x2)
-      (loop for i from 0
-            for e1 across x1
-            for e2 across x2
-            for cr = (funcall ec e1 e2) do
-            (cond
-              ((< cr 0) (return -1))
-              ((> cr 0) (return 1)))
-            finally
-            (let ((lc (number-comparator (length x1) (length x2))))
-              (cond
-                ((< lc 0) (return -2))
-                ((> lc 0) (return 2))
-                (t (return 0)))))))
+      (loop :for i :from 0
+        :for e1 :across x1
+        :for e2 :across x2
+        :for cr = (funcall ec e1 e2) :do
+        (cond
+          ((< cr 0) (return -1))
+          ((> cr 0) (return 1)))
+        :finally
+        (let ((lc (number-comparator (length x1) (length x2))))
+          (cond
+            ((< lc 0) (return -2))
+            ((> lc 0) (return 2))
+            (t (return 0)))))))
 
 (let ((f (vector-comparator #'char-comparator)))
   (defun string-comparator (x1 x2)

@@ -228,4 +228,34 @@ erroring out if some source of non-portability is found"
              (not (member (pathname-version x) '(nil :unspecific :newest))))
        (error "pathname ~S isn't a directory" x)
        x))))
+
+(defun unwilden (pathspec)
+  (block :u
+    (let ((p (pathname pathspec)))
+      (unless (wild-pathname-p p)
+        (return-from :u (values p (make-pathname))))
+      (when (or (wild-pathname-p p :host) (wild-pathname-p p :device))
+        (return-from :u (values (make-pathname) p)))
+      (let ((host (pathname-host p))
+            (device (pathname-device p))
+            (directory (pathname-directory p)))
+        (when (wild-pathname-p p :directory)
+          (when (atom directory)
+            (return-from :u (values (make-pathname) p)))
+          (loop :with unwild = nil
+            :for i :from 1 :to (length directory)
+            :for dir = (subseq directory 0 i)
+            :until (wild-pathname-p (make-pathname :directory dir) :directory)
+            :do (setf unwild dir)
+            :finally (return-from :u
+                       (values
+                        (make-pathname :host host :device device :directory unwild)
+                        (make-pathname :host host :device device
+                                       :directory (if unwild
+                                                      `(:relative ,@(subseq directory (1- i)))
+                                                      directory)
+                                       :defaults p)))))
+        (values
+         (make-pathname :host host :device device :directory directory)
+         (make-pathname :directory nil :defaults p))))))
 )

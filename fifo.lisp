@@ -42,13 +42,13 @@
   fifo2)
 
 (defun fifo-dequeue-object (obj fifo)
-  (loop with buffer = (make-fifo)
-    with top = nil
-    until (fifo-empty-p fifo)
-    do (setf top (fifo-dequeue fifo))
-    until (eql obj top)
-    do (fifo-enqueue top buffer)
-    finally (return (fifo-nconc2 buffer fifo))))
+  (loop :with buffer = (make-fifo)
+    :with top = nil
+    :until (fifo-empty-p fifo)
+    :do (setf top (fifo-dequeue fifo))
+    :until (eql obj top)
+    :do (fifo-enqueue top buffer)
+    :finally (return (fifo-nconc2 buffer fifo))))
 
 (defun fifo-empty! (fifo)
   (setf (fifo-head fifo) nil

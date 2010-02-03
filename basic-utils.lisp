@@ -98,7 +98,7 @@
 
 (defmacro export-symbols* (p &rest symbols)
   `(eval-now
-    ,@(loop for s in symbols collect
+    ,@(loop :for s :in symbols :collect
             `(package-ensure-symbol-exported ',s ',p))))
 
 (defmacro export* (s &optional (p *package*))
@@ -109,9 +109,9 @@
 
 (defmacro exporting-definitions (&body body)
   `(progn
-    ,@(loop for def in body
-            collect def
-            nconc
+    ,@(loop :for def :in body
+            :collect def
+            :nconc
             (block nil
               (let* ((def1 (if (and (consp def) (consp (cdr def))) (car def) (return)))
                      (d1s (if (symbolp def1) (string def1) (return)))

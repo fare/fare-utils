@@ -28,8 +28,8 @@
 ;; Containers and lists
 (defgeneric container-add-list! (container list)
   (:method ((container container) list)
-           (loop for item in list do (insert-item! container item))
-           nil))
+    (dolist (item list) (insert-item! container item))
+    (values)))
 (defun container-from-list! (class list &rest r)
   (apply #'make-instance class :initial-contents list r))
 (defgeneric list-from-container! (container)

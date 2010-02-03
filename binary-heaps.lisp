@@ -74,7 +74,7 @@
 (defun binary-heap-enforce-invariant (heap)
   ;; starting from arbitrary contents, enforce the heap invariant,
   ;; starting at the next-to-deepest level upward. Time O(n ln n)
-  (loop for i from (ash (container-size heap) -1) downto 1 do
+  (loop :for i :from (ash (container-size heap) -1) :downto 1 :do
         (binary-heap-sift-down heap i)))
 
 (defmethod initialize-instance :after ((heap binary-heap) &key)

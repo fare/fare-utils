@@ -32,8 +32,8 @@
                         :external-format ,external-format)
         (let ((,vector (make-array (list ,buffer-size)
                                    :element-type ,element-type)))
-          (loop for ,length = (read-sequence ,vector ,stream)
-                while (> ,length 0) do
+          (loop :for ,length = (read-sequence ,vector ,stream)
+                :while (> ,length 0) :do
                 (progn
                   ,@body)))))))
 
