@@ -16,7 +16,6 @@
    "hash-tables"
    "binary-heaps"
    "binomial-heaps"
-   "avl-trees"
    "fifo"
    "dllist"
    "pathnames"
@@ -25,6 +24,8 @@
    "files"
    "sorting"
    "atomic"
-   "msv")
+   "msv"
+   "pure-trees"
+   "pure-hash-tables")
   :supersedes-asdf
   ("fare-utils")))

@@ -9,7 +9,10 @@
   (:nicknames :fmap)
   (:use)
   (:export
-   #:<map> #:<alist> #:<binary-tree> #:<avl-tree>
+   #:<map> #:<alist>
+   #:<binary-tree> #:<avl-tree>
+   #:<number-keyed-functional-map> #:<nkfm>
+   #:<pure-hash-table>
    #:empty
    #:empty-p
    #:lookup
@@ -109,6 +112,12 @@ that correspond the lookup for K in the result."))
 
 ;;; Trivial implementation: alists.
 
+(defclass fmap-simple-empty () ())
+(defmethod fmap:empty ((i fmap-simple-empty))
+  '())
+(defmethod fmap:empty-p ((i fmap-simple-empty) map)
+  (null map))
+
 (defclass fmap-simple-decons () ())
 (defmethod fmap:decons ((i fmap-simple-decons) map)
   (multiple-value-bind (k v f) (fmap:first-key-value i map)
@@ -167,12 +176,19 @@ that correspond the lookup for K in the result."))
 (defclass fmap:<alist>
     (eq:<eq> fmap-simple-decons fmap-simple-update fmap-simple-divide/list
      fmap-simple-merge fmap-simple-append fmap-simple-append/list)
-  ())
+  ((eq-interface
+    :initarg :eq
+    :initform (make-instance 'eq:<eq>)
+    :reader eq-interface)))
 
-(defmethod fmap:empty ((i fmap:<alist>))
-  '())
-(defmethod fmap:empty-p ((i fmap:<alist>) map)
-  (null map))
+(defun fmap:<alist> (&optional eq)
+  (apply #'make-instance 'fmap:<alist> (when eq `(:eq eq))))
+(defparameter fmap:<alist> (fmap:<alist>))
+(defmethod eq:= ((i fmap:<alist>) x y)
+  (eq:= (eq-interface i) x y))
+(defmethod eq:test-function ((i fmap:<alist>))
+  (eq:test-function (eq-interface i)))
+
 (defmethod fmap:lookup ((i fmap:<alist>) map key)
   (assoc key map :test (eq:test-function i)))
 (defmethod fmap:insert ((i fmap:<alist>) map key value)

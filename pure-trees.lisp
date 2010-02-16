@@ -34,7 +34,7 @@ between them, re-balancing as needed."))
 
 (defclass fmap:<binary-tree>
     (tree:<tree> fmap:<map> order:<order>
-     fmap-simple-decons fmap-simple-update
+     fmap-simple-empty fmap-simple-decons fmap-simple-update
      fmap-simple-merge fmap-simple-append fmap-simple-append/list
      fmap-simple-count)
   ()
@@ -80,10 +80,6 @@ between them, re-balancing as needed."))
   (make-instance 'pure-binary-tree-node
                  :key key :value value :left left :right right))
 
-(defmethod fmap:empty ((i fmap:<binary-tree>))
-  '())
-(defmethod fmap:empty-p ((i fmap:<binary-tree>) map)
-  (null map))
 (defmethod tree:find ((i fmap:<binary-tree>) node key path)
   (if (null node) (values nil nil)
       (ecase (order:compare i key (node-key node))
@@ -207,8 +203,13 @@ between them, re-balancing as needed."))
   (- (node-height (right node))
      (node-height (left node))))
 
-(defmethod check-invariant :after ((i fmap:<avl-tree>) &key node)
+(defmethod check-invariant :before ((i fmap:<avl-tree>) &key node)
   (when node
+    (assert (typep (node-height node)
+                   `(integer 1 ,most-positive-fixnum)))
+    (assert (= (node-height node)
+               (1+ (max (node-height (left node))
+                        (node-height (right node))))))
     (assert (member (node-balance node) '(-1 0 1)))))
 
 (defmethod tree:node ((i fmap:<avl-tree>) &key left right key value)
@@ -261,14 +262,21 @@ between them, re-balancing as needed."))
               :key (node-key right) :value (node-value right)
               :right (right right))))))))
 
+(defclass fmap:<number-keyed-functional-map> (fmap:<avl-tree> order:<numeric>) ())
+(defparameter fmap:<number-keyed-functional-map>
+  (make-instance 'fmap:<number-keyed-functional-map>))
+(defparameter fmap:<nkfm> fmap:<number-keyed-functional-map>)
+
 #|
 Simple tests:
 (load "/home/fare/cl/asdf/asdf.lisp")
+
 (asdf:load-system :fare-utils)
 (in-package :fare-utils)
-(defclass <nmap> (fmap:<avl-tree> order:<numeric>) ())
-(defparameter <nmap> (make-instance '<nmap>))
-(defparameter <alist> (make-instance 'fmap:<alist>))
+
+(defparameter <nmap> fmap:<number-keyed-functional-map>)
+(defparameter <alist> fmap:<alist>)
+
 (fmap:convert <alist> <nmap>
               (fmap:convert <nmap> <alist>
                             '((1 un) (2 deux) (5 cinq) (3 trois) (4 quatre))))
@@ -286,4 +294,8 @@ Simple tests:
   (check-invariant <nmap> :node m)
   (format t "~&height: ~A   count: ~A~%" (node-height m) (fmap:count <nmap> m)))
 
+(let ((m (fmap:convert <nmap> <alist>
+                       (loop :for i :from 1 :to 10000 :collect (cons (random (expt 10 9)) i)))))
+  (check-invariant <nmap> :node m)
+  (format t "~&height: ~A   count: ~A~%" (node-height m) (fmap:count <nmap> m)))
 |#

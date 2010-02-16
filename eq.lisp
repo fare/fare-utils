@@ -9,7 +9,10 @@
   (:use)
   (:export
    #:<eq> #:<eq-simple> #:<eq-slot>
-   #:= #:test-function))
+   #:= #:test-function
+   #:<hashable>
+   #:hash
+   ))
 
 (defclass eq:<eq> () ())
 (defgeneric eq:= (i x y))
@@ -29,3 +32,8 @@
   ((test :initform #'eql :initarg :test :reader eq:test-function)))
 (defmethod eq:= ((i eq:<eq-slot>) x y)
   (funcall (eq:test-function i) x y))
+
+(defclass eq:<hashable> (eq:<eq>) ())
+(defgeneric eq:hash (i x))
+(defmethod eq:<hashable> ((i eq:<hashable>) x)
+  (sxhash x))

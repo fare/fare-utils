@@ -21,6 +21,7 @@
                (:file "order" :depends-on ("eq"))
                (:file "functional-map" :depends-on ("eq"))
                (:file "pure-trees" :depends-on ("functional-map" "order"))
+               (:file "pure-hash-tables" :depends-on ("pure-trees"))
                (:file "fifo" :depends-on ("containers"))
                (:file "dllist" :depends-on ("containers"))
 	       (:file "streams" :depends-on ("basic-utils"))
