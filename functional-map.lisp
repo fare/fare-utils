@@ -186,6 +186,7 @@ that correspond the lookup for K in the result."))
 
 (defun fmap:<alist> (&optional eq)
   (apply #'make-instance 'fmap:<alist> (when eq `(:eq ,eq))))
+
 (defparameter fmap:<alist> (fmap:<alist>))
 (defmethod eq:= ((i fmap:<alist>) x y)
   (eq:= (eq-interface i) x y))

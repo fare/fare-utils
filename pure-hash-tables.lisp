@@ -18,6 +18,9 @@
 
 (defparameter fmap:<pure-hash-table> (make-instance 'fmap:<pure-hash-table>))
 
+(defclass fmap:<pure-equal-hash-table> (fmap:<pure-hash-table> eq:<equal>) ())
+(defparameter fmap:<pure-equal-hash-table> (make-instance 'fmap:<pure-equal-hash-table>))
+
 (defmethod fmap:lookup ((i fmap:<pure-hash-table>) node key)
   (if (null node) (values nil nil)
       (let ((bucket (fmap:lookup fmap:<nkfm> node (eq:hash i key))))

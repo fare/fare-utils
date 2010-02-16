@@ -9,6 +9,7 @@
   (:use)
   (:export
    #:<eq> #:<eq-simple> #:<eq-slot>
+   #:<equal>
    #:= #:test-function
    #:<hashable>
    #:hash
@@ -37,3 +38,9 @@
 (defgeneric eq:hash (i x))
 (defmethod eq:hash ((i eq:<hashable>) x)
   (sxhash x))
+
+(defclass eq:<equal> (eq:<hashable>) ())
+(defmethod eq:= ((i eq:<equal>) x y)
+  (equal x y))
+(defmethod eq:test-function ((i eq:<equal>))
+  #'equal)
