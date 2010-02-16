@@ -31,3 +31,4 @@
 
 (defmacro hashmacros (&rest names)
   `(mapmacro hashmacro ,names))
+
