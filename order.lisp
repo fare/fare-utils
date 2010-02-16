@@ -13,7 +13,7 @@
    #:< #:<= #:> #:>= #:=
    #:compare))
 
-(defclass order:<order> (<eq>) ())
+(defclass order:<order> (eq:<eq>) ())
 (defgeneric order:< (i x y))
 (defgeneric order:<= (i x y))
 (defgeneric order:> (i x y))

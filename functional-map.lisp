@@ -25,9 +25,10 @@
    #:append/list
    #:divide/list
    #:update
-   #:merge))
+   #:merge
+   #:convert))
 
-(defclass fmap:<map> (<eq>) ())
+(defclass fmap:<map> (eq:<eq>) ())
 
 (defgeneric fmap:empty (interface)
   (:documentation "Return an empty map"))
@@ -103,6 +104,8 @@ V2 and F2 are the value and found flag for MAP2,
 and FUN returns value V and found flag F,
 that correspond the lookup for K in the result."))
 
+(defgeneric fmap:convert (interface2 interface1 map1)
+  (:documentation "Convert a map from interface1 to interface2."))
 
 ;;; Trivial implementation: alists.
 
@@ -127,7 +130,7 @@ that correspond the lookup for K in the result."))
 
 (defclass fmap-simple-append () ())
 (defmethod fmap:append ((i fmap-simple-append) map1 map2)
-  (fmap:fold-left (lambda (m k v) (fmap:insert i m k v)) map1 map2))
+  (fmap:fold-left i map1 (lambda (m k v) (fmap:insert i m k v)) map2))
 
 (defclass fmap-simple-append/list () ())
 (defmethod fmap:append/list ((i fmap-simple-append/list) maplist)
@@ -162,7 +165,7 @@ that correspond the lookup for K in the result."))
   (fmap:fold-left map (lambda (x k v) (declare (ignore k v)) (1+ x)) 0))
 
 (defclass fmap:<alist>
-    (<eq> fmap-simple-decons fmap-simple-update fmap-simple-divide/list
+    (eq:<eq> fmap-simple-decons fmap-simple-update fmap-simple-divide/list
      fmap-simple-merge fmap-simple-append fmap-simple-append/list)
   ())
 
@@ -171,29 +174,31 @@ that correspond the lookup for K in the result."))
 (defmethod fmap:empty-p ((i fmap:<alist>) map)
   (null map))
 (defmethod fmap:lookup ((i fmap:<alist>) map key)
-  (assoc key map :test (test-function i)))
+  (assoc key map :test (eq:test-function i)))
 (defmethod fmap:insert ((i fmap:<alist>) map key value)
   (acons key value (fmap:remove i map key)))
 (defmethod fmap:remove ((i fmap:<alist>) map key)
   (multiple-value-bind (v f) (fmap:lookup i map key)
     (if f
-        (values (remove key map :key 'car :test (test-function i)) v t)
+        (values (remove key map :key 'car :test (eq:test-function i)) v t)
         (values map nil nil))))
 (defmethod fmap:first-key-value ((i fmap:<alist>) map)
   (values (caar map) (cdar map) (not (null map))))
 (defmethod fmap:fold-left ((i fmap:<alist>) map f seed)
-  (reduce (lambda (pair acc) (f acc (car pair) (cdr pair)))
+  (reduce (lambda (acc pair) (funcall f acc (car pair) (cdr pair)))
           map :initial-value seed))
 (defmethod fmap:fold-right ((i fmap:<alist>) map f seed)
-  (reduce (lambda (pair acc) (f (car pair) (cdr pair) acc))
+  (reduce (lambda (pair acc) (funcall f (car pair) (cdr pair) acc))
           map :initial-value seed :from-end t))
-(defmethod fmap:append ((i fmap:<alist>) map1 map2)
-  (flet ((key-in-map1-p (k)
-           (member k map1 :key #'car :test (test-function i))))
-    (append map1 (remove-if #'key-in-map1-p map2 :key #'car))))
 (defmethod fmap:divide ((i fmap:<alist>) map)
   (let* ((l (length map))
          (l1 (floor l 2)))
     (values (subseq map 0 l1) (nthcdr l1 map))))
 (defmethod fmap:count ((i fmap:<alist>) map)
   (length map))
+
+(defmethod fmap:convert (i2 i1 map1)
+  (fmap:fold-right
+   i1 map1
+   (lambda (k v map2) (fmap:insert i2 map2 k v))
+   (fmap:empty i2)))

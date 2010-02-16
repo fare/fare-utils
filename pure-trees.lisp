@@ -10,7 +10,7 @@
 (defpackage :tree
   (:use)
   (:export
-   #:<tree> #:node #:find))
+   #:<tree> #:node #:find #:join))
 
 (defclass tree:<tree> () ())
 (defgeneric tree:node (i &key)
@@ -20,14 +20,18 @@ in the constituents, and that any ordering constraint is respected
 between them, re-balancing as needed."))
 (defgeneric tree:find (i tree key path)
   (:documentation "lookup a tree for a key, return a path to the proper node."))
-
+(defgeneric tree:join (i a b)
+  (:documentation "join two trees, assuming.
+Assumes that any ordering and balancing constraints are respected
+in the constituents, and that any ordering constraint is respected
+between them, re-balancing as needed."))
 
 ;;; Vanilla Binary Tree
 
 (defclass fmap:<binary-tree>
     (tree:<tree> fmap:<map> order:<order>
      fmap-simple-decons fmap-simple-update
-     fmap-simple-merge fmap-simple-append/list
+     fmap-simple-merge fmap-simple-append fmap-simple-append/list
      fmap-simple-count)
   ()
   (:documentation "Keys in binary trees increase from left to right"))
@@ -88,9 +92,9 @@ between them, re-balancing as needed."))
         (0 (values (node-value node) t))
         (-1 (fmap:lookup i (left node) key))
         (1 (fmap:lookup i (right node) key)))))
-(defmethod fmap:insert ((i fmap:<binary-tree>) map key value)
+(defmethod fmap:insert ((i fmap:<binary-tree>) node key value)
   (if (null node)
-      (make-mode i :key key :value value)
+      (tree:node i :key key :value value)
       (ecase (order:compare i key (node-key node))
         (0 (tree:node i :key key :value value
                       :left (left node) :right (right node)))
@@ -98,21 +102,23 @@ between them, re-balancing as needed."))
                        :left (fmap:insert i (left node) key value) :right (right node)))
         (1 (tree:node i :key (node-key node) :value (node-value node)
                       :left (left node) :right (fmap:insert i (right node) key value))))))
-(defmethod fmap:remove ((i fmap:<binary-tree>) map key)
+(defmethod fmap:remove ((i fmap:<binary-tree>) node key)
   (if (null node)
       (values nil nil nil)
-      (ecase (order:compare i key (node-key node))
-        (0 (values
-            (fmap:append i (left node) (right node))
-            (node-value node) t))
-        (-1 (multiple-value-bind (left v f) (fmap:remove i (left node) k)
-              (values (tree:node i :key key :value value
-                                 :left left :right (right node))
-                      v f)))
-        (1 (multiple-value-bind (right v f) (fmap:remove i (right node) k)
-             (values (tree:node i :key key :value value
-                                :left (left node) :right right)
-                     v f))))))
+      (let ((k (node-key node))
+            (v (node-value node)))
+        (ecase (order:compare i key k)
+          (0 (values
+              (tree:join i (left node) (right node))
+              v t))
+          (-1 (multiple-value-bind (left value foundp) (fmap:remove i (left node) key)
+                (values (tree:node i :key k :value v
+                                   :left left :right (right node))
+                        value foundp)))
+          (1 (multiple-value-bind (right value foundp) (fmap:remove i (right node) k)
+               (values (tree:node i :key k :value v
+                                  :left (left node) :right right)
+                       value foundp)))))))
 (defmethod fmap:first-key-value ((i fmap:<binary-tree>) map)
   (if map
       (values (node-key map) (node-value map) t)
@@ -124,7 +130,7 @@ between them, re-balancing as needed."))
                       (funcall f
                                (fmap:fold-left i (left node) f seed)
                                (node-key node) (node-value node)))))
-(defmethod fmap:fold-right ((i fmap:<binary-tree>) map f seed)
+(defmethod fmap:fold-right ((i fmap:<binary-tree>) node f seed)
   (if (null node)
       seed
       (fmap:fold-right i (left node) f
@@ -145,28 +151,19 @@ between them, re-balancing as needed."))
       (let* ((rlist (cons (tree:node i :key (node-key node) :value (node-value node))
                           (if (null (right node)) '() (list (right node))))))
         (if (null (left node)) rlist (cons (left node) rlist)))))
-(defmethod fmap:append ((i fmap:<binary-tree>) a b)
+
+(defmethod tree:join ((i fmap:<binary-tree>) a b)
   (cond
     ((null a) b)
     ((null b) a)
     (t
-     (ecase (order:compare i (node-key a) (node-key b))
-       (0
-        (tree:node :key (node-key a) :value (node-value a)
-                   :left (fmap:append i (left a) (left b))
-                   :right (fmap:append i (right a) (right b))))
-       (1
-        (tree:node :key (node-key a) :value (node-value a)
-                   :left (left a)
-                   :right (tree:node :key (node-key b) :value (node-value b)
-                                     :left (fmap:append i (right a) (left b))
-                                     :right (right b))))
-       (-1
-        (tree:node :key (node-key b) :value (node-value b)
-                   :left (left b)
-                   :right (tree:node :key (node-key a) :value (node-value a)
-                                     :left (fmap:append i (right b) (left a))
-                                     :right (right a))))))))
+     (assert (order:< i (node-key a) (node-key b)))
+     (tree:node i :key (node-key a) :value (node-value a)
+                :left (left a)
+                :right (tree:node i :key (node-key b) :value (node-value b)
+                                  :left (tree:join i (right a) (left b))
+                                  :right (right b))))))
+
 
 ;;; pure AVL-tree
 
@@ -174,7 +171,7 @@ between them, re-balancing as needed."))
 
 (defclass pure-avl-tree-node (pure-binary-tree-node)
   ((height
-    :initarg :balance
+    :initarg :height
     :initform 0
     :type integer
     :reader node-height))
@@ -241,3 +238,23 @@ between them, re-balancing as needed."))
                         :right (left right))
               :key (node-key right) :value (node-value right)
               :right (right right))))))))
+
+#|
+Simple tests:
+(load "/home/fare/cl/asdf/asdf.lisp")
+(asdf:load-system :fare-utils)
+(defclass <nmap> (fmap:<avl-tree> order:<numeric>) ())
+(defparameter <nmap> (make-instance '<nmap>))
+(defparameter <alist> (make-instance 'fmap:<alist>))
+(fmap:convert <alist> <nmap>
+              (fmap:convert <nmap> <alist>
+                            '((1 un) (2 deux) (5 cinq) (3 trois) (4 quatre))))
+
+(fmap:convert <alist> <nmap>
+              (fmap:append <nmap>
+                           (fmap:convert <nmap> <alist>
+                                         '((1 un) (2 deux) (5 cinq) (3 trois) (4 quatre)))
+                           (fmap:convert <nmap> <alist>
+                                         '((1 one) (6 six) (7 seven) (3 three) (0 zero)))))
+
+|#
