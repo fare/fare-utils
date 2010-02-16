@@ -9,12 +9,14 @@
     (fmap:<map> eq:<hashable>
      fmap-simple-empty)
   ((alist-interface :accessor alist-interface))
-  (:documentation "..."))
+  (:documentation "pure hash table"))
 
 (defmethod shared-initialize :after ((i fmap:<pure-hash-table>)
                                      slot-names &rest initargs &key &allow-other-keys)
   (declare (ignore slot-names initargs))
   (setf (alist-interface i) (fmap:<alist> i)))
+
+(defparameter fmap:<pure-hash-table> (make-instance 'fmap:<pure-hash-table>))
 
 (defmethod fmap:lookup ((i fmap:<pure-hash-table>) node key)
   (if (null node) (values nil nil)
@@ -23,13 +25,12 @@
             (fmap:lookup (alist-interface i) bucket key)
             (values nil nil)))))
 (defmethod fmap:insert ((i fmap:<pure-hash-table>) node key value)
-  (if (null node) (values nil nil)
-      (let ((hash (eq:hash i key)))
-        (fmap:insert
-         fmap:<nkfm> node hash
-         (fmap:insert (alist-interface i)
-                      (fmap:lookup fmap:<nkfm> node hash)
-                      key value)))))
+  (let ((hash (eq:hash i key)))
+    (fmap:insert
+     fmap:<nkfm> node hash
+     (fmap:insert (alist-interface i)
+                  (fmap:lookup fmap:<nkfm> node hash)
+                  key value))))
 (defmethod fmap:remove ((i fmap:<pure-hash-table>) node key)
   (if (null node)
       (values nil nil nil)
@@ -80,3 +81,10 @@
      (multiple-value-list (fmap:divide i node)))
     (t
      (fmap:divide/list fmap:<nkfm> node))))
+
+#|
+(defparameter <pht> fmap:<pure-hash-table>)
+
+(sort (fmap:fold-left <pht> (reduce (lambda (x i) (fmap:insert <pht> x i i)) (loop :for i :below 1000 :collect i) :initial-value nil) (lambda (m k v) k (cons v m)) nil) '<)
+
+|#

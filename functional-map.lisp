@@ -110,7 +110,7 @@ that correspond the lookup for K in the result."))
 (defgeneric fmap:convert (interface2 interface1 map1)
   (:documentation "Convert a map from interface1 to interface2."))
 
-;;; Trivial implementation: alists.
+;;; Simple cases for a lot of the above functions
 
 (defclass fmap-simple-empty () ())
 (defmethod fmap:empty ((i fmap-simple-empty))
@@ -173,8 +173,11 @@ that correspond the lookup for K in the result."))
 (defmethod fmap:count ((i fmap-simple-count) map)
   (fmap:fold-left i map (lambda (x k v) (declare (ignore k v)) (1+ x)) 0))
 
+
+;;; Trivial functional map implementation: alists.
+
 (defclass fmap:<alist>
-    (eq:<eq> fmap-simple-decons fmap-simple-update fmap-simple-divide/list
+    (eq:<hashable> fmap-simple-decons fmap-simple-update fmap-simple-divide/list
      fmap-simple-merge fmap-simple-append fmap-simple-append/list)
   ((eq-interface
     :initarg :eq
@@ -182,7 +185,7 @@ that correspond the lookup for K in the result."))
     :reader eq-interface)))
 
 (defun fmap:<alist> (&optional eq)
-  (apply #'make-instance 'fmap:<alist> (when eq `(:eq eq))))
+  (apply #'make-instance 'fmap:<alist> (when eq `(:eq ,eq))))
 (defparameter fmap:<alist> (fmap:<alist>))
 (defmethod eq:= ((i fmap:<alist>) x y)
   (eq:= (eq-interface i) x y))

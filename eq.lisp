@@ -35,5 +35,5 @@
 
 (defclass eq:<hashable> (eq:<eq>) ())
 (defgeneric eq:hash (i x))
-(defmethod eq:<hashable> ((i eq:<hashable>) x)
+(defmethod eq:hash ((i eq:<hashable>) x)
   (sxhash x))
