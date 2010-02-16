@@ -49,11 +49,11 @@ between them, re-balancing as needed."))
      nil)
     (pure-binary-tree-node
      (when (left node)
-       (check-invariant i (left node))
-       (assert (order:< i (node-key (left node)) (node-key node))))
+       (check-invariant i :node (left node))
+       (assert (order:< i (tree:rightmost i (left node)) (node-key node))))
      (when (right node)
-       (check-invariant i (right node))
-       (assert (order:< i (node-key node) (node-key (right node))))))))
+       (check-invariant i :node (right node))
+       (assert (order:< i (node-key node) (tree:leftmost i (right node))))))))
 
 (defclass pure-binary-tree-node ()
   ((left
@@ -265,6 +265,7 @@ between them, re-balancing as needed."))
 Simple tests:
 (load "/home/fare/cl/asdf/asdf.lisp")
 (asdf:load-system :fare-utils)
+(in-package :fare-utils)
 (defclass <nmap> (fmap:<avl-tree> order:<numeric>) ())
 (defparameter <nmap> (make-instance '<nmap>))
 (defparameter <alist> (make-instance 'fmap:<alist>))
@@ -272,11 +273,12 @@ Simple tests:
               (fmap:convert <nmap> <alist>
                             '((1 un) (2 deux) (5 cinq) (3 trois) (4 quatre))))
 
-(fmap:convert <alist> <nmap>
-              (fmap:append <nmap>
+(let ((m (fmap:append <nmap>
                            (fmap:convert <nmap> <alist>
                                          '((1 un) (2 deux) (5 cinq) (3 trois) (4 quatre)))
                            (fmap:convert <nmap> <alist>
-                                         '((1 one) (6 six) (7 seven) (3 three) (0 zero)))))
+                                         '((1 one) (6 six) (7 seven) (3 three) (0 zero))))))
+  (check-invariant <nmap> :node m)
+  (fmap:convert <alist> <nmap> m))
 
 |#
