@@ -281,4 +281,9 @@ Simple tests:
   (check-invariant <nmap> :node m)
   (fmap:convert <alist> <nmap> m))
 
+(let ((m (fmap:convert <nmap> <alist>
+                       (loop :for i :from 1 :to 1000 :collect (cons i (format nil "~@R" i))))))
+  (check-invariant <nmap> :node m)
+  (format t "~&height: ~A   count: ~A~%" (node-height m) (fmap:count <nmap> m)))
+
 |#

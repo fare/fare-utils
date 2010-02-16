@@ -162,7 +162,7 @@ that correspond the lookup for K in the result."))
 
 (defclass fmap-simple-count () ())
 (defmethod fmap:count ((i fmap-simple-count) map)
-  (fmap:fold-left map (lambda (x k v) (declare (ignore k v)) (1+ x)) 0))
+  (fmap:fold-left i map (lambda (x k v) (declare (ignore k v)) (1+ x)) 0))
 
 (defclass fmap:<alist>
     (eq:<eq> fmap-simple-decons fmap-simple-update fmap-simple-divide/list
