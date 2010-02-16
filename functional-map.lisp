@@ -111,7 +111,7 @@ that correspond the lookup for K in the result."))
 
 (defclass fmap-simple-decons () ())
 (defmethod fmap:decons ((i fmap-simple-decons) map)
-  (multiple-value-bind (k v f) (fmap:first-key-value map)
+  (multiple-value-bind (k v f) (fmap:first-key-value i map)
     (if f
         (values (fmap:remove i map k) k v f)
         (values map nil nil nil))))

@@ -10,7 +10,7 @@
 (defpackage :tree
   (:use)
   (:export
-   #:<tree> #:node #:find #:join))
+   #:<tree> #:node #:find #:join #:leftmost #:rightmost))
 
 (defclass tree:<tree> () ())
 (defgeneric tree:node (i &key)
@@ -25,6 +25,10 @@ between them, re-balancing as needed."))
 Assumes that any ordering and balancing constraints are respected
 in the constituents, and that any ordering constraint is respected
 between them, re-balancing as needed."))
+(defgeneric tree:leftmost (i a)
+  (:documentation "key value and flag for leftmost node in a"))
+(defgeneric tree:rightmost (i a)
+  (:documentation "key value and flag for rightmost node in a"))
 
 ;;; Vanilla Binary Tree
 
@@ -152,12 +156,30 @@ between them, re-balancing as needed."))
                           (if (null (right node)) '() (list (right node))))))
         (if (null (left node)) rlist (cons (left node) rlist)))))
 
+
+(defmethod tree:leftmost ((i fmap:<binary-tree>) node)
+  (cond
+    ((null node)
+     (values nil nil nil))
+    ((null (left node))
+     (values (node-key node) (node-value node) t))
+    (t
+     (tree:leftmost i (left node)))))
+(defmethod tree:rightmost ((i fmap:<binary-tree>) node)
+  (cond
+    ((null node)
+     (values nil nil nil))
+    ((null (right node))
+     (values (node-key node) (node-value node) t))
+    (t
+     (tree:rightmost i (right node)))))
+
 (defmethod tree:join ((i fmap:<binary-tree>) a b)
   (cond
     ((null a) b)
     ((null b) a)
     (t
-     (assert (order:< i (node-key a) (node-key b)))
+     (assert (order:< i (tree:rightmost a) (tree:leftmost b)))
      (tree:node i :key (node-key a) :value (node-value a)
                 :left (left a)
                 :right (tree:node i :key (node-key b) :value (node-value b)
