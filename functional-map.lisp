@@ -12,7 +12,8 @@
    #:<map> #:<alist>
    #:<binary-tree> #:<avl-tree>
    #:<number-keyed-functional-map> #:<nkfm>
-   #:<pure-hash-table>
+   #:<pure-hash-table> #:<pure-equal-hash-table>
+   #:<faim>
    #:empty
    #:empty-p
    #:lookup
@@ -109,6 +110,12 @@ that correspond the lookup for K in the result."))
 
 (defgeneric fmap:convert (interface2 interface1 map1)
   (:documentation "Convert a map from interface1 to interface2."))
+
+#|
+Instead of divide and divide/list and in the spirit of fold-left and fold-right,
+we could have a
+(defgeneric monoid-fold (i map m-null m-singleton m-append m-append/list))
+|#
 
 ;;; Simple cases for a lot of the above functions
 

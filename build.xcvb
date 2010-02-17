@@ -26,6 +26,7 @@
    "atomic"
    "msv"
    "pure-trees"
-   "pure-hash-tables")
+   "pure-hash-tables"
+   "faim")
   :supersedes-asdf
   ("fare-utils")))

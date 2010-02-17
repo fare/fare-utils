@@ -43,6 +43,29 @@ between them, re-balancing as needed."))
 
 (defgeneric check-invariant (i &key))
 
+(defclass pure-binary-branch ()
+  ((left
+    :initarg :left
+    :initform nil
+    :reader left)
+   (right
+    :initarg :right
+    :initform nil
+    :reader right)))
+
+(defclass association-pair ()
+  ((key
+    :initarg :key
+    :initform nil
+    :reader node-key)
+   (value
+    :initarg :value
+    :initform nil
+    :reader node-value)))
+
+(defclass pure-binary-tree-node (pure-binary-branch association-pair)
+  ())
+
 (defmethod check-invariant ((i fmap:<binary-tree>) &key node)
   (etypecase node
     (null
@@ -55,26 +78,6 @@ between them, re-balancing as needed."))
        (check-invariant i :node (right node))
        (assert (order:< i (node-key node) (tree:leftmost i (right node))))))))
 
-(defclass pure-binary-tree-node ()
-  ((left
-    :initarg :left
-    :initform nil
-    :type (or null pure-binary-tree-node)
-    :reader left)
-   (right
-    :initarg :right
-    :initform nil
-    :type (or null pure-binary-tree-node)
-    :reader right)
-   (key
-    :initarg :key
-    :initform nil
-    :reader node-key)
-   (value
-    :initarg :value
-    :initform nil
-    :reader node-value))
-  (:metaclass structure-class))
 
 (defmethod tree:node ((i fmap:<binary-tree>) &key left right key value)
   (make-instance 'pure-binary-tree-node
@@ -192,8 +195,7 @@ between them, re-balancing as needed."))
     :initarg :height
     :initform 0
     :type integer
-    :reader node-height))
-  (:metaclass structure-class))
+    :reader node-height)))
 
 (defmethod node-height ((node null))
   0)
