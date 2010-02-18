@@ -32,6 +32,9 @@
    #:merge
    #:convert))
 
+;;; On this "Interface-Passing Style" of programming, see
+;;;  http://fare.livejournal.com/155094.html
+
 (defclass fmap:<map> (eq:<eq>) ())
 
 (defgeneric fmap:empty (interface)

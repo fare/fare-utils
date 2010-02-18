@@ -199,6 +199,8 @@ between them, re-balancing as needed."))
 
 (defmethod node-height ((node null))
   0)
+
+(defgeneric node-balance (node))
 (defmethod node-balance ((node null))
   0)
 (defmethod node-balance ((node pure-avl-tree-node))

@@ -106,4 +106,7 @@
            #:portable-namestring-prefix<=
            #:ensure-pathname-is-directory
            #:unwilden
+           #:append1 #:append1f #:appendf #:nconcf #:funcallf
+           #:with-nesting
+           #:while-collecting
            ))

@@ -57,6 +57,15 @@ CMUCL's EXT:ONCE-ONLY has a different interface."
 |#
 
 
+;; Simple modify-macro's
+(defun xfuncall (x f &rest args) (apply f x args))
+(exporting-definitions
+(define-modify-macro funcallf (f &rest args) xfuncall)
+(define-modify-macro appendf (&rest args) append "Append onto list")
+(define-modify-macro nconcf (&rest args) nconc "Destructively append onto list")
+(defun append1 (l x) (append l (list x)))
+(define-modify-macro append1f (x) append1 "Append one element onto list"))
+
 #|
 ;; The following is based on code by Tim Moore
 ;; Tim Moore <moore@bricoworks.com> on comp.lang.lisp 2001-11-03 01:51:05 GMT
@@ -482,3 +491,18 @@ shall be declared with a serial dependency in system definitions.
 	      ,@body)
 	  (setf ,guard ,hash))))))
 
+
+;;; Nesting binding forms (from a suggestion by marco baringer)
+(defmacro with-nesting (() &rest things)
+  (reduce #'(lambda (outer inner) (append outer (list inner)))
+          things :from-end t))
+
+;;; Collecting data
+
+(defmacro while-collecting ((&rest collectors) &body body)
+  (let ((vars (mapcar #'(lambda (x) (gensym (symbol-name x))) collectors))
+        (initial-values (mapcar (constantly nil) collectors)))
+    `(let ,(mapcar #'list vars initial-values)
+       (flet ,(mapcar #'(lambda (c v) `(,c (x) (push x ,v))) collectors vars)
+         ,@body
+         (values ,@(mapcar #'(lambda (v) `(nreverse ,v)) vars))))))
