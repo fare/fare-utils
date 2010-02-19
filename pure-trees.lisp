@@ -268,7 +268,7 @@ between them, re-balancing as needed."))
 
 (defclass fmap:<number-keyed-functional-map> (fmap:<avl-tree> order:<numeric>) ())
 (defparameter fmap:<number-keyed-functional-map>
-  (make-instance 'fmap:<number-keyed-functional-map>))
+  (memo:memoized 'make-instance 'fmap:<number-keyed-functional-map>))
 (defparameter fmap:<nkfm> fmap:<number-keyed-functional-map>)
 
 #|

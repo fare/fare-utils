@@ -194,8 +194,8 @@ we could have a
     :initform (make-instance 'eq:<eq>)
     :reader eq-interface)))
 
-(defun fmap:<alist> (&optional eq)
-  (apply #'make-instance 'fmap:<alist> (when eq `(:eq ,eq))))
+(defun fmap:<alist> (&optional (eq '<eq>))
+  (memo:memoized 'make-instance 'fmap:<alist> :eq eq))
 
 (defparameter fmap:<alist> (fmap:<alist>))
 (defmethod eq:= ((i fmap:<alist>) x y)

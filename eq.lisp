@@ -16,6 +16,7 @@
    ))
 
 (defclass eq:<eq> () ())
+(defparameter eq:<eq> (memo:memoized 'make-instance 'eq:<eq>))
 (defgeneric eq:= (i x y))
 (defgeneric eq:test-function (i)
   (:documentation "test function for <eq> interface"))
@@ -40,6 +41,7 @@
   (sxhash x))
 
 (defclass eq:<equal> (eq:<hashable>) ())
+(defparameter eq:<equal> (memo:memoized 'make-instance 'eq:<equal>))
 (defmethod eq:= ((i eq:<equal>) x y)
   (equal x y))
 (defmethod eq:test-function ((i eq:<equal>))

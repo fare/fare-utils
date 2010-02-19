@@ -16,11 +16,13 @@
   (declare (ignore slot-names initargs))
   (setf (alist-interface i) (fmap:<alist> i)))
 
-(defparameter fmap:<pure-hash-table> (make-instance 'fmap:<pure-hash-table>))
+(defparameter fmap:<pure-hash-table>
+  (memo:memoized 'make-instance 'fmap:<pure-hash-table>))
 (defparameter <pht> fmap:<pure-hash-table>)
 
 (defclass fmap:<pure-equal-hash-table> (fmap:<pure-hash-table> eq:<equal>) ())
-(defparameter fmap:<pure-equal-hash-table> (make-instance 'fmap:<pure-equal-hash-table>))
+(defparameter fmap:<pure-equal-hash-table>
+  (memo:memoized 'make-instance 'fmap:<pure-equal-hash-table>))
 (defparameter <equal-pht> fmap:<pure-equal-hash-table>)
 
 (defmethod fmap:lookup ((i fmap:<pure-hash-table>) node key)

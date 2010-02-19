@@ -2,9 +2,8 @@
 (in-package :cl-user)
 
 (asdf:defsystem :fare-utils
-  :version "1.96"
-  :serial nil
   :components ((:file "package")
+               (:file "memoization")
 	       (:file "basic-utils" :depends-on ("package"))
 	       (:file "basic-strings" :depends-on ("basic-utils"))
 	       (:file "basic-symbols" :depends-on ("basic-strings"))
