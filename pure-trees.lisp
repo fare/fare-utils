@@ -41,8 +41,6 @@ between them, re-balancing as needed."))
   (:documentation "Keys in binary trees increase from left to right"))
 
 
-(defgeneric check-invariant (i &key))
-
 (defclass pure-binary-branch ()
   ((left
     :initarg :left
@@ -66,16 +64,16 @@ between them, re-balancing as needed."))
 (defclass pure-binary-tree-node (pure-binary-branch association-pair)
   ())
 
-(defmethod check-invariant ((i fmap:<binary-tree>) &key node)
+(defmethod check-invariant ((i fmap:<binary-tree>) role node)
   (etypecase node
     (null
      nil)
     (pure-binary-tree-node
      (when (left node)
-       (check-invariant i :node (left node))
+       (check-invariant i role (left node))
        (assert (order:< i (tree:rightmost i (left node)) (node-key node))))
      (when (right node)
-       (check-invariant i :node (right node))
+       (check-invariant i role (right node))
        (assert (order:< i (node-key node) (tree:leftmost i (right node))))))))
 
 
@@ -207,7 +205,7 @@ between them, re-balancing as needed."))
   (- (node-height (right node))
      (node-height (left node))))
 
-(defmethod check-invariant :before ((i fmap:<avl-tree>) &key node)
+(defmethod check-invariant :before ((i fmap:<avl-tree>) role node)
   (when node
     (assert (typep (node-height node)
                    `(integer 1 ,most-positive-fixnum)))
@@ -271,35 +269,3 @@ between them, re-balancing as needed."))
   (memo:memoized 'make-instance 'fmap:<number-keyed-functional-map>))
 (defparameter fmap:<nkfm> fmap:<number-keyed-functional-map>)
 
-#|
-Simple tests:
-(load "/home/fare/cl/asdf/asdf.lisp")
-
-(asdf:load-system :fare-utils)
-(in-package :fare-utils)
-
-(defparameter <nmap> fmap:<number-keyed-functional-map>)
-(defparameter <alist> fmap:<alist>)
-
-(fmap:convert <alist> <nmap>
-              (fmap:convert <nmap> <alist>
-                            '((1 un) (2 deux) (5 cinq) (3 trois) (4 quatre))))
-
-(let ((m (fmap:append <nmap>
-                           (fmap:convert <nmap> <alist>
-                                         '((1 un) (2 deux) (5 cinq) (3 trois) (4 quatre)))
-                           (fmap:convert <nmap> <alist>
-                                         '((1 one) (6 six) (7 seven) (3 three) (0 zero))))))
-  (check-invariant <nmap> :node m)
-  (fmap:convert <alist> <nmap> m))
-
-(let ((m (fmap:convert <nmap> <alist>
-                       (loop :for i :from 1 :to 1000 :collect (cons i (format nil "~@R" i))))))
-  (check-invariant <nmap> :node m)
-  (format t "~&height: ~A   count: ~A~%" (node-height m) (fmap:count <nmap> m)))
-
-(let ((m (fmap:convert <nmap> <alist>
-                       (loop :for i :from 1 :to 10000 :collect (cons (random (expt 10 9)) i)))))
-  (check-invariant <nmap> :node m)
-  (format t "~&height: ~A   count: ~A~%" (node-height m) (fmap:count <nmap> m)))
-|#

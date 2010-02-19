@@ -185,6 +185,7 @@ we could have a
 
 
 ;;; Trivial functional map implementation: alists.
+;;; Move it to its own file?
 
 (defclass fmap:<alist>
     (eq:<hashable> fmap-simple-decons fmap-simple-update fmap-simple-divide/list
@@ -193,6 +194,12 @@ we could have a
     :initarg :eq
     :initform (make-instance 'eq:<eq>)
     :reader eq-interface)))
+
+(defmethod check-invariant ((i fmap:<alist>) role map)
+  (declare (ignore role))
+  (assert
+   (loop :for ((key . val) . rest) :on map :never
+     (member key rest :key 'car :test (eq:test-function i)))))
 
 (defun fmap:<alist> (&optional (eq '<eq>))
   (memo:memoized 'make-instance 'fmap:<alist> :eq eq))

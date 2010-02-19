@@ -46,3 +46,8 @@
   (equal x y))
 (defmethod eq:test-function ((i eq:<equal>))
   #'equal)
+
+
+
+;;;; To be moved to some file called interfaces.lisp
+(defgeneric check-invariant (interface role object))
