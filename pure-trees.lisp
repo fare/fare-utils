@@ -74,7 +74,8 @@ between them, re-balancing as needed."))
        (assert (order:< i (tree:rightmost i (left node)) (node-key node))))
      (when (right node)
        (check-invariant i role (right node))
-       (assert (order:< i (node-key node) (tree:leftmost i (right node))))))))
+       (assert (order:< i (node-key node) (tree:leftmost i (right node)))))))
+  node)
 
 
 (defmethod tree:node ((i fmap:<binary-tree>) &key left right key value)

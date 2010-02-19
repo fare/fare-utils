@@ -27,24 +27,22 @@
 (defparameter *al-5* (remove-duplicates (append *al-2* *al-3*) :key #'car :from-end t))
 
 (defun roundtrip (i al)
-  (fmap:convert <alist> i (fmap:convert i <alist> al)))
+  (fmap:convert
+   <alist> i
+   (check-invariant
+    i :map
+    (fmap:convert i <alist> al))))
 
-(defun test-fm (i)
-  (let* ((map (fmap:convert i <alist> *al-1*))
-         (roundtrip (fmap:convert <alist> i (shuffle-list map))))
-    (check-invariant i :map map)
-    (assert (equal-alist *alist-100-decimal* roundtrip))
-    (assert (equal-alist *al-5* (fmap:convert <alist> i
-                                              (fmap:append (fmap:convert i <alist> *al-2*)
-                                                           (fmap:convert i <alist> *al-3*)))))))
+(defmethod test-map ((i fmap:<map>))
+  (assert (equal-alist *alist-100-decimal* (roundtrip i *al-1*)))
+  (assert (equal-alist *al-5* (fmap:convert <alist> i
+                                            (fmap:append (fmap:convert i <alist> *al-2*)
+                                                         (fmap:convert i <alist> *al-3*)))))
 
-(let ((m (fmap:convert <nkfm> <alist>
-                       (loop :for i :from 1 :to 1000 :collect (cons i (format nil "~@R" i))))))
-  (check-invariant <nkfm> :node m)
-  (format t "~&height: ~A   count: ~A~%" (node-height m) (fmap:count <nkfm> m)))
-
-(let ((m (fmap:convert <nkfm> <alist>
-                       (loop :for i :from 1 :to 10000 :collect (cons (random (expt 10 9)) i)))))
-  (check-invariant <nkfm> :node m)
-  (format t "~&height: ~A   count: ~A~%" (node-height m) (fmap:count <nkfm> m)))
-
+(defmethod test-map :after ((i fmap:<nkfm>))
+  (let ((m (fmap:convert
+            i <alist>
+            (make-alist 1000 "~@R"))))
+    (check-invariant i :node m)
+    (assert (equal 16 (node-height m)))
+    (assert (equal 1000 (fmap:count i m)))))

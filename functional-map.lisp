@@ -188,7 +188,7 @@ we could have a
 ;;; Move it to its own file?
 
 (defclass fmap:<alist>
-    (eq:<hashable> fmap-simple-decons fmap-simple-update fmap-simple-divide/list
+    (fmap:<map> eq:<hashable> fmap-simple-decons fmap-simple-update fmap-simple-divide/list
      fmap-simple-merge fmap-simple-append fmap-simple-append/list)
   ((eq-interface
     :initarg :eq
@@ -199,7 +199,8 @@ we could have a
   (declare (ignore role))
   (assert
    (loop :for ((key . val) . rest) :on map :never
-     (member key rest :key 'car :test (eq:test-function i)))))
+     (member key rest :key 'car :test (eq:test-function i))))
+  map)
 
 (defun fmap:<alist> (&optional (eq '<eq>))
   (memo:memoized 'make-instance 'fmap:<alist> :eq eq))
