@@ -1,5 +1,7 @@
 ;;; Initially taken from http://fare.tunes.org/files/fun/fibonacci.lisp
 
+#+xcvb (module ())
+
 (cl:defpackage #:memoization
   (:nicknames #:memo)
   (:use #:common-lisp)

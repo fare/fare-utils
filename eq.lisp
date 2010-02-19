@@ -1,7 +1,7 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;;;; Equality
 
-#+xcvb (module (:depends-on ("pkgdcl")))
+#+xcvb (module (:depends-on ("basic-utils" "memoization")))
 
 (in-package :fare-utils)
 
@@ -51,7 +51,7 @@
 
 ;;;; To be moved to some file called interfaces.lisp
 
-(defgeneric check-invariant (interface role object)
+(def*generic check-invariant (interface role object)
   (:documentation "Check whether an object fulfills the invariants required
 to play a given role with respect to the given interface.
 Interface is an interface, role is a class or keyword, object in whatever makes sense.

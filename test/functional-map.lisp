@@ -13,10 +13,11 @@
                 #'< :key #'car)))
 (defun make-alist (n &optional (formatter "~D"))
   (loop :for i :from 1 :to n :collect
-    (cons n (format nil formatter n))))
+    (cons i (format nil formatter i))))
 (defun equal-alist (x y)
   (equal (sort-alist x) (sort-alist y)))
 
+(defparameter *alist-10-latin* (make-alist 10 "~@R"))
 (defparameter *alist-100-decimal* (make-alist 100 "~D"))
 (defparameter *alist-100-latin* (make-alist 100 "~@R"))
 (defparameter *alist-100-english* (make-alist 100 "~R"))
@@ -26,23 +27,35 @@
 (defparameter *al-3* (remove-if-not (lambda (x) (< (length x) 5)) *alist-100-latin* :key #'cdr))
 (defparameter *al-5* (remove-duplicates (append *al-2* *al-3*) :key #'car :from-end t))
 
-(defun roundtrip (i al)
-  (fmap:convert
-   <alist> i
-   (check-invariant
-    i :map
-    (fmap:convert i <alist> al))))
+(defun alist-from (i map)
+  (fmap:convert <alist> i map))
+
+(defun from-alist (i map)
+  (check-invariant i :map (fmap:convert i <alist> map)))
 
 (defmethod test-map ((i fmap:<map>))
-  (assert (equal-alist *alist-100-decimal* (roundtrip i *al-1*)))
-  (assert (equal-alist *al-5* (fmap:convert <alist> i
-                                            (fmap:append (fmap:convert i <alist> *al-2*)
-                                                         (fmap:convert i <alist> *al-3*)))))
+  ;;; TODO: test each and every function in the API
+  (assert (equal-alist *alist-10-latin*
+                       (alist-from i (from-alist i *alist-10-latin*))))
+  (assert (equal-alist *alist-100-decimal*
+                       (alist-from i (from-alist i *al-1*))))
+  (assert (equal-alist *al-5*
+                       (alist-from
+                        i (check-invariant
+                           i :map
+                           (fmap:append i (from-alist i *al-2*)
+                                        (from-alist i *al-3*))))))
+  t)
 
-(defmethod test-map :after ((i fmap:<nkfm>))
+(defmethod test-map :after ((i fmap:<number-keyed-functional-map>))
   (let ((m (fmap:convert
             i <alist>
             (make-alist 1000 "~@R"))))
     (check-invariant i :node m)
-    (assert (equal 16 (node-height m)))
+    (assert (equal 10 (fare-utils::node-height m)))
     (assert (equal 1000 (fmap:count i m)))))
+
+
+(test-map fmap:<alist>)
+(test-map fmap:<nkfm>)
+(test-map fmap:<faim>)

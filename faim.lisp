@@ -24,6 +24,7 @@
 
 (defclass pure-box ()
   ((datum
+    :initarg :datum
     :reader datum)))
 
 ;;; big-endian patricia trie
@@ -46,6 +47,33 @@
 (defclass trie-branch (trie-node pure-binary-branch) ())
 (defclass full-trie-branch (trie-branch) ())
 ;;; Not needed: position tells us! (defclass trie-leaf (trie-node pure-box) ())
+
+(defmethod check-invariant ((i fmap:<faim>) role map)
+  (declare (ignore role))
+  (check-type map trie-head)
+  (trie-check-invariant (datum map) (node-height map) 0)
+  map)
+
+(defun trie-check-invariant (trie position key)
+  (check-type position (unsigned-byte))
+  (check-type key (unsigned-byte))
+  (assert (zerop (ldb (byte position 0) key)))
+  (unless (zerop position)
+    (etypecase trie
+      (trie-skip
+       (let* ((pbits (node-prefix-bits trie))
+              (plen (node-prefix-length trie))
+              (pos (- position plen)))
+         (check-type pbits (unsigned-byte))
+         (check-type plen (integer 1 *))
+         (assert (<= (integer-length pbits) plen))
+         (assert (>= pos 0))
+         (trie-check-invariant (datum trie) pos (dpb pbits (byte plen pos) key))))
+        (trie-branch
+         (let ((pos (1- position)))
+           (trie-check-invariant (left trie) pos key)
+           (trie-check-invariant (right trie) pos (dpb 1 (byte 1 pos) key)))))))
+
 
 (defmethod fmap:lookup ((i fmap:<faim>) map key)
   (check-type map trie-head)
@@ -127,7 +155,7 @@
              (trie (if (zerop plen) datum
                        (make-trie-skip height plen (node-prefix-bits trie) datum))))
         (make-instance 'trie-head :height height :datum trie))
-      (make-instance 'trie-head :height height :trie trie)))
+      (make-instance 'trie-head :height height :datum trie)))
 
 (defmethod fmap:insert ((i fmap:<faim>) map key value)
   (check-type map (or null trie-head))
@@ -139,7 +167,7 @@
         (if (< height len)
             (values len
                     (make-instance
-                     'big-endian-patricia-trie-branch
+                     'trie-branch
                      :left (make-trie-skip len (- len height) 0 trie)
                      :right (make-trie-leaf (1- len) key value)))
             (values height
@@ -307,7 +335,8 @@
             (h (max ha hb)))
        (make-trie-head
         h (trie-append (make-trie-skip h (- h ha) 0 (datum a))
-                       (make-trie-skip h (- h hb) 0 (datum b))))))))
+                       (make-trie-skip h (- h hb) 0 (datum b))
+                       h))))))
 (defun trie-append (a b position)
   (if (zerop position) a
       (etypecase a

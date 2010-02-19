@@ -1,2 +1,2 @@
 (defpackage :fare-utils-test
-  (:use :fare-utils :cl :stefil))
+  (:use :fare-utils :cl :hu.dwim.stefil))
