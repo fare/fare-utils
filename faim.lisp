@@ -166,10 +166,9 @@
     (multiple-value-bind (l d)
         (if (< height len)
             (values len
-                    (make-instance
-                     'trie-branch
-                     :left (make-trie-skip len (- len height) 0 trie)
-                     :right (make-trie-leaf (1- len) key value)))
+                    (make-trie-branch len
+                     (make-trie-skip len (- len height) 0 trie)
+                     (make-trie-leaf (1- len) key value)))
             (values height
                     (trie-insert trie height key value)))
       (make-trie-head l d))))
@@ -183,16 +182,22 @@
            (if (= pbits (ldb (byte plen pos) key))
                (make-trie-skip position plen pbits
                                (trie-insert (datum trie) pos key value))
-               (let* ((leaf (make-trie-leaf (1- position) key value))
-                      (datum (datum trie))
+               (let* ((datum (datum trie))
                       (len (1- plen))
                       (pos (1- position))
                       (other (if (zerop len) datum
                                  (make-trie-skip
-                                  position len (ldb (byte len 0) pbits) datum))))
-                 (if (zerop (ldb (byte 1 pos) key))
-                     (make-trie-branch pos leaf other)
-                     (make-trie-branch pos other leaf))))))
+                                  position len (ldb (byte len 0) pbits) datum)))
+                      (old-hb (ldb (byte 1 len) pbits))
+                      (new-hb (ldb (byte 1 pos) key)))
+                 (if (= old-hb new-hb)
+                     (make-trie-skip
+                      position 1 old-hb
+                      (trie-insert other pos key value))
+                     (let ((leaf (make-trie-leaf pos key value)))
+                       (if (zerop new-hb)
+                           (make-trie-branch pos leaf other)
+                           (make-trie-branch pos other leaf))))))))
         (trie-branch
          (let ((pos (1- position)))
            (if (zerop (ldb (byte 1 pos) key))
