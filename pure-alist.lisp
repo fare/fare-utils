@@ -34,7 +34,7 @@
 (defmethod fmap:lookup ((i fmap:<alist>) map key)
   (let ((pair (assoc key map :test (eq:test-function i))))
     (if pair
-        (values (car pair) t)
+        (values (cdr pair) t)
         (values nil nil))))
     
 (defmethod fmap:insert ((i fmap:<alist>) map key value)

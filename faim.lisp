@@ -49,30 +49,33 @@
 ;;; Not needed: position tells us! (defclass trie-leaf (trie-node pure-box) ())
 
 (defmethod check-invariant ((i fmap:<faim>) role map)
+  (declare (optimize (debug 3)))
   (declare (ignore role))
   (check-type map trie-head)
   (trie-check-invariant (datum map) (node-height map) 0)
   map)
 
 (defun trie-check-invariant (trie position key)
+  (declare (optimize (debug 3)))
   (check-type position (unsigned-byte))
   (check-type key (unsigned-byte))
   (assert (zerop (ldb (byte position 0) key)))
   (unless (zerop position)
     (etypecase trie
       (trie-skip
-       (let* ((pbits (node-prefix-bits trie))
-              (plen (node-prefix-length trie))
-              (pos (- position plen)))
+       (let ((pbits (node-prefix-bits trie))
+             (plen (node-prefix-length trie)))
          (check-type pbits (unsigned-byte))
          (check-type plen (integer 1 *))
          (assert (<= (integer-length pbits) plen))
-         (assert (>= pos 0))
-         (trie-check-invariant (datum trie) pos (dpb pbits (byte plen pos) key))))
-        (trie-branch
+         (assert (<= plen position))
+         (let ((pos (- position plen)))
+           (trie-check-invariant (datum trie) pos (dpb pbits (byte plen pos) key)))))
+       (trie-branch
          (let ((pos (1- position)))
            (trie-check-invariant (left trie) pos key)
-           (trie-check-invariant (right trie) pos (dpb 1 (byte 1 pos) key)))))))
+           (trie-check-invariant (right trie) pos (dpb 1 (byte 1 pos) key))))))
+  (values))
 
 
 (defmethod fmap:lookup ((i fmap:<faim>) map key)
@@ -152,25 +155,27 @@
       (let* ((plen (integer-length (node-prefix-bits trie)))
              (datum (datum trie))
              (height (- height (- (node-prefix-length trie) plen)))
-             (trie (if (zerop plen) datum
-                       (make-trie-skip height plen (node-prefix-bits trie) datum))))
+             (trie (make-trie-skip height plen (node-prefix-bits trie) datum)))
         (make-instance 'trie-head :height height :datum trie))
       (make-instance 'trie-head :height height :datum trie)))
 
 (defmethod fmap:insert ((i fmap:<faim>) map key value)
   (check-type map (or null trie-head))
   (check-type key (integer 0 *))
-  (let ((len (integer-length key))
-        (height (if map (node-height map) -1))
-        (trie (if map (datum map) nil)))
+  (let ((len (integer-length key)))
     (multiple-value-bind (l d)
-        (if (< height len)
-            (values len
-                    (make-trie-branch len
-                     (make-trie-skip len (- len height) 0 trie)
-                     (make-trie-leaf (1- len) key value)))
-            (values height
-                    (trie-insert trie height key value)))
+        (if (null map)
+            (values len (make-trie-skip len len key value))
+            (let ((height (node-height map))
+                  (trie (datum map)))
+              (if (< height len)
+                  (values len
+                          (make-trie-branch
+                           len
+                           (make-trie-skip len (- len height 1) 0 trie)
+                           (make-trie-leaf (1- len) key value)))
+                  (values height
+                          (trie-insert trie height key value)))))
       (make-trie-head l d))))
 (defun trie-insert (trie position key value)
   (if (zerop position) value
@@ -185,19 +190,18 @@
                (let* ((datum (datum trie))
                       (len (1- plen))
                       (pos (1- position))
-                      (other (if (zerop len) datum
-                                 (make-trie-skip
-                                  position len (ldb (byte len 0) pbits) datum)))
-                      (old-hb (ldb (byte 1 len) pbits))
+                      (trie1 (make-trie-skip
+                              position len (ldb (byte len 0) pbits) datum))
+                      (hb (ldb (byte 1 len) pbits))
                       (new-hb (ldb (byte 1 pos) key)))
-                 (if (= old-hb new-hb)
+                 (if (= hb new-hb)
                      (make-trie-skip
-                      position 1 old-hb
-                      (trie-insert other pos key value))
+                      position 1 hb
+                      (trie-insert trie1 pos key value))
                      (let ((leaf (make-trie-leaf pos key value)))
                        (if (zerop new-hb)
-                           (make-trie-branch pos leaf other)
-                           (make-trie-branch pos other leaf))))))))
+                           (make-trie-branch pos leaf trie1)
+                           (make-trie-branch pos trie1 leaf))))))))
         (trie-branch
          (let ((pos (1- position)))
            (if (zerop (ldb (byte 1 pos) key))

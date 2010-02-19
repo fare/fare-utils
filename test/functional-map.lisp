@@ -1,7 +1,6 @@
 (in-package :fare-utils-test)
 
-;;; Simple tests:
-(load "/home/fare/cl/asdf/asdf.lisp")
+(declaim (optimize (speed 1) (debug 3) (space 3)))
 
 (defparameter <nkfm> fmap:<nkfm>)
 (defparameter <alist> fmap:<alist>)
@@ -33,8 +32,16 @@
 (defun from-alist (i map)
   (check-invariant i :map (fmap:convert i <alist> map)))
 
+(defgeneric test-map (fmap-interface))
+
 (defmethod test-map ((i fmap:<map>))
   ;;; TODO: test each and every function in the API
+  (assert (equal "12"
+                 (fmap:lookup
+                  i
+                  (from-alist
+                   i '((57 . "57") (10 . "10") (12 . "12")))
+                  12)))
   (assert (equal-alist *alist-10-latin*
                        (alist-from i (from-alist i *alist-10-latin*))))
   (assert (equal-alist *alist-100-decimal*
@@ -54,7 +61,6 @@
     (check-invariant i :node m)
     (assert (equal 10 (fare-utils::node-height m)))
     (assert (equal 1000 (fmap:count i m)))))
-
 
 (test-map fmap:<alist>)
 (test-map fmap:<nkfm>)
