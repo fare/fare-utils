@@ -12,7 +12,7 @@
    #:<map> #:<alist>
    #:<binary-tree> #:<avl-tree>
    #:<number-keyed-functional-map> #:<nkfm>
-   #:<pure-hash-table> #:<pure-equal-hash-table>
+   #:<pure-hash-table> #:<pure-equal-hash-table> #:<pht> #:<equal-pht>
    #:<faim>
    #:empty
    #:empty-p
@@ -23,6 +23,7 @@
    #:decons
    #:fold-left
    #:fold-right
+   #:for-each
    #:append
    #:divide
    #:count
@@ -74,7 +75,8 @@ yielding association k_1 v_1 .. k_n v_n, and computing
 by repeatedly deconstructing it as by decons,
 yielding association k_1 v_1 .. k_n v_n, and computing
 (f k_1 v_1 (f k2 v_2 (f ... (f k_n-1 v_n-1 (f k_n v_n seed))...)))"))
-
+(defgeneric fmap:for-each (interface map f)
+  (:documentation "For every key value pair in map, (funcall f k v)"))
 (defgeneric fmap:append (interface map1 map2)
   (:documentation "Merge two maps, returning a merged map.
 Mappings from MAP1 override those from MAP2."))

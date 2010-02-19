@@ -36,12 +36,18 @@
 
 (defmethod test-map ((i fmap:<map>))
   ;;; TODO: test each and every function in the API
+  (assert (null (alist-from i (fmap:empty i))))
+  (assert (fmap:empty-p i (from-alist i ())))
   (assert (equal "12"
                  (fmap:lookup
                   i
                   (from-alist
                    i '((57 . "57") (10 . "10") (12 . "12")))
                   12)))
+  (loop :for (k . v) :in *al-1* :with m = (from-alist i *al-1*) :do
+    (assert (eq v (fmap:lookup i m k))))
+  (assert (equal-alist *alist-10-latin*
+                       (alist-from i (from-alist i *alist-10-latin*))))
   (assert (equal-alist *alist-10-latin*
                        (alist-from i (from-alist i *alist-10-latin*))))
   (assert (equal-alist *alist-100-decimal*
@@ -55,13 +61,18 @@
   t)
 
 (defmethod test-map :after ((i fmap:<number-keyed-functional-map>))
-  (let ((m (fmap:convert
-            i <alist>
-            (make-alist 1000 "~@R"))))
-    (check-invariant i :node m)
-    (assert (equal 10 (fare-utils::node-height m)))
-    (assert (equal 1000 (fmap:count i m)))))
+  (let* ((a1 (make-alist 1000 "~@R"))
+         (a2 (shuffle-list a1))
+         (m1 (fmap:convert i <alist> a1))
+         (m2 (fmap:convert i <alist> a2)))
+    (check-invariant i :map m1)
+    (check-invariant i :map m2)
+    (assert (= 10 (fare-utils::node-height m1)))
+    (assert (<= 10 (fare-utils::node-height m2) 15))
+    (assert (= 1000 (fmap:count i m1)))
+    (assert (= 1000 (fmap:count i m2)))))
 
 (test-map fmap:<alist>)
 (test-map fmap:<nkfm>)
+(test-map fmap:<pht>)
 (test-map fmap:<faim>)

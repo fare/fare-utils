@@ -51,8 +51,9 @@
 (defmethod check-invariant ((i fmap:<faim>) role map)
   (declare (optimize (debug 3)))
   (declare (ignore role))
-  (check-type map trie-head)
-  (trie-check-invariant (datum map) (node-height map) 0)
+  (when map
+    (check-type map trie-head)
+    (trie-check-invariant (datum map) (node-height map) 0))
   map)
 
 (defun trie-check-invariant (trie position key)

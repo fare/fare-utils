@@ -139,6 +139,12 @@ between them, re-balancing as needed."))
                        (funcall f
                                 (node-key node) (node-value node)
                                 (fmap:fold-right i (right node) f seed)))))
+(defmethod fmap:for-each ((i fmap:<binary-tree>) node f)
+  (when node
+    (fmap:for-each i (left node) f)
+    (funcall f (node-key node) (node-value node))
+    (fmap:for-each i (right node) f))
+  (values))
 (defmethod fmap:divide ((i fmap:<binary-tree>) node)
   (cond
     ((null node)
@@ -214,6 +220,20 @@ between them, re-balancing as needed."))
                (1+ (max (node-height (left node))
                         (node-height (right node))))))
     (assert (member (node-balance node) '(-1 0 1)))))
+
+#| Minimum number of nodes in a tree of height n (maximum is 2^n-1)
+(memo:define-memo-function f (n)
+  (cond ((zerop n) 0)
+        ((= n 1) 1)
+        (t (+ 1 (f (1- n)) (f (- n 2))))))
+It's a variant of the fibonacci function,
+and it grows exponentially like phi^n when n is big.
+This ensures that even in the worst-case scenario,
+a balanced tree is logarithmically shallow.
+
+Exercise: prove that the in the above algorithms,
+tree:node is always called with branches that are of comparable height...
+|#
 
 (defmethod tree:node ((i fmap:<avl-tree>) &key left right key value)
   (flet ((mk (&key left right key value)
