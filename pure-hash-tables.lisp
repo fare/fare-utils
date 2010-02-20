@@ -25,13 +25,13 @@
   (memo:memoized 'make-instance 'pf:<equal-hash-table>))
 (defparameter pf:<equal-ht> pf:<equal-hash-table>)
 
-(defmethod check-invariant ((i pf:<hash-table>) role map)
-  (check-invariant pf:<im> role map)
+(defmethod pf:check-invariant ((i pf:<hash-table>) role map)
+  (pf:check-invariant pf:<im> role map)
   (pf:for-each
    pf:<im> map
    (lambda (hash bucket)
      (declare (ignore hash))
-     (check-invariant (alist-interface i) role bucket)))
+     (pf:check-invariant (alist-interface i) role bucket)))
   map)
 
 (defmethod pf:lookup ((i pf:<hash-table>) node key)

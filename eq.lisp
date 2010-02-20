@@ -49,10 +49,3 @@
 
 
 
-;;;; To be moved to some file called interfaces.lisp
-
-(def*generic check-invariant (interface role object)
-  (:documentation "Check whether an object fulfills the invariants required
-to play a given role with respect to the given interface.
-Interface is an interface, role is a class or keyword, object in whatever makes sense.
-On success, the OBJECT is returned. On failure, an error is signalled."))

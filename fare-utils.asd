@@ -1,8 +1,25 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 (in-package :cl-user)
 
+(proclaim
+ #+sbcl
+ '(optimize
+   (sb-c::merge-tail-calls 3)
+   (sb-c::insert-debug-catch 0)
+   (speed 3) (space 3) (debug 2))
+ #+clozure
+ '(optimize (speed 3) (space 3) (debug 2))
+ #-(or sbcl clozure)
+ '(optimize (speed 3) (space 3) (debug 1)))
+
+#+clozure
+(setf ccl::*compile-time-evaluation-policy*
+      (ccl::new-compiler-policy :allow-tail-recursion-elimination (constantly t)))
+
 (asdf:defsystem :fare-utils
   :components ((:file "package")
+
+               ;;; Utilities wrt Lisp
 	       (:file "basic-utils" :depends-on ("package"))
 	       (:file "basic-strings" :depends-on ("basic-utils"))
 	       (:file "basic-symbols" :depends-on ("basic-strings"))
@@ -15,6 +32,8 @@
 	       (:file "strings" :depends-on ("basic-strings" "streams"))
 	       (:file "files" :depends-on ("basic-utils"))
 	       (:file "atomic" :depends-on ("basic-macros"))
+
+               ;;; Magic Special Variables
 	       (:file "msv" :depends-on ("hash-tables"))
 
                ;;; Independent libraries
@@ -32,7 +51,7 @@
                (:file "pure-hash-tables" :depends-on ("pure-trees" "pure-alist"))
                (:file "faim" :depends-on ("pure-maps" "pure-trees"))
 
-               ;;; Imperative containers
+               ;;; Stateful containers
                (:file "containers" :depends-on ("order" "basic-macros" "basic-utils"))
                (:file "hash-tables" :depends-on ("containers"))
                (:file "binary-heaps" :depends-on ("containers"))

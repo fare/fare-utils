@@ -27,7 +27,7 @@
     :initarg :datum
     :reader datum)))
 
-;;; big-endian patricia trie
+;;; (big-endian) patricia tree (aka trie)
 (defclass trie-head (pure-box)
   ((height
     :type fixnum
@@ -48,7 +48,7 @@
 (defclass full-trie-branch (trie-branch) ())
 ;;; Not needed: position tells us! (defclass trie-leaf (trie-node pure-box) ())
 
-(defmethod check-invariant ((i pf:<faim>) role map)
+(defmethod pf:check-invariant ((i pf:<faim>) role map)
   (declare (optimize (debug 3)))
   (declare (ignore role))
   (when map

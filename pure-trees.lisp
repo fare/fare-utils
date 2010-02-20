@@ -67,16 +67,16 @@ between them, re-balancing as needed."))
 (defclass binary-tree-node (binary-branch association-pair)
   ())
 
-(defmethod check-invariant ((i pf:<binary-tree>) role node)
+(defmethod pf:check-invariant ((i pf:<binary-tree>) role node)
   (etypecase node
     (null
      nil)
     (binary-tree-node
      (when (left node)
-       (check-invariant i role (left node))
+       (pf:check-invariant i role (left node))
        (assert (order:< i (tree:rightmost i (left node)) (node-key node))))
      (when (right node)
-       (check-invariant i role (right node))
+       (pf:check-invariant i role (right node))
        (assert (order:< i (node-key node) (tree:leftmost i (right node)))))))
   node)
 
@@ -215,7 +215,7 @@ between them, re-balancing as needed."))
   (- (node-height (right node))
      (node-height (left node))))
 
-(defmethod check-invariant :before ((i pf:<avl-tree>) role node)
+(defmethod pf:check-invariant :before ((i pf:<avl-tree>) role node)
   (when node
     (assert (typep (node-height node)
                    `(integer 1 ,most-positive-fixnum)))

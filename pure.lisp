@@ -3,12 +3,15 @@
 
 #+xcvb (module (:depends-on ("basic-utils" "memoization")))
 
-(in-package :fare-utils)
+(in-package :cl)
 
 (defpackage :pf
   (:nicknames #:pure-functional)
   (:use)
   (:export
+
+   ;;; General purpose gfs
+   #:check-invariant
 
    ;;; Functional Maps and Containers: classes
    #:<map> #:<alist>
@@ -36,3 +39,10 @@
    #:update
    #:merge
    #:convert))
+
+(defgeneric pf:check-invariant (interface role object)
+  (:documentation "Check whether an OBJECT fulfills the invariant(s) required
+to play a given ROLE with respect to the given INTERFACE.
+Interface is an interface, role is a class or keyword,
+object is whatever makes sense.
+On success the OBJECT itself is returned. On failure an error is signalled."))

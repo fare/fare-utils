@@ -109,5 +109,4 @@
            #:append1 #:append1f #:appendf #:nconcf #:funcallf
            #:with-nesting
            #:while-collecting
-           #:check-invariant
            ))
