@@ -1,7 +1,7 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;; Sorting Algorithms.
 
-#+xcvb (module (:depends-on ("package" "comparators")))
+#+xcvb (module (:depends-on ("package" "order")))
 
 (in-package :fare-utils)
 
@@ -102,7 +102,7 @@
 |#
 
 (defun stable-topological-sort/ordinals (size dependencies)
-  (let* ((minimals (make-instance 'binary-heap :comparator #'number-comparator))
+  (let* ((minimals (make-instance 'binary-heap :order order:<numeric>))
          (adjacency-table (adjacency-table/ordinals size dependencies))
          (dependency-count (make-array size :initial-element 0))
          (result nil))
@@ -146,22 +146,22 @@
 #|
 (defun stable-cyclic-topological-sort (sequence dependencies &key (test 'equal))
   (labels
-      ((heap-comparator (h1 h2)
-         (number-comparator (find-least-item h1) (find-least-item h2))))
+      ((heap-order (h1 h2)
+         (order:<key> :order order:<numeric> :key 'find-least-item)))
     (let* ((elements (coerce sequence 'vector))
            (length (length elements))
            (hash (make-hash-table :test test))
            (equivs (make-array length :initial-element nil))
            (outgoing (make-array length :initial-element nil))
            (incoming (make-array length :initial-element nil))
-           (minimals (make-instance 'binary-heap :comparator comparator))
-           (nonmins (make-instance 'binary-heap :comparator comparator))
+           (minimals (make-instance 'binary-heap :order order))
+           (nonmins (make-instance 'binary-heap :order order))
            (results nil))
       (loop :for x :across elements :for i :from 0 :do
             (setf (gethash x hash) i)
-            (setf (aref equivs i) (singleton-binomial-heap i :comparator #'number-comparator))
-            (setf (aref incoming i) (make-instance 'binomial-heap :comparator #'number-comparator))
-            (setf (aref outgoing i) (make-instance 'binomial-heap :comparator #'number-comparator)))
+            (setf (aref equivs i) (singleton-binomial-heap i :order #'order:<numeric>))
+            (setf (aref incoming i) (make-instance 'binomial-heap :order #'order:<numeric>))
+            (setf (aref outgoing i) (make-instance 'binomial-heap :order #'order:<numeric>)))
       (loop :for (x . y) :in dependencies
             :for xi = (gethash x hash)
             :for yi = (gethash y hash) do

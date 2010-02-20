@@ -53,7 +53,7 @@
   (make-instance 'binary-heap
     :size (container-size heap)
     :vector (copy-array (container-vector heap))
-    :comparator (order-comparator heap)))
+    :order (order heap)))
 
 (defun binary-heap-sift-down (heap index &aux (min index))
   ;; the heap invariant is respected on each subtree of the specified node

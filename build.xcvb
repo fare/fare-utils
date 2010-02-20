@@ -11,7 +11,6 @@
    "basic-lists"
    "basic-packages"
    "basic-objects"
-   "comparators"
    "containers"
    "hash-tables"
    "binary-heaps"
@@ -25,6 +24,7 @@
    "sorting"
    "atomic"
    "msv"
+   "order"
    "pure-trees"
    "pure-hash-tables"
    "faim")

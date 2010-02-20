@@ -5,49 +5,49 @@
 
 (in-package :fare-utils)
 
-(defclass fmap:<pure-hash-table>
-    (fmap:<map> eq:<hashable>
+(defclass pf:<hash-table>
+    (pf:<map> eq:<hashable>
      fmap-simple-empty fmap-simple-append)
   ((alist-interface :accessor alist-interface))
   (:documentation "pure hash table"))
 
-(defmethod shared-initialize :after ((i fmap:<pure-hash-table>)
+(defmethod shared-initialize :after ((i pf:<hash-table>)
                                      slot-names &rest initargs &key &allow-other-keys)
   (declare (ignore slot-names initargs))
-  (setf (alist-interface i) (fmap:<alist> i)))
+  (setf (alist-interface i) (pf:<alist> i)))
 
-(defparameter fmap:<pure-hash-table>
-  (memo:memoized 'make-instance 'fmap:<pure-hash-table>))
-(defparameter fmap:<pht> fmap:<pure-hash-table>)
+(defparameter pf:<hash-table>
+  (memo:memoized 'make-instance 'pf:<hash-table>))
+(defparameter pf:<ht> pf:<hash-table>)
 
-(defclass fmap:<pure-equal-hash-table> (fmap:<pure-hash-table> eq:<equal>) ())
-(defparameter fmap:<pure-equal-hash-table>
-  (memo:memoized 'make-instance 'fmap:<pure-equal-hash-table>))
-(defparameter fmap:<equal-pht> fmap:<pure-equal-hash-table>)
+(defclass pf:<equal-hash-table> (pf:<hash-table> eq:<equal>) ())
+(defparameter pf:<equal-hash-table>
+  (memo:memoized 'make-instance 'pf:<equal-hash-table>))
+(defparameter pf:<equal-ht> pf:<equal-hash-table>)
 
-(defmethod check-invariant ((i fmap:<pure-hash-table>) role map)
-  (check-invariant fmap:<nkfm> role map)
-  (fmap:for-each
-   fmap:<nkfm> map
+(defmethod check-invariant ((i pf:<hash-table>) role map)
+  (check-invariant pf:<im> role map)
+  (pf:for-each
+   pf:<im> map
    (lambda (hash bucket)
      (declare (ignore hash))
      (check-invariant (alist-interface i) role bucket)))
   map)
 
-(defmethod fmap:lookup ((i fmap:<pure-hash-table>) node key)
+(defmethod pf:lookup ((i pf:<hash-table>) node key)
   (if (null node) (values nil nil)
-      (let ((bucket (fmap:lookup fmap:<nkfm> node (eq:hash i key))))
+      (let ((bucket (pf:lookup pf:<im> node (eq:hash i key))))
         (if bucket
-            (fmap:lookup (alist-interface i) bucket key)
+            (pf:lookup (alist-interface i) bucket key)
             (values nil nil)))))
-(defmethod fmap:insert ((i fmap:<pure-hash-table>) node key value)
+(defmethod pf:insert ((i pf:<hash-table>) node key value)
   (let ((hash (eq:hash i key)))
-    (fmap:insert
-     fmap:<nkfm> node hash
-     (fmap:insert (alist-interface i)
-                  (fmap:lookup fmap:<nkfm> node hash)
+    (pf:insert
+     pf:<im> node hash
+     (pf:insert (alist-interface i)
+                  (pf:lookup pf:<im> node hash)
                   key value))))
-(defmethod fmap:remove ((i fmap:<pure-hash-table>) node key)
+(defmethod pf:remove ((i pf:<hash-table>) node key)
   (if (null node)
       (values nil nil nil)
       (let* ((hash (node-key node))
@@ -57,49 +57,49 @@
              (rest (rest bucket)))
         (values
          (if rest
-             (fmap:insert fmap:<nkfm> node hash rest)
-             (fmap:remove fmap:<nkfm> node hash))
+             (pf:insert pf:<im> node hash rest)
+             (pf:remove pf:<im> node hash))
          key value t))))
-(defmethod fmap:first-key-value ((i fmap:<pure-hash-table>) map)
+(defmethod pf:first-key-value ((i pf:<hash-table>) map)
   (if map
-      (fmap:first-key-value (alist-interface i)
-                            (nth 1 (fmap:first-key-value fmap:<nkfm> map)))
+      (pf:first-key-value (alist-interface i)
+                            (nth 1 (pf:first-key-value pf:<im> map)))
       (values nil nil nil)))
-(defmethod fmap:fold-left ((i fmap:<pure-hash-table>) node f seed)
-  (fmap:fold-left fmap:<nkfm> node
+(defmethod pf:fold-left ((i pf:<hash-table>) node f seed)
+  (pf:fold-left pf:<im> node
                   (lambda (a h bucket)
                     (declare (ignore h))
-                    (fmap:fold-left (alist-interface i) bucket f a))
+                    (pf:fold-left (alist-interface i) bucket f a))
                   seed))
-(defmethod fmap:fold-right ((i fmap:<pure-hash-table>) node f seed)
-  (fmap:fold-right fmap:<nkfm> node
+(defmethod pf:fold-right ((i pf:<hash-table>) node f seed)
+  (pf:fold-right pf:<im> node
                    (lambda (h bucket a)
                      (declare (ignore h))
-                     (fmap:fold-right (alist-interface i) bucket f a))
+                     (pf:fold-right (alist-interface i) bucket f a))
                   seed))
-(defmethod fmap:for-each ((i fmap:<pure-hash-table>) map f)
-  (fmap:for-each
-   fmap:<nkfm> map
+(defmethod pf:for-each ((i pf:<hash-table>) map f)
+  (pf:for-each
+   pf:<im> map
    (lambda (hash bucket)
      (declare (ignore hash))
-     (fmap:for-each (alist-interface i) bucket f))))
-(defmethod fmap:divide ((i fmap:<pure-hash-table>) node)
+     (pf:for-each (alist-interface i) bucket f))))
+(defmethod pf:divide ((i pf:<hash-table>) node)
   (cond
     ((null node)
      (values nil nil))
     ((and (null (left node)) (null (right node)))
      (let ((hash (node-key node))
            (bucket (node-value node)))
-       (multiple-value-bind (b1 b2) (fmap:divide (alist-interface i) bucket)
-         (values (when b1 (fmap:insert i nil hash b1))
-                 (when b2 (fmap:insert i nil hash b2))))))
+       (multiple-value-bind (b1 b2) (pf:divide (alist-interface i) bucket)
+         (values (when b1 (pf:insert i nil hash b1))
+                 (when b2 (pf:insert i nil hash b2))))))
     (t
-     (fmap:divide fmap:<nkfm> node))))
-(defmethod fmap:divide/list ((i fmap:<pure-hash-table>) node)
+     (pf:divide pf:<im> node))))
+(defmethod pf:divide/list ((i pf:<hash-table>) node)
   (cond
     ((null node)
      (values nil nil))
     ((and (null (left node)) (null (right node)))
-     (multiple-value-list (fmap:divide i node)))
+     (multiple-value-list (pf:divide i node)))
     (t
-     (fmap:divide/list fmap:<nkfm> node))))
+     (pf:divide/list pf:<im> node))))

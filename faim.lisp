@@ -7,20 +7,20 @@
 ;;; Under the hood: Big Endian Patricia Trees (Tries).
 ;;; Except that in our API, what *they* call Merge is called Append.
 
-#+xcvb (module (:depends-on ("functional-map" "pure-trees")))
+#+xcvb (module (:depends-on ("pure-maps" "pure-trees")))
 
 (in-package :fare-utils)
 
 ;;; Generic tree interface
 
-(defclass fmap:<faim>
-    (tree:<tree> fmap:<map>
+(defclass pf:<faim>
+    (tree:<tree> pf:<map>
      fmap-simple-empty fmap-simple-decons fmap-simple-update
      fmap-simple-merge fmap-simple-append/list fmap-simple-count)
   ()
   (:documentation "Keys in binary trees increase from left to right"))
 
-(defparameter fmap:<faim> (make-instance 'fmap:<faim>))
+(defparameter pf:<faim> (make-instance 'pf:<faim>))
 
 (defclass pure-box ()
   ((datum
@@ -44,11 +44,11 @@
     :type fixnum
     :initarg :prefix-length
     :reader node-prefix-length)))
-(defclass trie-branch (trie-node pure-binary-branch) ())
+(defclass trie-branch (trie-node binary-branch) ())
 (defclass full-trie-branch (trie-branch) ())
 ;;; Not needed: position tells us! (defclass trie-leaf (trie-node pure-box) ())
 
-(defmethod check-invariant ((i fmap:<faim>) role map)
+(defmethod check-invariant ((i pf:<faim>) role map)
   (declare (optimize (debug 3)))
   (declare (ignore role))
   (when map
@@ -79,7 +79,7 @@
   (values))
 
 
-(defmethod fmap:lookup ((i fmap:<faim>) map key)
+(defmethod pf:lookup ((i pf:<faim>) map key)
   (check-type map trie-head)
   (check-type key (integer 0 *))
   (if map
@@ -160,7 +160,7 @@
         (make-instance 'trie-head :height height :datum trie))
       (make-instance 'trie-head :height height :datum trie)))
 
-(defmethod fmap:insert ((i fmap:<faim>) map key value)
+(defmethod pf:insert ((i pf:<faim>) map key value)
   (check-type map (or null trie-head))
   (check-type key (integer 0 *))
   (let ((len (integer-length key)))
@@ -214,10 +214,10 @@
                 pos
                 (left trie)
                 (trie-insert (right trie) pos key value))))))))
-(defmethod fmap:remove ((i fmap:<faim>) map key)
+(defmethod pf:remove ((i pf:<faim>) map key)
   (check-type map (or null trie-head))
   (multiple-value-bind (v f)
-      (fmap:lookup i map key)
+      (pf:lookup i map key)
     (if f
         (values (make-trie-head
                  (node-height map)
@@ -225,7 +225,7 @@
                 v f)
         (values map nil nil))))
 (defun trie-remove (trie position key)
-  ;; from our contract with fmap:remove,
+  ;; from our contract with pf:remove,
   ;; we do assume the key IS in fact in the trie.
   (if (zerop position)
       (values trie nil nil)
@@ -249,9 +249,9 @@
                 pos
                 (left trie)
                 (trie-remove (right trie) pos key))))))))
-(defmethod fmap:first-key-value ((i fmap:<faim>) map)
+(defmethod pf:first-key-value ((i pf:<faim>) map)
   (tree:leftmost i map))
-(defmethod fmap:fold-left ((i fmap:<faim>) map f seed)
+(defmethod pf:fold-left ((i pf:<faim>) map f seed)
   (if (null map)
       seed
       (trie-fold-left (datum map) (node-height map) 0 f seed)))
@@ -271,7 +271,7 @@
             (right trie) pos (dpb 1 (byte 1 pos) key) f
             (trie-fold-left
              (left trie) pos key f seed)))))))
-(defmethod fmap:fold-right ((i fmap:<faim>) map f seed)
+(defmethod pf:fold-right ((i pf:<faim>) map f seed)
   (if (null map)
       seed
       (trie-fold-right (datum map) (node-height map) 0 f seed)))
@@ -291,7 +291,7 @@
             (left trie) pos key f
             (trie-fold-right
              (right trie) pos (dpb 1 (byte 1 pos) key) f seed)))))))
-(defmethod tree:leftmost ((i fmap:<faim>) map)
+(defmethod tree:leftmost ((i pf:<faim>) map)
   (if map
       (trie-leftmost (datum map) (node-height map) 0)
       (values nil nil nil)))
@@ -307,7 +307,7 @@
             (datum trie) pos (dpb pbits (byte plen pos) key))))
         (trie-branch
          (trie-leftmost (left trie) (1- position) key)))))
-(defmethod tree:rightmost ((i fmap:<faim>) map)
+(defmethod tree:rightmost ((i pf:<faim>) map)
   (if map
       (trie-rightmost (datum map) (node-height map) 0)
       (values nil nil nil)))
@@ -325,15 +325,15 @@
          (let ((pos (1- position)))
            (trie-rightmost (right trie) pos (dpb 1 (byte 1 pos) key)))))))
 
-(defmethod fmap:divide ((i fmap:<faim>) node)
+(defmethod pf:divide ((i pf:<faim>) node)
   (NIY))
-(defmethod fmap:divide/list ((i fmap:<faim>) node)
+(defmethod pf:divide/list ((i pf:<faim>) node)
   (NIY))
-(defmethod tree:join ((i fmap:<faim>) a b)
+(defmethod tree:join ((i pf:<faim>) a b)
   (NIY))
 
 ;;; The whole point of faim is that we could do a fast "append",
-(defmethod fmap:append ((i fmap:<faim>) a b)
+(defmethod pf:append ((i pf:<faim>) a b)
   (cond
     ((null a) b)
     ((null b) a)

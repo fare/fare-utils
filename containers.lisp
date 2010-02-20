@@ -2,7 +2,7 @@
 ;;;;; Generic heap interface
 
 #+xcvb
-(module (:depends-on ("package" "basic-utils" "basic-macros" "comparators")))
+(module (:depends-on ("package" "basic-utils" "basic-macros" "order")))
 
 (in-package :fare-utils)
 
@@ -49,21 +49,21 @@
 
 ;; Finding, Deleting
 (defgeneric find-least-item (container)
-  (:method :before ((container order-mixin))
+  (:method :before (container)
            (check-not-empty container)))
 (defgeneric least-item (container)
-  (:method :before ((container order-mixin))
+  (:method :before (container)
            (check-not-empty container)))
 (defgeneric pop-least-item! (container)
-  (:method :before ((container order-mixin))
+  (:method :before (container)
            (check-not-empty container)))
 (defgeneric pop-item! (container)
   (:method :before (container)
            (check-not-empty container))
-  (:method :before ((container order-mixin))
+  (:method :before (container)
            (pop-least-item! container)))
 (defgeneric pop-last-item! (container)
-  (:method :before ((container order-mixin))
+  (:method :before (container)
            (check-not-empty container)))
 (defgeneric push-last-item! (container item))
 
@@ -86,13 +86,8 @@
 ;;;; Generic container mixins
 
 ;;; Heaps
-(defclass heap (order-mixin container)
+(defclass heap (order:<order> container)
   ())
-
-;;; Search Trees
-(defclass search-tree (order-mixin container)
-  ())
-
 
 ;;; containers with nodes
 (defclass node-container-mixin ()
