@@ -5,3 +5,5 @@ TODO
 * import trie from pangram thingie
 
 * DECLAIM - distributed execution of common-lisp agents with intent and mobility
+
+* move stateful datastructures to a stateful: or st: or sf: package.

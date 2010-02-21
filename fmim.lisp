@@ -1,41 +1,32 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
-;;; Fast Appendable Integer Maps
-;;;
-;;; See "Fast Mergable Integer Maps"
-;;; Chris Okasaki & Andrew Gill, 1998
+;;; "Fast Mergable Integer Maps"
+;;; See article of same name by Chris Okasaki & Andrew Gill, 1998
 ;;; http://www.eecs.usma.edu/webs/people/okasaki/ml98maps.ps
 ;;; Under the hood: Big Endian Patricia Trees (Tries).
-;;; Except that in our API, what *they* call Merge is called Append.
+;;; Note however that in our API, what they call "merge" is called "join".
 
 #+xcvb (module (:depends-on ("pure-maps" "pure-trees")))
 
-(in-package :fare-utils)
+(in-package :pure)
 
-;;; Generic tree interface
-
-(defclass pf:<faim>
-    (tree:<tree> pf:<map>
-     fmap-simple-empty fmap-simple-decons fmap-simple-update
-     fmap-simple-merge fmap-simple-append/list fmap-simple-count)
+(defclass <fmim>
+    (<map> <tree>
+     map-simple-empty map-simple-decons map-simple-update-key
+     map-simple-map/2 map-simple-join/list map-simple-size)
   ()
-  (:documentation "Keys in binary trees increase from left to right"))
+  (:documentation "Fast Merge Integer Maps"))
 
-(defparameter pf:<faim> (make-instance 'pf:<faim>))
-
-(defclass pure-box ()
-  ((datum
-    :initarg :datum
-    :reader datum)))
+(defparameter <fmim> (make-instance '<fmim>))
 
 ;;; (big-endian) patricia tree (aka trie)
-(defclass trie-head (pure-box)
+(defclass trie-head (box)
   ((height
     :type fixnum
     :initform 0
     :initarg :height
     :reader node-height)))
 (defclass trie-node () ())
-(defclass trie-skip (trie-node pure-box)
+(defclass trie-skip (trie-node box)
   ((prefix-bits
     :type (integer 0 *)
     :initarg :prefix-bits
@@ -46,15 +37,10 @@
     :reader node-prefix-length)))
 (defclass trie-branch (trie-node binary-branch) ())
 (defclass full-trie-branch (trie-branch) ())
-;;; Not needed: position tells us! (defclass trie-leaf (trie-node pure-box) ())
+;;; Not needed: position tells us! (defclass trie-leaf (trie-node box) ())
 
-(defmethod pf:check-invariant ((i pf:<faim>) role map)
-  (declare (optimize (debug 3)))
-  (declare (ignore role))
-  (when map
-    (check-type map trie-head)
-    (trie-check-invariant (datum map) (node-height map) 0))
-  map)
+(defmethod check-invariant ((i <fmim>) (map trie-head))
+  (trie-check-invariant (datum map) (node-height map) 0))
 
 (defun trie-check-invariant (trie position key)
   (declare (optimize (debug 3)))
@@ -78,9 +64,8 @@
            (trie-check-invariant (right trie) pos (dpb 1 (byte 1 pos) key))))))
   (values))
 
-
-(defmethod pf:lookup ((i pf:<faim>) map key)
-  (check-type map trie-head)
+(defmethod lookup ((i <fmim>) map key)
+  (check-type map (or null trie-head))
   (check-type key (integer 0 *))
   (if map
       (let ((len (integer-length key))
@@ -160,7 +145,7 @@
         (make-instance 'trie-head :height height :datum trie))
       (make-instance 'trie-head :height height :datum trie)))
 
-(defmethod pf:insert ((i pf:<faim>) map key value)
+(defmethod insert ((i <fmim>) map key value)
   (check-type map (or null trie-head))
   (check-type key (integer 0 *))
   (let ((len (integer-length key)))
@@ -214,18 +199,18 @@
                 pos
                 (left trie)
                 (trie-insert (right trie) pos key value))))))))
-(defmethod pf:remove ((i pf:<faim>) map key)
+(defmethod drop ((i <fmim>) map key)
   (check-type map (or null trie-head))
   (multiple-value-bind (v f)
-      (pf:lookup i map key)
+      (lookup i map key)
     (if f
         (values (make-trie-head
                  (node-height map)
-                 (trie-remove (datum map) (node-height map) key))
+                 (trie-drop (datum map) (node-height map) key))
                 v f)
         (values map nil nil))))
-(defun trie-remove (trie position key)
-  ;; from our contract with pf:remove,
+(defun trie-drop (trie position key)
+  ;; from our contract with drop,
   ;; we do assume the key IS in fact in the trie.
   (if (zerop position)
       (values trie nil nil)
@@ -237,21 +222,21 @@
            (assert (= pbits (ldb (byte plen pos) key)))
            (make-trie-skip
             position plen pbits
-            (trie-remove (datum trie) pos key))))
+            (trie-drop (datum trie) pos key))))
         (trie-branch
          (let ((pos (1- position)))
            (if (zerop (ldb (byte 1 pos) key))
                (make-trie-branch
                 pos
-                (trie-remove (left trie) pos key)
+                (trie-drop (left trie) pos key)
                 (right trie))
                (make-trie-branch
                 pos
                 (left trie)
-                (trie-remove (right trie) pos key))))))))
-(defmethod pf:first-key-value ((i pf:<faim>) map)
-  (tree:leftmost i map))
-(defmethod pf:fold-left ((i pf:<faim>) map f seed)
+                (trie-drop (right trie) pos key))))))))
+(defmethod first-key-value ((i <fmim>) map)
+  (leftmost i map))
+(defmethod fold-left ((i <fmim>) map f seed)
   (if (null map)
       seed
       (trie-fold-left (datum map) (node-height map) 0 f seed)))
@@ -271,7 +256,7 @@
             (right trie) pos (dpb 1 (byte 1 pos) key) f
             (trie-fold-left
              (left trie) pos key f seed)))))))
-(defmethod pf:fold-right ((i pf:<faim>) map f seed)
+(defmethod fold-right ((i <fmim>) map f seed)
   (if (null map)
       seed
       (trie-fold-right (datum map) (node-height map) 0 f seed)))
@@ -291,10 +276,10 @@
             (left trie) pos key f
             (trie-fold-right
              (right trie) pos (dpb 1 (byte 1 pos) key) f seed)))))))
-(defmethod tree:leftmost ((i pf:<faim>) map)
-  (if map
-      (trie-leftmost (datum map) (node-height map) 0)
-      (values nil nil nil)))
+(defmethod leftmost ((i <fmim>) map)
+  (if (null map)
+      (values nil nil nil)
+      (trie-leftmost (datum map) (node-height map) 0)))
 (defun trie-leftmost (trie position key)
   (if (zerop position)
       (values key trie t)
@@ -307,10 +292,10 @@
             (datum trie) pos (dpb pbits (byte plen pos) key))))
         (trie-branch
          (trie-leftmost (left trie) (1- position) key)))))
-(defmethod tree:rightmost ((i pf:<faim>) map)
-  (if map
-      (trie-rightmost (datum map) (node-height map) 0)
-      (values nil nil nil)))
+(defmethod rightmost ((i <fmim>) map)
+  (if (null map)
+      (values nil nil nil)
+      (trie-rightmost (datum map) (node-height map) 0)))
 (defun trie-rightmost (trie position key)
   (if (zerop position)
       (values key trie t)
@@ -325,15 +310,15 @@
          (let ((pos (1- position)))
            (trie-rightmost (right trie) pos (dpb 1 (byte 1 pos) key)))))))
 
-(defmethod pf:divide ((i pf:<faim>) node)
+(defmethod divide ((i <fmim>) node)
   (NIY))
-(defmethod pf:divide/list ((i pf:<faim>) node)
+(defmethod divide/list ((i <fmim>) node)
   (NIY))
-(defmethod tree:join ((i pf:<faim>) a b)
+(defmethod join-nodes ((i <fmim>) a b)
   (NIY))
 
-;;; The whole point of faim is that we could do a fast "append",
-(defmethod pf:append ((i pf:<faim>) a b)
+;;; The whole point of fmim is that we could do a fast "append",
+(defmethod join ((i <fmim>) a b)
   (cond
     ((null a) b)
     ((null b) a)
@@ -344,10 +329,10 @@
             (hb (node-height b))
             (h (max ha hb)))
        (make-trie-head
-        h (trie-append (make-trie-skip h (- h ha) 0 (datum a))
-                       (make-trie-skip h (- h hb) 0 (datum b))
-                       h))))))
-(defun trie-append (a b position)
+        h (trie-join (make-trie-skip h (- h ha) 0 (datum a))
+                     (make-trie-skip h (- h hb) 0 (datum b))
+                     h))))))
+(defun trie-join (a b position)
   (if (zerop position) a
       (etypecase a
         (full-trie-branch a)
@@ -357,8 +342,8 @@
              (trie-branch
               (make-trie-branch
                position
-               (trie-append (left a) (left b) pos)
-               (trie-append (right a) (right b) pos)))
+               (trie-join (left a) (left b) pos)
+               (trie-join (right a) (right b) pos)))
              (trie-skip
               (let* ((pbits (node-prefix-bits b))
                      (plen (node-prefix-length b))
@@ -369,9 +354,9 @@
                        (ldb (byte (1- plen) 0) pbits) (datum b))))
                 (if (zerop bh)
                     (make-trie-branch
-                     position (trie-append (left a) b1 pos) (right a))
+                     position (trie-join (left a) b1 pos) (right a))
                     (make-trie-branch
-                     position (left a) (trie-append (right a) b1 pos))))))))
+                     position (left a) (trie-join (right a) b1 pos))))))))
         (trie-skip
          (let* ((pbits (node-prefix-bits a))
                 (plen (node-prefix-length a))
@@ -385,9 +370,9 @@
              (trie-branch
                 (if (zerop ah)
                     (make-trie-branch
-                     position (trie-append a1 (left b) pos) (right b))
+                     position (trie-join a1 (left b) pos) (right b))
                     (make-trie-branch
-                     position (left b) (trie-append a1 (right b) pos))))
+                     position (left b) (trie-join a1 (right b) pos))))
              (trie-skip
               (let* ((pbitsb (node-prefix-bits b))
                      (plenb (node-prefix-length b))
@@ -397,7 +382,21 @@
                        pos (1- plenb)
                        (ldb (byte (1- plenb) 0) pbitsb) (datum b))))
                 (if (= ah bh)
-                    (make-trie-skip position 1 0 (trie-append a1 b1 pos))
+                    (make-trie-skip position 1 0 (trie-join a1 b1 pos))
                     (if (zerop ah)
                         (make-trie-branch position a1 b1)
                         (make-trie-branch position b1 a1)))))))))))
+
+#|
+You could implement sets of integers as bitmaps,
+as a list of integers, as a binary tree,
+or as big-endian patricia tries mapping integers to the unit type.
+In the latter case, using multiple dispatch for sub-operations
+instead of the typecases I used above would allow to easily add an
+optimization to my patricia trie implementation in the case the
+target type is the unit type (eql t), by i.e. short-circuiting
+data representation and membership test on full subtrees.
+
+See also
+http://paste.lisp.org/display/95321
+|#

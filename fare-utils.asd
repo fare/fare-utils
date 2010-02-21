@@ -49,7 +49,7 @@
                (:file "pure-alist" :depends-on ("pure-maps"))
                (:file "pure-trees" :depends-on ("pure-maps" "order"))
                (:file "pure-hash-tables" :depends-on ("pure-trees" "pure-alist"))
-               (:file "faim" :depends-on ("pure-maps" "pure-trees"))
+               (:file "fmim" :depends-on ("pure-maps" "pure-trees"))
 
                ;;; Stateful containers
                (:file "containers" :depends-on ("order" "basic-macros" "basic-utils"))

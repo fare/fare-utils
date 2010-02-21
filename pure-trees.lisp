@@ -3,44 +3,48 @@
 
 #+xcvb (module (:depends-on ("pure-maps" "order")))
 
-(in-package :fare-utils)
-
-;;; Generic tree interface
-
-(defpackage :tree
-  (:use)
-  (:export
-   #:<tree> #:node #:find #:join #:leftmost #:rightmost))
-
+(in-package :pure)
 
 ;;; Trees in general
 
-(defclass tree:<tree> () ())
-(defgeneric tree:node (i &key)
-  (:documentation "create a new node for a <tree> interface.
-Assumes that any ordering and balancing constraints are respected
-in the constituents, and that any ordering constraint is respected
-between them, re-balancing as needed."))
-(defgeneric tree:find (i tree key path)
-  (:documentation "lookup a tree for a key, return a path to the proper node."))
-(defgeneric tree:join (i a b)
-  (:documentation "join two trees, assuming.
-Assumes that any ordering and balancing constraints are respected
-in the constituents, and that any ordering constraint is respected
-between them, re-balancing as needed."))
-(defgeneric tree:leftmost (i a)
-  (:documentation "key value and flag for leftmost node in a"))
-(defgeneric tree:rightmost (i a)
-  (:documentation "key value and flag for rightmost node in a"))
+(defclass <tree> (<type>) ()
+  (:documentation "abstract interface for trees"))
 
+#|
+(defclass <node> (<type>) ()
+  (:documentation "abstract interface for nodes of trees"))
+(defgeneric node-interface (<tree>)
+  (:documentation "returns the interface for nodes of given tree interface"))
+(defgeneric key-interface (<interface>)
+  (:documentation "returns the interface for keys of given tree interface"))
+|#
+
+(defgeneric join-nodes (<tree> node1 node2)
+  (:documentation "join two nodes.
+Unlike join, which accepts arbitrary trees,
+join assumes that any ordering and balancing constraints are respected
+in the constituents, and that any ordering constraint is respected
+between them, re-balancing as needed."))
+(defgeneric leftmost (<tree> tree)
+  (:documentation "key, value, foundp for leftmost node in TREE"))
+(defgeneric rightmost (<tree> tree)
+  (:documentation "key, value, foundp for rightmost node in TREE"))
+
+(defgeneric locate (<tree> tree key path)
+  (:documentation "lookup a tree for a key, return a path to the proper node."))
+
+(defgeneric node (<tree> &key)
+  (:documentation "make a node for a tree interface"))
 
 ;;; Vanilla Binary Tree
 
-(defclass pf:<binary-tree>
-    (tree:<tree> pf:<map> order:<order>
-     fmap-simple-empty fmap-simple-decons fmap-simple-update
-     fmap-simple-merge fmap-simple-append fmap-simple-append/list
-     fmap-simple-count)
+(defclass <binary-tree>
+    (<tree> <map>
+     order:<order> ;; TODO: delegate that to a key interface?
+     map-simple-empty ;; handles all the null cases so we don't have to.
+     map-simple-decons map-simple-update-key
+     map-simple-join map-simple-map/2 map-simple-join/list
+     map-simple-size)
   ()
   (:documentation "Keys in binary trees increase from left to right"))
 
@@ -64,139 +68,136 @@ between them, re-balancing as needed."))
     :initform nil
     :reader node-value)))
 
+(defclass box ()
+  ((datum :initarg :datum :reader datum)))
+
 (defclass binary-tree-node (binary-branch association-pair)
+  ;;; Or should we have a box instead of an association-pair ???
+  ;;; Or let the user just inherit from binary-branch,
+  ;;; and use a node-interface with make and update?
   ())
 
-(defmethod pf:check-invariant ((i pf:<binary-tree>) role node)
-  (etypecase node
-    (null
-     nil)
-    (binary-tree-node
-     (when (left node)
-       (pf:check-invariant i role (left node))
-       (assert (order:< i (tree:rightmost i (left node)) (node-key node))))
-     (when (right node)
-       (pf:check-invariant i role (right node))
-       (assert (order:< i (node-key node) (tree:leftmost i (right node)))))))
-  node)
+(defmethod check-invariant ((i <binary-tree>)
+                            (node binary-branch))
+  (when (left node)
+    (check-invariant i (left node))
+    (assert (order:< i (rightmost i (left node)) (node-key node))))
+  (when (right node)
+    (check-invariant i (right node))
+    (assert (order:< i (node-key node) (leftmost i (right node))))))
 
-
-(defmethod tree:node ((i pf:<binary-tree>) &key left right key value)
+;;(defmethod node ((i <tree>) &rest keys &key &allow-other-keys)
+;;  (apply #'make (node-interface i) keys))
+(defmethod node ((i <binary-tree>) &key left right key value)
   (make-instance 'binary-tree-node
                  :key key :value value :left left :right right))
 
-(defmethod tree:find ((i pf:<binary-tree>) node key path)
-  (if (null node) (values nil nil)
-      (ecase (order:compare i key (node-key node))
+;;(defmethod compare-key ((i <map>) key1 key2)
+;;  (compare (key-interface i) key1 key2))
+
+(defmethod locate ((i <binary-tree>) node key path)
+  (ecase (order:compare i key (node-key node)) ;; (compare-key i key (node-key node))
         (0 (values node path))
-        (-1 (tree:find i (left node) key (cons 'left path)))
-        (1 (tree:find i (right node) key (cons 'right path))))))
-(defmethod pf:lookup ((i pf:<binary-tree>) node key)
-  (if (null node) (values nil nil)
-      (ecase (order:compare i key (node-key node))
-        (0 (values (node-value node) t))
-        (-1 (pf:lookup i (left node) key))
-        (1 (pf:lookup i (right node) key)))))
-(defmethod pf:insert ((i pf:<binary-tree>) node key value)
+        (-1 (locate i (left node) key (cons 'left path)))
+        (1 (locate i (right node) key (cons 'right path)))))
+(defmethod lookup ((i <binary-tree>) node key)
   (if (null node)
-      (tree:node i :key key :value value)
+      (values nil nil)
+      (ecase (order:compare i key (node-key node)) ;; (compare-key i key (node-key node))
+        (0 (values (node-value node) t))
+        (-1 (lookup i (left node) key))
+        (1 (lookup i (right node) key)))))
+(defmethod insert ((i <binary-tree>) node key value)
+  (if (null node)
+      (node i :key key :value value)
       (ecase (order:compare i key (node-key node))
-        (0 (tree:node i :key key :value value
-                      :left (left node) :right (right node)))
-        (-1 (tree:node i :key (node-key node) :value (node-value node)
-                       :left (pf:insert i (left node) key value) :right (right node)))
-        (1 (tree:node i :key (node-key node) :value (node-value node)
-                      :left (left node) :right (pf:insert i (right node) key value))))))
-(defmethod pf:remove ((i pf:<binary-tree>) node key)
+        (0 (node i :key key :value value ;; (update-node i node :key key :value value)
+                 :left (left node) :right (right node)))
+        (-1 (node i :key (node-key node) :value (node-value node)
+                  :left (insert i (left node) key value) :right (right node)))
+        (1 (node i :key (node-key node) :value (node-value node)
+                 :left (left node) :right (insert i (right node) key value))))))
+(defmethod drop ((i <binary-tree>) (node binary-branch) key)
   (if (null node)
       (values nil nil nil)
       (let ((k (node-key node))
             (v (node-value node)))
         (ecase (order:compare i key k)
           (0 (values
-              (tree:join i (left node) (right node))
+              (join-nodes i (left node) (right node))
               v t))
-          (-1 (multiple-value-bind (left value foundp) (pf:remove i (left node) key)
-                (values (tree:node i :key k :value v
-                                   :left left :right (right node))
-                        value foundp)))
-          (1 (multiple-value-bind (right value foundp) (pf:remove i (right node) k)
-               (values (tree:node i :key k :value v
-                                  :left (left node) :right right)
+          (-1 (multiple-value-bind (left value foundp) (drop i (left node) key)
+                (values (node i :key k :value v
+                              :left left :right (right node))
+                    value foundp)))
+          (1 (multiple-value-bind (right value foundp) (drop i (right node) k)
+               (values (node i :key k :value v
+                             :left (left node) :right right)
                        value foundp)))))))
-(defmethod pf:first-key-value ((i pf:<binary-tree>) map)
-  (if map
-      (values (node-key map) (node-value map) t)
-      (values nil nil nil)))
-(defmethod pf:fold-left ((i pf:<binary-tree>) node f seed)
+(defmethod first-key-value ((i <binary-tree>) map)
+  (if (null map)
+      (values nil nil nil)
+      (values (node-key map) (node-value map) t)))
+(defmethod fold-left ((i <binary-tree>) node f seed)
   (if (null node)
       seed
-      (pf:fold-left i (right node) f
+      (fold-left i (right node) f
                       (funcall f
-                               (pf:fold-left i (left node) f seed)
+                               (fold-left i (left node) f seed)
                                (node-key node) (node-value node)))))
-(defmethod pf:fold-right ((i pf:<binary-tree>) node f seed)
+(defmethod fold-right ((i <binary-tree>) node f seed)
   (if (null node)
       seed
-      (pf:fold-right i (left node) f
+      (fold-right i (left node) f
                        (funcall f
                                 (node-key node) (node-value node)
-                                (pf:fold-right i (right node) f seed)))))
-(defmethod pf:for-each ((i pf:<binary-tree>) node f)
+                                (fold-right i (right node) f seed)))))
+(defmethod for-each ((i <binary-tree>) node f)
   (when node
-    (pf:for-each i (left node) f)
+    (for-each i (left node) f)
     (funcall f (node-key node) (node-value node))
-    (pf:for-each i (right node) f))
+    (for-each i (right node) f))
   (values))
-(defmethod pf:divide ((i pf:<binary-tree>) node)
+(defmethod divide ((i <binary-tree>) node)
   (cond
     ((null node)
      (values nil nil))
     ((null (left node))
-     (values (tree:node i :key (node-key node) :value (node-value node))
+     (values (node i :key (node-key node) :value (node-value node))
              (right node)))
     (t
-     (values (left node) (pf:insert i (right node) (node-key node) (node-value node))))))
-(defmethod pf:divide/list ((i pf:<binary-tree>) node)
+     (values (left node) (insert i (right node) (node-key node) (node-value node))))))
+(defmethod divide/list ((i <binary-tree>) node)
   (if (null node) '()
-      (let* ((rlist (cons (tree:node i :key (node-key node) :value (node-value node))
+      (let* ((rlist (cons (node i :key (node-key node) :value (node-value node))
                           (if (null (right node)) '() (list (right node))))))
         (if (null (left node)) rlist (cons (left node) rlist)))))
 
 
-(defmethod tree:leftmost ((i pf:<binary-tree>) node)
+(defmethod leftmost ((i <binary-tree>) node)
   (cond
-    ((null node)
-     (values nil nil nil))
-    ((null (left node))
-     (values (node-key node) (node-value node) t))
-    (t
-     (tree:leftmost i (left node)))))
-(defmethod tree:rightmost ((i pf:<binary-tree>) node)
+    ((null node) nil)
+    ((null (left node)) (values (node-key node) (node-value node) t))
+    (t (leftmost i (left node)))))
+(defmethod rightmost ((i <binary-tree>) node)
   (cond
-    ((null node)
-     (values nil nil nil))
-    ((null (right node))
-     (values (node-key node) (node-value node) t))
-    (t
-     (tree:rightmost i (right node)))))
+    ((null node) nil)
+    ((null (right node)) (values (node-key node) (node-value node) t))
+    (t (rightmost i (right node)))))
 
-(defmethod tree:join ((i pf:<binary-tree>) a b)
-  (cond
-    ((null a) b)
-    ((null b) a)
-    (t
-     (assert (order:< i (tree:rightmost a) (tree:leftmost b)))
-     (tree:node i :key (node-key a) :value (node-value a)
-                :left (left a)
-                :right (tree:node i :key (node-key b) :value (node-value b)
-                                  :left (tree:join i (right a) (left b))
-                                  :right (right b))))))
-
+(defmethod join-nodes ((i map-simple-empty) (a null) b) b)
+(defmethod join-nodes ((i map-simple-empty) a (b null)) a)
+(defmethod join-nodes ((i <binary-tree>) a b)
+  (assert (order:< i (rightmost a) (leftmost b)))
+  (node i :key (node-key a) :value (node-value a)
+        :left (left a)
+        :right (node i :key (node-key b) :value (node-value b)
+                     :left (join i (right a) (left b))
+                     :right (right b))))
 
 ;;; pure AVL-tree
 
-(defclass pf:<avl-tree> (pf:<binary-tree>) ())
+(defclass <avl-tree> (<binary-tree>) ())
 
 (defclass avl-tree-node (binary-tree-node)
   ((height
@@ -215,14 +216,13 @@ between them, re-balancing as needed."))
   (- (node-height (right node))
      (node-height (left node))))
 
-(defmethod pf:check-invariant :before ((i pf:<avl-tree>) role node)
-  (when node
-    (assert (typep (node-height node)
-                   `(integer 1 ,most-positive-fixnum)))
-    (assert (= (node-height node)
-               (1+ (max (node-height (left node))
-                        (node-height (right node))))))
-    (assert (member (node-balance node) '(-1 0 1)))))
+(defmethod check-invariant :before ((i <avl-tree>) (node avl-tree-node))
+  (assert (typep (node-height node)
+                 `(integer 1 ,most-positive-fixnum)))
+  (assert (= (node-height node)
+             (1+ (max (node-height (left node))
+                      (node-height (right node))))))
+  (assert (member (node-balance node) '(-1 0 1))))
 
 #| Minimum number of nodes in a tree of height n (maximum is 2^n-1)
 (memo:define-memo-function f (n)
@@ -235,10 +235,10 @@ This ensures that even in the worst-case scenario,
 a balanced tree is logarithmically shallow.
 
 Exercise: prove that the in the above algorithms,
-tree:node is always called with branches that are of comparable height...
+node is always called with branches that are of comparable height...
 |#
 
-(defmethod tree:node ((i pf:<avl-tree>) &key left right key value)
+(defmethod node ((i <avl-tree>) &key left right key value)
   (flet ((mk (&key left right key value)
            (let ((lh (node-height left))
                  (rh (node-height right)))
@@ -288,7 +288,9 @@ tree:node is always called with branches that are of comparable height...
               :key (node-key right) :value (node-value right)
               :right (right right))))))))
 
-(defclass pf:<integer-map> (pf:<avl-tree> order:<numeric>) ())
-(defparameter pf:<integer-map>
-  (memo:memoized 'make-instance 'pf:<integer-map>))
-(defparameter pf:<im> pf:<integer-map>)
+
+;;; Common special case: when keys are numbers
+(defclass <integer-map> (<avl-tree> order:<numeric>) ())
+(defparameter <integer-map>
+  (memo:memoized 'make-instance '<integer-map>))
+(defparameter <im> <integer-map>)

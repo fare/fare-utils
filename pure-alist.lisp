@@ -3,67 +3,60 @@
 
 #+xcvb (module (:depends-on ("pure-maps")))
 
-(in-package :fare-utils)
+(in-package :pure)
 
-
-(defclass pf:<alist>
-    (pf:<map> eq:<hashable>
-     fmap-simple-empty fmap-simple-decons fmap-simple-update fmap-simple-divide/list
-     fmap-simple-merge fmap-simple-append fmap-simple-append/list)
+(defclass <alist>
+    (<map>
+     map-simple-empty map-simple-decons map-simple-update-key map-simple-divide/list
+     map-simple-map/2 map-simple-join map-simple-join/list)
   ((eq-interface
     :initarg :eq
     :initform eq:<eq>
     :reader eq-interface)))
 
-(defmethod pf:check-invariant ((i pf:<alist>) role map)
-  (declare (ignore role))
+(defmethod check-invariant ((i <alist>) map)
   (loop :for ((key . val) . rest) :on map :do
-    (assert (not (member key rest :key 'car :test (eq:test-function i))) ()
-            "Key ~S is present twice in alist ~S" key map))
-  map)
+    (assert (not (member key rest
+                         :key 'car
+                         :test (eq:test-function (eq-interface i))))
+            () "Key ~S is present twice in alist ~S" key map)))
 
-(defun pf:<alist> (&optional (eq eq:<eq>))
-  (memo:memoized 'make-instance 'pf:<alist> :eq eq))
+(defun <alist> (&optional (eq eq:<eq>))
+  (memo:memoized 'make-instance '<alist> :eq eq))
 
-(defparameter pf:<alist> (pf:<alist>))
-(defmethod eq:= ((i pf:<alist>) x y)
-  (eq:= (eq-interface i) x y))
-(defmethod eq:test-function ((i pf:<alist>))
-  (eq:test-function (eq-interface i)))
+(defparameter <alist> (<alist>))
 
-(defmethod pf:lookup ((i pf:<alist>) map key)
-  (let ((pair (assoc key map :test (eq:test-function i))))
-    (if pair
-        (values (cdr pair) t)
-        (values nil nil))))
-    
-(defmethod pf:insert ((i pf:<alist>) map key value)
-  (acons key value (pf:remove i map key)))
-(defmethod pf:remove ((i pf:<alist>) map key)
-  (multiple-value-bind (v f) (pf:lookup i map key)
-    (if f
-        (values (remove key map :key 'car :test (eq:test-function i)) v t)
-        (values map nil nil))))
-(defmethod pf:first-key-value ((i pf:<alist>) map)
+(defmethod lookup ((i <alist>) map key)
+  (if (null map)
+      (values nil nil)
+      (let ((pair (assoc key map :test (eq:test-function (eq-interface i)))))
+        (if pair
+            (values (cdr pair) t)
+            (values nil nil)))))
+
+(defmethod insert ((i <alist>) map key value)
+  (acons key value (drop i map key)))
+(defmethod drop ((i <alist>) map key)
+  (if (null map)
+      (values nil nil nil)
+      (multiple-value-bind (v f) (lookup i map key)
+        (if f
+            (values (remove key map :key 'car :test (eq:test-function (eq-interface i))) v t)
+            (values map nil nil)))))
+(defmethod first-key-value ((i <alist>) map)
   (values (caar map) (cdar map) (not (null map))))
-(defmethod pf:fold-left ((i pf:<alist>) map f seed)
+(defmethod fold-left ((i <alist>) map f seed)
   (reduce (lambda (acc pair) (funcall f acc (car pair) (cdr pair)))
           map :initial-value seed))
-(defmethod pf:fold-right ((i pf:<alist>) map f seed)
+(defmethod fold-right ((i <alist>) map f seed)
   (reduce (lambda (pair acc) (funcall f (car pair) (cdr pair) acc))
           map :initial-value seed :from-end t))
-(defmethod pf:for-each ((i pf:<alist>) map f)
+(defmethod for-each ((i <alist>) map f)
   (loop :for (key . val) :in map :do (funcall f key val))
   (values))
-(defmethod pf:divide ((i pf:<alist>) map)
+(defmethod divide ((i <alist>) map)
   (let* ((l (length map))
          (l1 (floor l 2)))
     (values (subseq map 0 l1) (nthcdr l1 map))))
-(defmethod pf:count ((i pf:<alist>) map)
+(defmethod size ((i <alist>) map)
   (length map))
-
-(defmethod pf:convert (i2 i1 map1)
-  (pf:fold-right
-   i1 map1
-   (lambda (k v map2) (pf:insert i2 map2 k v))
-   (pf:empty i2)))

@@ -3,103 +3,98 @@
 
 #+xcvb (module (:depends-on ("pure-trees")))
 
-(in-package :fare-utils)
+(in-package :pure)
 
-(defclass pf:<hash-table>
-    (pf:<map> eq:<hashable>
-     fmap-simple-empty fmap-simple-append)
-  ((alist-interface :accessor alist-interface))
+(defclass <hash-table>
+    (<map>
+     map-simple-join)
+  ((key-interface :reader key-interface :initarg :key)
+   (hashmap-interface :reader hashmap-interface :initarg :hashmap)
+   (bucketmap-interface :reader bucketmap-interface :initarg :bucketmap))
   (:documentation "pure hash table"))
 
-(defmethod shared-initialize :after ((i pf:<hash-table>)
-                                     slot-names &rest initargs &key &allow-other-keys)
-  (declare (ignore slot-names initargs))
-  (setf (alist-interface i) (pf:<alist> i)))
+(defun <hash-table> (&key (key eq:<equal>)
+                     (hashmap <im>)
+                     (bucketmap (<alist> key)))
+  (assert (typep key 'eq:<hashable>))
+  (assert (typep hashmap '<map>))
+  (assert (typep bucketmap '<map>))
+  (memo:memoized 'make-instance '<hash-table>
+                 :key key :hashmap hashmap :bucketmap bucketmap))
+(defparameter <hash-table> (<hash-table>))
 
-(defparameter pf:<hash-table>
-  (memo:memoized 'make-instance 'pf:<hash-table>))
-(defparameter pf:<ht> pf:<hash-table>)
-
-(defclass pf:<equal-hash-table> (pf:<hash-table> eq:<equal>) ())
-(defparameter pf:<equal-hash-table>
-  (memo:memoized 'make-instance 'pf:<equal-hash-table>))
-(defparameter pf:<equal-ht> pf:<equal-hash-table>)
-
-(defmethod pf:check-invariant ((i pf:<hash-table>) role map)
-  (pf:check-invariant pf:<im> role map)
-  (pf:for-each
-   pf:<im> map
+(defmethod check-invariant ((i <hash-table>) map)
+  (check-invariant (hashmap-interface i) map)
+  (for-each
+   (hashmap-interface i) map
    (lambda (hash bucket)
      (declare (ignore hash))
-     (pf:check-invariant (alist-interface i) role bucket)))
-  map)
+     (check-invariant (bucketmap-interface i) bucket))))
 
-(defmethod pf:lookup ((i pf:<hash-table>) node key)
-  (if (null node) (values nil nil)
-      (let ((bucket (pf:lookup pf:<im> node (eq:hash i key))))
-        (if bucket
-            (pf:lookup (alist-interface i) bucket key)
-            (values nil nil)))))
-(defmethod pf:insert ((i pf:<hash-table>) node key value)
-  (let ((hash (eq:hash i key)))
-    (pf:insert
-     pf:<im> node hash
-     (pf:insert (alist-interface i)
-                  (pf:lookup pf:<im> node hash)
-                  key value))))
-(defmethod pf:remove ((i pf:<hash-table>) node key)
-  (if (null node)
-      (values nil nil nil)
-      (let* ((hash (node-key node))
-             (bucket (node-value node))
-             (key (caar bucket))
-             (value (cdar bucket))
-             (rest (rest bucket)))
-        (values
-         (if rest
-             (pf:insert pf:<im> node hash rest)
-             (pf:remove pf:<im> node hash))
-         key value t))))
-(defmethod pf:first-key-value ((i pf:<hash-table>) map)
-  (if map
-      (pf:first-key-value (alist-interface i)
-                            (nth 1 (pf:first-key-value pf:<im> map)))
-      (values nil nil nil)))
-(defmethod pf:fold-left ((i pf:<hash-table>) node f seed)
-  (pf:fold-left pf:<im> node
-                  (lambda (a h bucket)
-                    (declare (ignore h))
-                    (pf:fold-left (alist-interface i) bucket f a))
-                  seed))
-(defmethod pf:fold-right ((i pf:<hash-table>) node f seed)
-  (pf:fold-right pf:<im> node
-                   (lambda (h bucket a)
-                     (declare (ignore h))
-                     (pf:fold-right (alist-interface i) bucket f a))
-                  seed))
-(defmethod pf:for-each ((i pf:<hash-table>) map f)
-  (pf:for-each
-   pf:<im> map
+(defmethod empty ((i <hash-table>))
+  (empty (hashmap-interface i)))
+(defmethod empty-p ((i <hash-table>) map)
+  (empty-p (hashmap-interface i) map))
+(defmethod lookup ((i <hash-table>) map key)
+  (let ((bucket (lookup (hashmap-interface i) map
+                        (eq:hash (key-interface i) key))))
+    (lookup (bucketmap-interface i) bucket key)))
+(defmethod insert ((i <hash-table>) node key value)
+  (let ((hash (eq:hash (key-interface i) key)))
+    (insert
+     (hashmap-interface i) node hash
+     (insert (bucketmap-interface i)
+             (multiple-value-bind (bucket foundp)
+                 (lookup (hashmap-interface i) node hash)
+               (if foundp bucket (empty (bucketmap-interface i))))
+             key value))))
+(defmethod drop ((i <hash-table>) map key)
+  (multiple-value-bind (hash bucket) ;; hashfoundp
+      (first-key-value (hashmap-interface i) map)
+    (multiple-value-bind (new-bucket key value) ;; foundp
+        (decons (bucketmap-interface i) bucket)
+      (values
+       (if new-bucket
+           (insert (hashmap-interface i) map hash new-bucket)
+           (drop (hashmap-interface i) map hash))
+       key value t))))
+(defmethod first-key-value ((i <hash-table>) map)
+  (multiple-value-bind (hash bucket foundp)
+      (first-key-value (hashmap-interface i) map)
+    (declare (ignore hash))
+    (if foundp
+        (first-key-value (bucketmap-interface i) bucket)
+        (values nil nil nil))))
+(defmethod fold-left ((i <hash-table>) node f seed)
+  (fold-left (hashmap-interface i) node
+             (lambda (a h bucket)
+               (declare (ignore h))
+               (fold-left (bucketmap-interface i) bucket f a))
+             seed))
+(defmethod fold-right ((i <hash-table>) node f seed)
+  (fold-right (hashmap-interface i) node
+              (lambda (h bucket a)
+                (declare (ignore h))
+                (fold-right (bucketmap-interface i) bucket f a))
+              seed))
+(defmethod for-each ((i <hash-table>) map f)
+  (for-each
+   (hashmap-interface i) map
    (lambda (hash bucket)
      (declare (ignore hash))
-     (pf:for-each (alist-interface i) bucket f))))
-(defmethod pf:divide ((i pf:<hash-table>) node)
+     (for-each (bucketmap-interface i) bucket f))))
+(defmethod divide ((i <hash-table>) node)
   (cond
-    ((null node)
-     (values nil nil))
     ((and (null (left node)) (null (right node)))
      (let ((hash (node-key node))
            (bucket (node-value node)))
-       (multiple-value-bind (b1 b2) (pf:divide (alist-interface i) bucket)
-         (values (when b1 (pf:insert i nil hash b1))
-                 (when b2 (pf:insert i nil hash b2))))))
+       (multiple-value-bind (b1 b2) (divide (bucketmap-interface i) bucket)
+         (values (when b1 (insert i nil hash b1))
+                 (when b2 (insert i nil hash b2))))))
     (t
-     (pf:divide pf:<im> node))))
-(defmethod pf:divide/list ((i pf:<hash-table>) node)
-  (cond
-    ((null node)
-     (values nil nil))
-    ((and (null (left node)) (null (right node)))
-     (multiple-value-list (pf:divide i node)))
-    (t
-     (pf:divide/list pf:<im> node))))
+     (divide (hashmap-interface i) node))))
+(defmethod divide/list ((i <hash-table>) node)
+  (let ((list (divide/list (hashmap-interface i) node)))
+    (if (cdr list)
+        list
+        (multiple-value-list (divide i node)))))
