@@ -3,7 +3,7 @@
 
 #+xcvb (module (:depends-on ("package" "order")))
 
-(in-package :fare-utils)
+(in-package :stateful)
 
 (defun stable-bucket-sort/ordinals (size vector)
   ;; in: a vector mapping its indices to numbers below size

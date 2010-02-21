@@ -1,6 +1,6 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;;;; doubly-linked lists
-#+xcvb (module (:depends-on ("package" "containers")))
+#+xcvb (module (:depends-on ("stateful/container")))
 
 #|
 doubly-linked-mixin and doubly-linked list.
@@ -17,7 +17,7 @@ TODO:
 
 |#
 
-(in-package :fare-utils)
+(in-package :stateful)
 
 (defclass doubly-linked-mixin ()
   ((previous :accessor doubly-linked-previous)

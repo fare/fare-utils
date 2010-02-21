@@ -23,11 +23,8 @@
            #:clobber-file-if-different #:clobber-file-with-vector
            #:combinationp #:compose #:compose/2 #:conc-gensym
            #:conc-keyword #:conc-string #:conc-symbol #:conc-symbol-in
-           #:cond2 #:cons-tree-map #:container #:container-add-list!
-           #:container-contents #:container-empty #:container-empty-p
-           #:container-from-list! #:container-size #:container-sized
-           #:containers-empty-p #:copy-array #:copy-array-shape
-           #:copy-container #:copy-list-without-nth
+           #:cond2 #:cons-tree-map #:copy-array #:copy-array-shape
+           #:copy-list-without-nth
            #:copy-symbol-function #:copy-symbol-value #:dbg #:dbg-time
            #:declaim-type #:declare-type #:def*class #:def*constant
            #:def*fun #:def*generic #:def*macro #:def*method
@@ -45,9 +42,7 @@
            #:enable-fun #:equal-array #:error-behaviour #:eval-now
            #:eval-once #:evaluating-once #:exchange-nodes #:export*
            #:export-symbols #:export-symbols* #:exporting-definitions
-           #:extremum #:featurify #:fifo #:fifo-dequeue
-           #:fifo-dequeue-object #:fifo-empty-p #:fifo-empty! #:fifo-enqueue
-           #:fifo-head #:fifo-nconc2 #:fifo-tail
+           #:extremum #:featurify
            #:file-contents-equal-vector-p #:fill-array #:find-item
            #:find-least-item #:find-node #:firstn #:get-file-contents
            #:hash-table->alist #:hashmacro #:hashmacros #:heap #:if-bind #:when-bind
@@ -56,15 +51,15 @@
            #:join-strings #:kwote #:least-item #:length<-p #:length<=-p
            #:length<=n-p #:length<n-p #:length=-p #:length=n-p
            #:length>-p #:length>=-p #:length>=n-p #:length>n-p #:let1
-           #:list->vector #:list-from-container! #:list-of-integers
-           #:literalp #:make-container-from-list #:make-defpackage-form
-           #:make-fifo #:make-node #:make-predicate-symbol
+           #:list->vector #:list-of-integers
+           #:literalp #:make-defpackage-form
+           #:make-node #:make-predicate-symbol
            #:make-single-arg-form #:mapcar2 #:mapmacro #:mappend
            #:maybe-adjust-size-down #:maybe-adjust-size-up
-           #:merge-containers! #:msg #:multiple-value-quote #:mvbind
+           #:msg #:multiple-value-quote #:mvbind
            #:mvcall #:mvlist #:mvprog1 #:mvquote #:mvsetq
            #:ndolist-with-rest #:ndolist-with-rest-fun #:nilf #:niy
-           #:node-container-mixin #:node-item #:node-mixin #:nop
+           #:node-item #:node-mixin #:nop
            #:null-string-p #:plist->alist #:pop-last-item
            #:pop-last-item! #:pop-least-item #:pop-least-item! #:pop-item!
            #:post-decf #:post-incf #:propmacro #:propmacros

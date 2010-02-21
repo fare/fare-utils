@@ -2,8 +2,9 @@
 
 (declaim (optimize (speed 1) (debug 3) (space 3)))
 
-(defparameter <im> <im>)
-(defparameter <alist> <alist>)
+(defsuite* (test-functional-map
+            :in root-suite
+            :documentation "Testing pure functional maps"))
 
 (defun sort-alist (alist) (sort (copy-seq alist) #'< :key #'car))
 (defun shuffle-list (list)
@@ -32,46 +33,45 @@
 (defun from-alist (i map)
   (check-invariant i (convert i <alist> map)))
 
-(defgeneric test-map (fmap-interface))
+(defgeneric interface-test (<interface>))
 
-(defmethod test-map ((i <map>))
+(defmethod interface-test ((i <map>))
   ;;; TODO: test each and every function in the API
-  (assert (null (alist-from i (empty i))))
-  (assert (empty-p i (from-alist i ())))
-  (assert (equal "12"
-                 (lookup
-                  i
-                  (from-alist
-                   i '((57 . "57") (10 . "10") (12 . "12")))
-                  12)))
+  (is (null (alist-from i (empty i))))
+  (is (empty-p i (from-alist i ())))
+  (is (equal "12"
+             (lookup
+              i
+              (from-alist
+               i '((57 . "57") (10 . "10") (12 . "12")))
+              12)))
   (loop :for (k . v) :in *al-1* :with m = (from-alist i *al-1*) :do
-    (assert (eq v (lookup i m k))))
-  (assert (equal-alist *alist-10-latin*
-                       (alist-from i (from-alist i *alist-10-latin*))))
-  (assert (equal-alist *alist-10-latin*
-                       (alist-from i (from-alist i *alist-10-latin*))))
-  (assert (equal-alist *alist-100-decimal*
+    (is (eq v (lookup i m k))))
+  (is (equal-alist *alist-10-latin*
+                   (alist-from i (from-alist i *alist-10-latin*))))
+  (is (equal-alist *alist-10-latin*
+                   (alist-from i (from-alist i *alist-10-latin*))))
+  (is (equal-alist *alist-100-decimal*
                        (alist-from i (from-alist i *al-1*))))
-  (assert (equal-alist *al-5*
-                       (alist-from
-                        i (check-invariant
-                           i (join i (from-alist i *al-2*)
-                                   (from-alist i *al-3*))))))
+  (is (equal-alist *al-5*
+                   (alist-from
+                    i (check-invariant
+                       i (join i (from-alist i *al-2*)
+                               (from-alist i *al-3*))))))
   t)
 
-(defmethod test-map :after ((i <integer-map>))
+(defmethod interface-test :after ((i <integer-map>))
   (let* ((a1 (make-alist 1000 "~@R"))
          (a2 (shuffle-list a1))
          (m1 (convert i <alist> a1))
          (m2 (convert i <alist> a2)))
     (check-invariant i m1)
     (check-invariant i m2)
-    (assert (= 10 (pure::node-height m1)))
-    (assert (<= 10 (pure::node-height m2) 15))
-    (assert (= 1000 (size i m1)))
-    (assert (= 1000 (size i m2)))))
+    (is (= 10 (pure::node-height m1)))
+    (is (<= 10 (pure::node-height m2) 15))
+    (is (= 1000 (size i m1)))
+    (is (= 1000 (size i m2)))))
 
-(test-map <alist>)
-(test-map <im>)
-(test-map <hash-table>)
-(test-map <fmim>)
+(deftest test-pure-map-interfaces ()
+  (dolist (i (list <alist> <im> <hash-table> <fmim>))
+    (interface-test i)))

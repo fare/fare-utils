@@ -14,11 +14,12 @@
 ;;; * write a better function that gives you node handles for editing/removal purposes
 
 #+xcvb
-(module (:depends-on ("package" "basic-utils" "basic-macros" "containers")))
+(module (:depends-on ("base/utils" "base/macros" "stateful/container")))
 
-(in-package :fare-utils)
+(in-package :stateful)
 
-(def*class binary-heap (heap vector-container-mixin sized-container-mixin)
+(def*class binary-heap (heap order:<order-parameter>
+                        vector-container-mixin sized-container-mixin)
   ())
 
 ;; In this implementation, we use the standard trick of representing heap contents
@@ -53,7 +54,7 @@
   (make-instance 'binary-heap
     :size (container-size heap)
     :vector (copy-array (container-vector heap))
-    :order (order heap)))
+    :order (order:order-interface heap)))
 
 (defun binary-heap-sift-down (heap index &aux (min index))
   ;; the heap invariant is respected on each subtree of the specified node

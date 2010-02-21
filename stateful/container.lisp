@@ -4,7 +4,7 @@
 #+xcvb
 (module (:depends-on ("package" "basic-utils" "basic-macros" "order")))
 
-(in-package :fare-utils)
+(in-package :stateful)
 
 (exporting-definitions
 

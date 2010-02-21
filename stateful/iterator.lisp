@@ -1,6 +1,8 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;;; Generic iteration
 
+(in-package :stateful)
+
 (defclass iterator ()
   ())
 

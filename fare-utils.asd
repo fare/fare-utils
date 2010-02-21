@@ -17,45 +17,66 @@
       (ccl::new-compiler-policy :allow-tail-recursion-elimination (constantly t)))
 
 (asdf:defsystem :fare-utils
-  :components ((:file "package")
+  :components
+  ((:file "package")
 
-               ;;; Utilities wrt Lisp
-	       (:file "basic-utils" :depends-on ("package"))
-	       (:file "basic-strings" :depends-on ("basic-utils"))
-	       (:file "basic-symbols" :depends-on ("basic-strings"))
-	       (:file "basic-macros" :depends-on ("basic-symbols"))
-	       (:file "basic-lists" :depends-on ("basic-macros"))
-               (:file "basic-packages" :depends-on ("basic-lists"))
-               (:file "basic-objects" :depends-on ("basic-macros"))
-	       (:file "streams" :depends-on ("basic-utils"))
-	       (:file "pathnames" :depends-on ("basic-utils" "streams"))
-	       (:file "strings" :depends-on ("basic-strings" "streams"))
-	       (:file "files" :depends-on ("basic-utils"))
-	       (:file "atomic" :depends-on ("basic-macros"))
+   ;;; Utilities wrt Lisp
+   (:module "base"
+    :depends-on ("package")
+    :components
+    ((:file "utils")
+     (:file "strings" :depends-on ("utils"))
+     (:file "symbols" :depends-on ("strings"))
+     (:file "macros" :depends-on ("symbols"))
+     (:file "lists" :depends-on ("macros"))
+     (:file "packages" :depends-on ("lists"))
+     (:file "objects" :depends-on ("macros"))
+     (:file "streams" :depends-on ("utils"))
+     (:file "hash-tables" :depends-on ("macros"))
+     (:file "more-strings" :depends-on ("strings" "streams"))))
 
-               ;;; Magic Special Variables
-	       (:file "msv" :depends-on ("hash-tables"))
+   ;;; Utilities wrt Lisp
+   (:module "filesystem"
+    :depends-on ("base")
+    :components
+    ((:file "pathnames")
+     (:file "files")
+     (:file "atomic")))
 
-               ;;; Independent libraries
-               (:file "memoization")
+   ;;; Half-baked stuff
+   (:module "unbaked"
+    :depends-on ("base")
+    :components
+    ((:file "msv"))) ; Magic Special Variables
 
-               ;;; Interface-Passing Style generic libraries
-               (:file "eq" :depends-on ("basic-utils" "memoization"))
-               (:file "order" :depends-on ("eq" "basic-symbols"))
+   ;;; Interface-Passing Style generic libraries
+   (:module "interface"
+    :depends-on ("base")
+    :components
+    ((:file "memoization")
+     (:file "interface")
+     (:file "eq" :depends-on ("interface" "memoization"))
+     (:file "order" :depends-on ("eq"))))
 
-               ;;; IPS pure functional datastructures
-               (:file "pure" :depends-on ("basic-utils" "memoization"))
-               (:file "pure-maps" :depends-on ("eq" "pure"))
-               (:file "pure-alist" :depends-on ("pure-maps"))
-               (:file "pure-trees" :depends-on ("pure-maps" "order"))
-               (:file "pure-hash-tables" :depends-on ("pure-trees" "pure-alist"))
-               (:file "fmim" :depends-on ("pure-maps" "pure-trees"))
-
-               ;;; Stateful containers
-               (:file "containers" :depends-on ("order" "basic-macros" "basic-utils"))
-               (:file "hash-tables" :depends-on ("containers"))
-               (:file "binary-heaps" :depends-on ("containers"))
-               (:file "binomial-heaps" :depends-on ("containers"))
-               (:file "fifo" :depends-on ("containers"))
-               (:file "dllist" :depends-on ("containers"))
-	       (:file "sorting" :depends-on ("binary-heaps" "binomial-heaps"))))
+   ;;; IPS pure functional datastructures
+   (:module "pure"
+    :depends-on ("base" "interface")
+    :components
+    ((:file "package")
+     (:file "map" :depends-on ("package"))
+     (:file "alist" :depends-on ("map"))
+     (:file "tree" :depends-on ("map"))
+     (:file "hash-table" :depends-on ("tree" "alist"))
+     (:file "fmim" :depends-on ("map" "tree"))))
+   
+   ;;; Stateful containers
+   (:module "stateful"
+    :depends-on ("base" "interface")
+    :components
+    ((:file "package")
+     (:file "container" :depends-on ("package"))
+     (:file "binary-heap" :depends-on ("container"))
+     (:file "binomial-heap" :depends-on ("container"))
+     (:file "fifo" :depends-on ("container"))
+     (:file "dllist" :depends-on ("container"))
+     (:file "sorting" :depends-on ("binary-heap" "binomial-heap"))))))

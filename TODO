@@ -6,4 +6,6 @@ TODO
 
 * DECLAIM - distributed execution of common-lisp agents with intent and mobility
 
-* move stateful datastructures to a stateful: or st: or sf: package.
+* move stateful datastructures to a stateful: package.
+  Question: should I use separate interfaces as in the pure: package,
+  or dispatch directly on objects as in usual OO style?

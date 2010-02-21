@@ -11,7 +11,7 @@
 
 #+xcvb (module (:depends-on ("package" "basic-utils" "containers")))
 
-(in-package :fare-utils)
+(in-package :stateful)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
 (defclass binomial-tree (node-mixin)
