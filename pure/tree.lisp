@@ -262,9 +262,11 @@ node is always called with branches that are of comparable height...
       ((-1 0 1) (mk :key key :value value :left left :right right))
       ((-2)
        (ecase (node-balance left)
-         ((-1)
-          ;; LL rebalance:
+         ((-1 0)
+          ;; -1: LL rebalance:
           ;; (LL2 KL LR1) K R1 ==> (LL2 KL (LR1 K R1))
+          ;; 0: left rebalance during deletion
+          ;; (LL2 KL LR2) K R1 ==> (LL2 KL (LR2 K R1))
           (mk :left (left left)
               :key (node-key left) :value (node-value left)
               :right (mk :key key :value value :left (right left) :right right)))
@@ -290,17 +292,21 @@ node is always called with branches that are of comparable height...
               :right (mk :left (right (left right))
                          :key (node-key right) :value (node-value right)
                          :right (right right))))
-         ((1)
-          ;; RR rebalance:
+         ((0 1)
+          ;; -1: RR rebalance:
           ;; L1 K (RL1 KR RR2) ==> (L1 K RL1) KR RR2
+          ;; 0: right rebalance during deletion
+          ;; L1 K (RL2 KR RR2) ==> (L1 K RL2) KR RR2
           (mk :left (mk :left left
                         :key key :value value
                         :right (left right))
               :key (node-key right) :value (node-value right)
               :right (right right))))))))
 
-#| For debugging only
 (defmethod print-object ((x binary-tree-node) stream)
+  (format stream "#<bin ~A>"
+          (flatten-binary-tree x)))
+(defmethod print-object ((x avl-tree-node) stream)
   (format stream "#<avl ~A>"
           (flatten-binary-tree x)))
 
@@ -310,8 +316,8 @@ node is always called with branches that are of comparable height...
     (binary-tree-node
      (remove-if #'null
                 (list (flatten-binary-tree (left x))
-                      (node-key x) (flatten-binary-tree (right x)))))))
-|#
+                      (vector (node-key x) (node-value x))
+                      (flatten-binary-tree (right x)))))))
 
 ;;; Common special case: when keys are numbers
 ;;; TODO: rename to number-map ???

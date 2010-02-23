@@ -49,15 +49,33 @@
                (if foundp bucket (empty (bucketmap-interface i))))
              key value))))
 (defmethod drop ((i <hash-table>) map key)
-  (multiple-value-bind (hash bucket) ;; hashfoundp
+  (let ((hash (eq:hash (key-interface i) key)))
+    (multiple-value-bind (bucket hashfoundp)
+        (lookup (hashmap-interface i) map hash)
+      (if (null hashfoundp)
+          (values map nil nil)
+          (multiple-value-bind (new-bucket value foundp)
+              (drop (bucketmap-interface i) bucket key)
+            (if (null foundp)
+                (values map nil nil)
+                (values
+                 (if (empty-p (bucketmap-interface i) new-bucket)
+                     (drop (hashmap-interface i) map hash)
+                     (insert (hashmap-interface i) map hash new-bucket))
+                 value t)))))))
+(defmethod decons ((i <hash-table>) map)
+  (multiple-value-bind (hash bucket hashfoundp)
       (first-key-value (hashmap-interface i) map)
-    (multiple-value-bind (new-bucket key value) ;; foundp
-        (decons (bucketmap-interface i) bucket)
-      (values
-       (if new-bucket
-           (insert (hashmap-interface i) map hash new-bucket)
-           (drop (hashmap-interface i) map hash))
-       key value t))))
+    (if (null hashfoundp)
+        (values map nil nil nil)
+        (multiple-value-bind (new-bucket key value foundp)
+            (decons (bucketmap-interface i) bucket)
+          (assert foundp)
+          (values
+           (if (empty-p (bucketmap-interface i) new-bucket)
+               (insert (hashmap-interface i) map hash new-bucket)
+               (drop (hashmap-interface i) map hash))
+           key value t)))))
 (defmethod first-key-value ((i <hash-table>) map)
   (multiple-value-bind (hash bucket foundp)
       (first-key-value (hashmap-interface i) map)
@@ -98,3 +116,8 @@
     (if (cdr list)
         list
         (multiple-value-list (divide i node)))))
+(defmethod size ((i <hash-table>) map)
+  (fold-left (hashmap-interface i) map
+             (lambda (acc hash bucket) (declare (ignore hash))
+                     (+ acc (size (bucketmap-interface i) bucket)))
+             0))
