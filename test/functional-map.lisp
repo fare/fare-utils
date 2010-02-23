@@ -58,6 +58,77 @@
                     i (check-invariant
                        i (join i (from-alist i *al-2*)
                                (from-alist i *al-3*))))))
+
+  ;; insert
+  (is (equal '((nil)) (alist-from i (insert i () nil nil))))
+  (is (equal-alist '((1 . "1") (2 . "2") (3 . "3"))
+             (alist-from (insert i (from-alist i '((1 . "1") (2 . "2") (3 . "3")))))))
+  (is (= 101 (length (alist-from i (insert i (from-alist i *al-1*) 101 "101")))))
+
+  ;; drop (UNTESTED)
+  (multiple-value-bind (r d b)
+      (drop i (from-alist i '()) nil)
+    (is (equal r nil))
+    (is (equal d nil))
+    (is (equal b nil)))
+  (multiple-value-bind (r d b)
+      (drop i (from-alist i '((1 . "1") (2 . "2"))) 1)
+    (is (equal r '((2 . "2"))))
+    (is (equal d "1"))
+    (is (equal b t)))
+  (multiple-value-bind (r d b)
+      (drop i (from-alist i *al-1*) 1)
+    (is (= (length r) 99))
+    (is (equal d "1"))
+    (is (equal b t)))
+
+  ;; first-key-value
+  (multiple-value-bind (k v b)
+      (first-key-value i ())
+    (is (eql r nil))
+    (is (eql d nil))
+    (is (eql b nil)))
+
+  (multiple-value-bind (k v b)
+      (first-key-value i (from-alist i *al-2*))
+    (is (= k 2))
+    (is (equal v "2"))
+    (is (equal b t)))
+
+  (multiple-value-bind (k v b)
+      (first-key-value i (from-alist i *alist-100-latin*))
+    (is (= k 1))
+    (is (equal v "I"))
+    (is (equal b t)))
+
+  ;; decons
+  (multiple-value-bind (r k v b)
+      (decons i ())
+    (is (eql r nil))
+    (is (eql k nil))
+    (is (eql v nil))
+    (is (eql b nil)))
+
+  ;; FIXME: does not work for all interfaces
+  (multiple-value-bind (r k v b)
+      (decons i (from-alist i *alist-10-latin*))
+    (declare (ignorable k))
+    (is (= k 1))
+    (is (equal v "I"))
+    (is (equal b t)))
+
+  ;; fold-left
+  ;; fold-right
+  ;; for-each
+  ;; join
+  ;; divide
+  ;; size
+  ;; join/list
+  ;; divide/list
+  ;; update-key
+  ;; map/2
+  ;; convert
+  
   t)
 
 (defmethod interface-test :after ((i <integer-map>))
@@ -75,3 +146,4 @@
 (deftest test-pure-map-interfaces ()
   (dolist (i (list <alist> <im> <hash-table> <fmim>))
     (interface-test i)))
+
