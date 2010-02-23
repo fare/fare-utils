@@ -79,16 +79,14 @@
     (is (equal b t)))
     (is (= (size i r) 99)))
 
-  ;; first-key-value
-  (equal '(nil nil nil)
-         (multiple-value-list (first-key-value i (empty i))))
-
+  ;; first-key-value <- bogus. assumes the keys decons'ed in the same order as alist
+  (is (equal '(nil nil nil)
+             (multiple-value-list (first-key-value i (empty i)))))
   (multiple-value-bind (k v b)
       (first-key-value i (from-alist i *al-2*))
     (is (= k 2))
     (is (equal v "2"))
     (is (equal b t)))
-
   (multiple-value-bind (k v b)
       (first-key-value i (from-alist i *alist-100-latin*))
     (is (= k 1))
@@ -96,7 +94,7 @@
     (is (equal b t)))
 
   ;; decons
-  (equal '(() () () ()) (multiple-value-list (decons i (empty i))))
+  (is (equal '(() () () ()) (multiple-value-list (decons i (empty i)))))
   (multiple-value-bind (m k v b) (decons i (from-alist i *alist-10-latin*))
     (is (eq b t))
     (is (equal (list v t)
@@ -105,9 +103,14 @@
                (multiple-value-list (lookup i m k)))))
 
   ;; fold-left
+  
   ;; fold-right
+
   ;; for-each
   ;; join
+  (is (equal '() (join i (empty i) (empty i))))
+  
+ 
   ;; divide
   ;; size
   ;; join/list
