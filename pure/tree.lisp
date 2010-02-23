@@ -117,20 +117,27 @@ between them, re-balancing as needed."))
                   :left (insert i (left node) key value) :right (right node)))
         (1 (node i :key (node-key node) :value (node-value node)
                  :left (left node) :right (insert i (right node) key value))))))
-(defmethod drop ((i <binary-tree>) (node binary-branch) key)
+(defmethod drop ((i <binary-tree>) node key)
   (if (null node)
       (values nil nil nil)
       (let ((k (node-key node))
             (v (node-value node)))
         (ecase (order:compare i key k)
           (0 (values
-              (join-nodes i (left node) (right node))
+              (cond
+                ((null (left node)) (right node))
+                ((null (right node)) (left node))
+                (t
+                 (multiple-value-bind (kk vv)
+                     (leftmost i (right node))
+                   (node i :key kk :value vv
+                         :left (left node) :right (drop i (right node) kk)))))
               v t))
           (-1 (multiple-value-bind (left value foundp) (drop i (left node) key)
                 (values (node i :key k :value v
                               :left left :right (right node))
                     value foundp)))
-          (1 (multiple-value-bind (right value foundp) (drop i (right node) k)
+          (1 (multiple-value-bind (right value foundp) (drop i (right node) key)
                (values (node i :key k :value v
                              :left (left node) :right right)
                        value foundp)))))))
@@ -185,15 +192,17 @@ between them, re-balancing as needed."))
     ((null (right node)) (values (node-key node) (node-value node) t))
     (t (rightmost i (right node)))))
 
-(defmethod join-nodes ((i map-simple-empty) (a null) b) b)
-(defmethod join-nodes ((i map-simple-empty) a (b null)) a)
 (defmethod join-nodes ((i <binary-tree>) a b)
-  (assert (order< i (rightmost a) (leftmost b)))
-  (node i :key (node-key a) :value (node-value a)
-        :left (left a)
-        :right (node i :key (node-key b) :value (node-value b)
-                     :left (join i (right a) (left b))
-                     :right (right b))))
+  (cond
+    ((null a) b)
+    ((null b) a)
+    (t
+     (assert (order< i (rightmost i a) (leftmost i b)))
+     (node i :key (node-key a) :value (node-value a)
+           :left (left a)
+           :right (node i :key (node-key b) :value (node-value b)
+                        :left (join-nodes i (right a) (left b))
+                        :right (right b))))))
 
 ;;; pure AVL-tree
 
