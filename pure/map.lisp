@@ -36,7 +36,8 @@ whether the map was already empty."))
   (:documentation "Drop the first association from a map,
 returning four values:
 a new map, a key, a value, and a boolean indicating
-whether the map was already empty."))
+whether the map was already empty. The new map may have element ordering
+different from the input map."))
 (defgeneric fold-left (<map> map f seed)
   (:documentation "Fold a map with a function,
 by repeatedly deconstructing it as by decons,
