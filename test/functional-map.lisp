@@ -136,4 +136,3 @@
 (deftest test-pure-map-interfaces ()
   (dolist (i (list <alist> <im> <hash-table> <fmim>))
     (interface-test i)))
-

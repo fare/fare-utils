@@ -133,11 +133,13 @@ between them, re-balancing as needed."))
                    (node i :key kk :value vv
                          :left (left node) :right (drop i (right node) kk)))))
               v t))
-          (-1 (multiple-value-bind (left value foundp) (drop i (left node) key)
+          (-1
+           (multiple-value-bind (left value foundp) (drop i (left node) key)
                 (values (node i :key k :value v
                               :left left :right (right node))
                     value foundp)))
-          (1 (multiple-value-bind (right value foundp) (drop i (right node) key)
+          (1
+           (multiple-value-bind (right value foundp) (drop i (right node) key)
                (values (node i :key k :value v
                              :left (left node) :right right)
                        value foundp)))))))
@@ -297,8 +299,22 @@ node is always called with branches that are of comparable height...
               :key (node-key right) :value (node-value right)
               :right (right right))))))))
 
+#| For debugging only
+(defmethod print-object ((x binary-tree-node) stream)
+  (format stream "#<avl ~A>"
+          (flatten-binary-tree x)))
+
+(defun flatten-binary-tree (x)
+  (etypecase x
+    (null '())
+    (binary-tree-node
+     (remove-if #'null
+                (list (flatten-binary-tree (left x))
+                      (node-key x) (flatten-binary-tree (right x)))))))
+|#
 
 ;;; Common special case: when keys are numbers
+;;; TODO: rename to number-map ???
 (defclass <integer-map> (<avl-tree> order:<numeric>) ())
 (defparameter <integer-map>
   (memo:memoized 'make-instance '<integer-map>))
