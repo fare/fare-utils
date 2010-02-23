@@ -31,12 +31,18 @@ and a boolean that is true iff an association was found."))
 (defgeneric first-key-value (<map> map)
   (:documentation "Return three values:
 a key, a value, and a boolean indicating
-whether the map was already empty."))
+whether the map was already empty.
+What first means here may depend on the particular map interface,
+but generally means the element most easily accessible.
+"))
 (defgeneric decons (<map> map)
   (:documentation "Drop the first association from a map,
 returning four values:
 a new map, a key, a value, and a boolean indicating
-whether the map was already empty."))
+whether the map was already empty.
+What first means here may depend on the particular map interface,
+but generally means the element most easily accessible.
+"))
 (defgeneric fold-left (<map> map f seed)
   (:documentation "Fold a map with a function,
 by repeatedly deconstructing it as by decons,
