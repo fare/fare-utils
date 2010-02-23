@@ -5,9 +5,6 @@
 
 (in-package :pure)
 
-;;; On this "Interface-Passing Style" of programming, see
-;;;  http://fare.livejournal.com/155094.html
-
 (defclass <map> () ())
 
 (defgeneric empty (<map>)

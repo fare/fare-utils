@@ -80,15 +80,13 @@
     (is (= (size i r) 99)))
 
   ;; first-key-value
-  (equal '(nil nil nil)
-         (multiple-value-list (first-key-value i (empty i))))
-
+  (is (equal '(nil nil nil)
+             (multiple-value-list (first-key-value i (empty i)))))
   (multiple-value-bind (k v b)
       (first-key-value i (from-alist i *al-2*))
     (is (= k 2))
     (is (equal v "2"))
     (is (equal b t)))
-
   (multiple-value-bind (k v b)
       (first-key-value i (from-alist i *alist-100-latin*))
     (is (= k 1))
@@ -96,7 +94,7 @@
     (is (equal b t)))
 
   ;; decons
-  (equal '(() () () ()) (multiple-value-list (decons i (empty i))))
+  (is (equal '(() () () ()) (multiple-value-list (decons i (empty i)))))
   (multiple-value-bind (m k v b) (decons i (from-alist i *alist-10-latin*))
     (is (eq b t))
     (is (equal (list v t)
@@ -105,17 +103,80 @@
                (multiple-value-list (lookup i m k)))))
 
   ;; fold-left
+  (is (eql nil (fold-left i (empty i) (constantly t) nil)))
+  (is (eql t (fold-left i (empty i) (constantly t) t)))
+  (is (equal-alist
+       (alist-from i '((2 . "2") (1 . "1") (20 . "20") (30 . "30")))
+       (fold-left
+        i (alist-from i (make-alist 2))
+        (lambda (m k v) (insert i m k v))
+        (alist-from i '((20 . "20") (30 . "30"))))))
+    
   ;; fold-right
-  ;; for-each
-  ;; join
-  ;; divide
-  ;; size
-  ;; join/list
-  ;; divide/list
-  ;; update-key
-  ;; map/2
-  ;; convert
+  (is (eql nil (fold-right i (empty i) (constantly t) nil)))
+  (is (eql t (fold-right i (empty i) (constantly t) t)))
+  ;; TODO: write the 3rd case
 
+  ;; for-each
+  (is (eql (values) (for-each i (empty i) (constantly t))))
+  (is (equal "1122334455667788991010"
+             (with-output-to-string (o)
+               (for-each i (from-alist i (make-alist 10))
+                         (lambda (x y) (format o "~A~A" x y))))))
+  (is (= 1129 (length (with-output-to-string (o)
+                        (for-each i (from-alist i *alist-100-english*
+                                                (lambda (x y)
+                                                  (format o "~A~A" x y))))))))
+
+  ;; join
+  (is (equal '() (join i (empty i) (empty i))))
+  (is (equal-alist '((1 . "1") (2 . "2") (5 . "5") (6 . "6"))
+                   (alist-from
+                    i
+                    (join i
+                          (alist-from i (from-alist i '((1 . "1") (2 . "2"))))
+                          (alist-from i (from-alist i '((5 . "5") (6 . "6")))))))
+  ;; join and size
+  (is (= 100 (size i (join i
+                           (alist-from i *alist-10-latin*)
+                           (alist-from i *alist-100-latin*)))))
+ 
+  ;; divide
+  (is (equal '(nil nil) (multiple-value-list (divide i (empty i)))))
+  (multiple-value-bind (x y)
+      (divide i (from-alist i '((2 . "2") (67 . "67") (13 . "13") (88 . "88"))))
+    (is (equal-alist (alist-from i x) '((2 . "2") (67 . "67"))))
+    (is (equal-alist (alist-from i y) '((13 . "13") (88 . "88")))))
+  ;; divide and size
+  (multiple-value-bind (x y)
+      (divide i (from-alist i *alist-100-latin*))
+    (is (= 50 (size i x)))
+    (is (= 50 (size i y))))
+             
+  ;; size
+  (is (= 0 (size i (empty i))))
+  (is (= 100 (size i (from-alist i *alist-100-decimal*))))
+  (is (= 99 (size i (decons i (from-alist i *alist-100-decimal*)))))
+
+  ;; join/list
+  ;; TODO: add tests 
+
+  ;; divide/list
+  ;; TODO: add more tests
+  (is (null (divide/list i (empty i))))
+
+  ;; update-key
+  ;; TODO: add more tests
+  (is (null (update-key i (empty i) nil (constantly nil))))
+  
+  ;; map/2
+  ;; TODO: add more tests
+  (is (null (map/2 i (constantly t) nil nil)))
+
+  ;; convert
+  (is (null (convert i i (empty i))))
+  (is (equal (from-alist i '((1 . "1") (2 . "2") (3 . "3") (4 . "4") (5 . "5")))
+             (convert i <alist> '((1 . "1") (2 . "2") (3 . "3") (4 . "4") (5 . "5")))))
   t)
 
 (defmethod interface-test :after ((i <integer-map>))
