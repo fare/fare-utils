@@ -38,6 +38,6 @@
    #:size
    #:join/list
    #:divide/list
-   #:update
+   #:update-key
    #:map/2
    #:convert))

@@ -3,6 +3,9 @@
 
 #+xcvb (module (:depends-on ()))
 
+;;; On this "Interface-Passing Style" of programming, see
+;;;  http://fare.livejournal.com/155094.html
+
 (in-package :cl)
 
 (defpackage :interface

@@ -135,7 +135,7 @@
                     i
                     (join i
                           (alist-from i (from-alist i '((1 . "1") (2 . "2"))))
-                          (alist-from i (from-alist i '((5 . "5") (6 . "6")))))))
+                          (alist-from i (from-alist i '((5 . "5") (6 . "6"))))))))
   ;; join and size
   (is (= 100 (size i (join i
                            (alist-from i *alist-10-latin*)
