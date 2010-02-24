@@ -61,8 +61,17 @@
 
   ;; insert
   (is (equal '((nil)) (alist-from i (insert i (empty i) nil nil))))
-  (is (equal-alist '((1 . "1") (2 . "2") (3 . "3"))
-             (alist-from i (insert i (from-alist i '((1 . "1") (3 . "3"))) 2 "2"))))
+  (is (equal '((nil)) 
+             (alist-from i (insert i
+                                   (from-alist i '((nil) (nil) (nil)))
+                                   () ()))))
+  (is (equal-alist
+       '((1 . "1") (2 . "2") (3 . "3"))
+       (alist-from i (insert i (from-alist i '((1 . "1") (3 . "3"))) 2 "2"))))
+  ;; insert and join
+  (is (equal-alist
+       '((0 . "0") (1 . "1") (2 . "2"))
+       (alist-from i (insert i (from-alist i (join i '((1 . "1")) '((2 . "2")))) 0 "0"))))
   ;; insert and size
   (is (= 101 (size i (insert i (from-alist i *al-1*) 101 "101"))))
 
@@ -78,6 +87,12 @@
     (is (equal d "42")
     (is (equal b t)))
     (is (= (size i r) 99)))
+  ;; drop and size
+  (multiple-value-bind (r d b)
+      (drop i (from-alist i *alist-100-decimal*) 57)
+    (is (= (length r) 99))
+    (is (equal d "17"))
+    (is (eql b t)))
 
   ;; first-key-value
   (is (equal '(nil nil nil)
@@ -103,6 +118,8 @@
                (multiple-value-list (lookup <alist> *alist-10-latin* k))))
     (is (equal (list nil nil)
                (multiple-value-list (lookup i m k)))))
+  (multiple-value-bind (m k v b) (decons i (from-alist i *alist-100-latin*))
+    (is (= (length m) 99)))
 
   ;; fold-left
   (is (eql nil (fold-left i (empty i) (constantly t) nil)))
@@ -114,11 +131,24 @@
                    i (from-alist i (make-alist 2))
                    (lambda (m k v) (insert i m k v))
                    (from-alist i '((20 . "20") (30 . "30")))))))
+  ;; fold-left and size
+  (is (= 100
+         (size i
+               (from-alist i
+                           (fold-left i (from-alist i *alist-100-decimal*)
+                                      (lambda (m k v) (insert i m k v))
+                                      (from-alist i *alist-100-latin*))))))
 
   ;; fold-right
   (is (eql nil (fold-right i (empty i) (constantly t) nil)))
   (is (eql t (fold-right i (empty i) (constantly t) t)))
-  ;; TODO: write the 3rd case
+  (is (equal-alist
+       '((1 . "1") (2 . "2") (20 . "20") (30 . "30"))
+       (alist-from i
+                   (fold-right
+                    i (from-alist i (make-alist 2))
+                    (lambda (k v m) (insert i m k v))
+                    (from-alist i '((20 . "20") (30 . "30")))))))
 
   ;; for-each
   (is (eql nil (while-collecting (c)
@@ -169,6 +199,7 @@
 
   ;; join/list
   ;; TODO: add tests
+
 
   ;; divide/list
   ;; TODO: add more tests
