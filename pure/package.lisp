@@ -40,4 +40,6 @@
    #:divide/list
    #:update-key
    #:map/2
-   #:convert))
+   #:convert
+
+   #:check-invariant))
