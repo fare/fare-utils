@@ -67,7 +67,8 @@
   ;; insert and join
   (is (equal-alist
        '((0 . "0") (1 . "1") (2 . "2"))
-       (alist-from i (insert i (from-alist i (join i '((1 . "1")) '((2 . "2")))) 0 "0"))))
+       (alist-from i (insert i (join i (from-alist i '((1 . "1")))
+                                     (from-alist i'((2 . "2")))) 0 "0"))))
   ;; insert and size
   (is (= 101 (size i (insert i (from-alist i *al-1*) 101 "101"))))
 
@@ -86,7 +87,7 @@
   ;; drop and size
   (multiple-value-bind (r d b)
       (drop i (from-alist i *alist-100-decimal*) 57)
-    (is (= (length r) 99))
+    (is (= (size i r) 99))
     (is (equal d "57"))
     (is (eql b t)))
 
@@ -114,7 +115,7 @@
                (multiple-value-list (lookup <alist> *alist-10-latin* k))))
     (is (equal (list nil nil)
                (multiple-value-list (lookup i m k))))
-    (is (= (length m) 9)))
+    (is (= (size i m) 9)))
 
   ;; fold-left
   (is (eql nil (fold-left i (empty i) (constantly t) nil)))
@@ -129,10 +130,9 @@
   ;; fold-left and size
   (is (= 100
          (size i
-               (from-alist i
-                           (fold-left i (from-alist i *alist-100-decimal*)
-                                      (lambda (m k v) (insert i m k v))
-                                      (from-alist i *alist-100-latin*))))))
+               (fold-left i (from-alist i *alist-100-decimal*)
+                          (lambda (m k v) (insert i m k v))
+                          (from-alist i *alist-100-latin*)))))
 
   ;; fold-right
   (is (eql nil (fold-right i (empty i) (constantly t) nil)))
