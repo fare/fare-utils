@@ -14,7 +14,7 @@
   (:documentation "pure hash table"))
 
 (defun <hash-table> (&key (key eq:<equal>)
-                     (hashmap <im>)
+                     (hashmap <number-map>)
                      (bucketmap (<alist> key)))
   (assert (typep key 'eq:<hashable>))
   (assert (typep hashmap '<map>))

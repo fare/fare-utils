@@ -87,7 +87,7 @@
   (multiple-value-bind (r d b)
       (drop i (from-alist i *alist-100-decimal*) 57)
     (is (= (length r) 99))
-    (is (equal d "17"))
+    (is (equal d "57"))
     (is (eql b t)))
 
   ;; first-key-value
@@ -113,9 +113,8 @@
     (is (equal (list v t)
                (multiple-value-list (lookup <alist> *alist-10-latin* k))))
     (is (equal (list nil nil)
-               (multiple-value-list (lookup i m k)))))
-  (multiple-value-bind (m k v b) (decons i (from-alist i *alist-100-latin*))
-    (is (= (length m) 99)))
+               (multiple-value-list (lookup i m k))))
+    (is (= (length m) 9)))
 
   ;; fold-left
   (is (eql nil (fold-left i (empty i) (constantly t) nil)))
@@ -186,7 +185,7 @@
     (is (empty-p i x))
     (is (empty-p i y)))
   (multiple-value-bind (x y)
-      (divide i (from-alist i '((1 "1"))))
+      (divide i (from-alist i '((1 . "1"))))
     (is (empty-p i y))
     (is (= 1 (size i x))))
   (multiple-value-bind (x y)
@@ -223,7 +222,7 @@
                    (convert <alist> i (convert i <alist> *alist-10-latin*))))
   t)
 
-(defmethod interface-test :after ((i <integer-map>))
+(defmethod interface-test :after ((i <number-map>))
   (let* ((a1 (make-alist 1000 "~@R"))
          (a2 (shuffle-list a1))
          (m1 (convert i <alist> a1))
@@ -236,5 +235,5 @@
     (is (= 1000 (size i m2)))))
 
 (deftest test-pure-map-interfaces ()
-  (dolist (i (list <alist> <im> <hash-table> <fmim>))
+  (dolist (i (list <alist> <number-map> <hash-table> <fmim>))
     (interface-test i)))

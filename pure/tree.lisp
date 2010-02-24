@@ -320,8 +320,12 @@ node is always called with branches that are of comparable height...
                       (flatten-binary-tree (right x)))))))
 
 ;;; Common special case: when keys are numbers
-;;; TODO: rename to number-map ???
-(defclass <integer-map> (<avl-tree> order:<numeric>) ())
-(defparameter <integer-map>
-  (memo:memoized 'make-instance '<integer-map>))
-(defparameter <im> <integer-map>)
+(defclass <number-map> (<avl-tree> order:<numeric>) ())
+(defparameter <number-map>
+  (memo:memoized 'make-instance '<number-map>))
+(defparameter <nm> <number-map>)
+
+(defmethod print-object ((object binary-tree-node) stream)
+  (format stream "#<bt ~S>" (convert <alist> <nm> object)))
+(defmethod print-object ((object avl-tree-node) stream)
+  (format stream "#<at ~S>" (convert <alist> <nm> object)))

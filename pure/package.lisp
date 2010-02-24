@@ -18,8 +18,8 @@
    ;;; Functional Maps and Containers: classes
    #:<map> #:<alist>
    #:<binary-tree> #:<avl-tree>
-   #:<integer-map> #:<im>
-   #:<hash-table> #:<equal-hash-table> #:<ht> #:<equal-ht>
+   #:<number-map> #:<nm>
+   #:<hash-table> #:<equal-hash-table>
    #:<fmim>
 
    ;;; Functional Maps and Containers: Generic Functions
