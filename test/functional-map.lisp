@@ -60,7 +60,7 @@
                                (from-alist i *al-3*))))))
 
   ;; insert
-  (is (equal '((nil)) (alist-from i (insert i (empty i) nil nil))))
+  (is (equal '((0)) (alist-from i (insert i (empty i) 0 nil))))
   (is (equal-alist '((1 . "1") (2 . "2") (3 . "3"))
              (alist-from i (insert i (from-alist i '((1 . "1") (3 . "3"))) 2 "2"))))
   ;; insert and size
@@ -68,7 +68,7 @@
 
   ;; drop
   (is (equal '(nil nil nil)
-             (multiple-value-list (drop i (empty i) nil))))
+             (multiple-value-list (drop i (empty i) 0))))
   (multiple-value-bind (r d b)
       (drop i (from-alist i '((1 . "1") (2 . "2"))) 1)
     (is (equal '(((2 . "2")) "1" t)
@@ -156,6 +156,14 @@
                      (append (alist-from i x) (alist-from i y)))))
   ;; divide and size
   (multiple-value-bind (x y)
+      (divide i (from-alist i '()))
+    (is (empty-p i x))
+    (is (empty-p i y)))
+  (multiple-value-bind (x y)
+      (divide i (from-alist i '((1 "1"))))
+    (is (empty-p i y))
+    (is (= 1 (size i x))))
+  (multiple-value-bind (x y)
       (divide i (from-alist i *alist-100-latin*))
     (let ((sx (size i x)) (sy (size i y)))
       (is (plusp sx))
@@ -176,11 +184,11 @@
 
   ;; update-key
   ;; TODO: add more tests
-  (is (null (update-key i (empty i) nil (constantly nil))))
+  (is (null (update-key i (empty i) 0 (constantly nil))))
 
   ;; map/2
   ;; TODO: add more tests
-  (is (null (map/2 i (constantly t) nil nil)))
+  (is (null (map/2 i (constantly t) (empty i) (empty i))))
 
   ;; convert
   (is (null (convert <alist> i (empty i))))

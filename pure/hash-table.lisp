@@ -7,7 +7,7 @@
 
 (defclass <hash-table>
     (<map>
-     map-simple-join)
+     map-simple-join map-simple-update-key map-simple-map/2)
   ((key-interface :reader key-interface :initarg :key)
    (hashmap-interface :reader hashmap-interface :initarg :hashmap)
    (bucketmap-interface :reader bucketmap-interface :initarg :bucketmap))
@@ -101,21 +101,31 @@
    (lambda (hash bucket)
      (declare (ignore hash))
      (for-each (bucketmap-interface i) bucket f))))
-(defmethod divide ((i <hash-table>) node)
-  (cond
-    ((and (null (left node)) (null (right node)))
-     (let ((hash (node-key node))
-           (bucket (node-value node)))
-       (multiple-value-bind (b1 b2) (divide (bucketmap-interface i) bucket)
-         (values (when b1 (insert i nil hash b1))
-                 (when b2 (insert i nil hash b2))))))
-    (t
-     (divide (hashmap-interface i) node))))
+(defmethod divide ((i <hash-table>) map)
+  (if (empty-p (hashmap-interface i) map)
+      (values nil nil)
+      (multiple-value-bind (a b) (divide (hashmap-interface i) map)
+        (if (empty-p (hashmap-interface i) b)
+            (multiple-value-bind (hash bucket)
+                (first-key-value (hashmap-interface i) a)
+              (multiple-value-bind (x y) (divide (bucketmap-interface i) bucket)
+                (if (empty-p (bucketmap-interface i) y)
+                    (values a b)
+                    (values (insert (hashmap-interface i) b hash x)
+                            (insert (hashmap-interface i) b hash y)))))
+            (values a b)))))
 (defmethod divide/list ((i <hash-table>) node)
   (let ((list (divide/list (hashmap-interface i) node)))
     (if (cdr list)
         list
-        (multiple-value-list (divide i node)))))
+        (multiple-value-bind (a b) (divide i node)
+          (cond
+            ((empty-p (hashmap-interface i) a)
+             nil)
+            ((empty-p (hashmap-interface i) b)
+             (list a))
+            (t
+             (list a b)))))))
 (defmethod size ((i <hash-table>) map)
   (fold-left (hashmap-interface i) map
              (lambda (acc hash bucket) (declare (ignore hash))

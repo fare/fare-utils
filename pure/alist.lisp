@@ -56,7 +56,7 @@
   (values))
 (defmethod divide ((i <alist>) map)
   (let* ((l (length map))
-         (l1 (floor l 2)))
+         (l1 (ceiling l 2)))
     (values (subseq map 0 l1) (nthcdr l1 map))))
 (defmethod size ((i <alist>) map)
   (length map))

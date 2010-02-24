@@ -12,7 +12,8 @@
 (defclass <fmim>
     (<map> <tree>
      map-simple-empty map-simple-decons map-simple-update-key
-     map-simple-map/2 map-simple-join/list map-simple-size)
+     map-simple-map/2 map-simple-join/list map-simple-size
+     map-simple-for-each map-simple-divide/list)
   ()
   (:documentation "Fast Merge Integer Maps"))
 
@@ -135,15 +136,19 @@
     (t
      nil)))
 (defun make-trie-head (height trie)
-  (if (and (plusp height)
-           (typep trie 'trie-skip)
-           (zerop (ldb (byte 1 (1- (node-prefix-length trie))) (node-prefix-bits trie))))
-      (let* ((plen (integer-length (node-prefix-bits trie)))
-             (datum (datum trie))
-             (height (- height (- (node-prefix-length trie) plen)))
-             (trie (make-trie-skip height plen (node-prefix-bits trie) datum)))
-        (make-instance 'trie-head :height height :datum trie))
-      (make-instance 'trie-head :height height :datum trie)))
+  (cond
+    ((and (plusp height) (null trie))
+     nil)
+    ((and (plusp height)
+          (typep trie 'trie-skip)
+          (zerop (ldb (byte 1 (1- (node-prefix-length trie))) (node-prefix-bits trie))))
+     (let* ((plen (integer-length (node-prefix-bits trie)))
+            (datum (datum trie))
+            (height (- height (- (node-prefix-length trie) plen)))
+            (trie (make-trie-skip height plen (node-prefix-bits trie) datum)))
+       (make-instance 'trie-head :height height :datum trie)))
+    (t
+     (make-instance 'trie-head :height height :datum trie))))
 
 (defmethod insert ((i <fmim>) map key value)
   (check-type map (or null trie-head))
@@ -204,36 +209,48 @@
   (multiple-value-bind (v f)
       (lookup i map key)
     (if f
-        (values (make-trie-head
-                 (node-height map)
-                 (trie-drop (datum map) (node-height map) key))
-                v f)
+        (values
+         (multiple-value-bind (datum non-empty-p)
+             (trie-drop (datum map) (node-height map) key)
+           (when non-empty-p
+             (make-trie-head (node-height map) datum)))
+         v f)
         (values map nil nil))))
 (defun trie-drop (trie position key)
   ;; from our contract with drop,
   ;; we do assume the key IS in fact in the trie.
   (if (zerop position)
-      (values trie nil nil)
+      (values nil nil)
       (etypecase trie
         (trie-skip
          (let* ((pbits (node-prefix-bits trie))
                 (plen (node-prefix-length trie))
                 (pos (- position plen)))
            (assert (= pbits (ldb (byte plen pos) key)))
-           (make-trie-skip
-            position plen pbits
-            (trie-drop (datum trie) pos key))))
+           (multiple-value-bind (datum non-empty-p)
+               (trie-drop (datum trie) pos key)
+             (if non-empty-p
+                 (values (make-trie-skip position plen pbits datum) t)
+                 (values nil nil)))))
         (trie-branch
-         (let ((pos (1- position)))
-           (if (zerop (ldb (byte 1 pos) key))
+         (let* ((pos (1- position))
+                (bit (ldb (byte 1 pos) key)))
+           (values
+            (cond
+              ((zerop pos)
+               (make-trie-skip 1 1 (- 1 bit)
+                               (if (zerop bit) (right trie) (left trie))))
+              ((zerop bit)
                (make-trie-branch
-                pos
+                position
                 (trie-drop (left trie) pos key)
-                (right trie))
+                (right trie)))
+              (t
                (make-trie-branch
-                pos
+                position
                 (left trie)
-                (trie-drop (right trie) pos key))))))))
+                (trie-drop (right trie) pos key))))
+            t))))))
 (defmethod first-key-value ((i <fmim>) map)
   (leftmost i map))
 (defmethod fold-left ((i <fmim>) map f seed)
@@ -310,12 +327,38 @@
          (let ((pos (1- position)))
            (trie-rightmost (right trie) pos (dpb 1 (byte 1 pos) key)))))))
 
-(defmethod divide ((i <fmim>) node)
-  (NIY))
-(defmethod divide/list ((i <fmim>) node)
-  (NIY))
-(defmethod join-nodes ((i <fmim>) a b)
-  (NIY))
+(defmethod divide ((i <fmim>) map)
+  (etypecase map
+    (null
+     (values nil nil))
+    (trie-head
+     (let ((height (node-height map))
+           (datum (datum map)))
+       (if (zerop height)
+           (values map nil)
+           (etypecase datum
+             (trie-branch
+              (values
+               (make-trie-head (1- height) (left datum))
+               (make-trie-head height
+                               (make-trie-skip height 1 1 (right datum)))))
+             (trie-skip
+              (let* ((pbits (node-prefix-bits datum))
+                     (plen (node-prefix-length datum))
+                     (position (- height plen)))
+                (if (zerop position)
+                    (values map nil)
+                    (etypecase (datum datum)
+                      (trie-branch
+                       (flet ((f (bit datum)
+                                (make-trie-head height
+                                                (make-trie-skip
+                                                 height
+                                                 (1+ plen)
+                                                 (dpb pbits (byte plen 1) bit)
+                                                 datum))))
+                         (f 0 (left datum))
+                         (f 1 (right datum))))))))))))))
 
 ;;; The whole point of fmim is that we could do a fast "append",
 (defmethod join ((i <fmim>) a b)
@@ -386,6 +429,16 @@
                     (if (zerop ah)
                         (make-trie-branch position a1 b1)
                         (make-trie-branch position b1 a1)))))))))))
+
+(defmethod print-object ((object trie-head) stream)
+  (format stream "#<fmim ~S>" (convert <alist> <fmim> object)))
+(defmethod print-object ((trie trie-branch) stream)
+  (format stream "#<tb ~S ~S>" (left trie) (right trie)))
+(defmethod print-object ((trie trie-skip) stream)
+  (format stream "#<ts ~S ~S ~S>"
+          (node-prefix-bits trie)
+          (node-prefix-length trie)
+          (datum trie)))
 
 #|
 You could implement sets of integers as bitmaps,

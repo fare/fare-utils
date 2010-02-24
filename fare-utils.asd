@@ -67,7 +67,7 @@
      (:file "alist" :depends-on ("map"))
      (:file "tree" :depends-on ("map"))
      (:file "hash-table" :depends-on ("tree" "alist"))
-     (:file "fmim" :depends-on ("map" "tree"))))
+     (:file "fmim" :depends-on ("map" "tree" "alist"))))
    
    ;;; Stateful containers
    (:module "stateful"

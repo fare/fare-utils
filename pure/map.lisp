@@ -58,7 +58,10 @@ Mappings from MAP1 override those from MAP2."))
 (defgeneric divide (<map> map)
   (:documentation "Divide a map in two,
 returning two maps MAP1 and MAP2 that each have strictly
-fewer associations than MAP unless MAP is of size one or two."))
+fewer associations than MAP unless MAP is of size zero or one.
+If MAP is of size one, then MAP1 is MAP and MAP2 is empty.
+If MAP is of size zero, then both MAP1 and MAP2 are empty.
+"))
 (defgeneric size (<map> map)
   (:documentation "Size the number of elements in a map"))
 (defgeneric join/list (<map> list)
@@ -141,7 +144,7 @@ we could have a
     (t (multiple-value-list (divide map)))))
 
 (defclass map-simple-map/2 () ())
-(defmethod map/2 ((i map-simple-join) fun map1 map2)
+(defmethod map/2 ((i map-simple-map/2) fun map1 map2)
   (labels ((join1 (a k v1)
              (let ((mm (car a))
                    (m2 (cdr a)))
@@ -165,6 +168,14 @@ we could have a
     (lambda (f k v) (lambda (acc) (funcall f (funcall fun k v acc))))
     #'identity
    seed)))
+
+(defclass map-simple-for-each () ())
+(defmethod for-each ((i map-simple-for-each) map fun)
+  (fold-left
+   i map
+   (lambda (s k v) (declare (ignore s)) (funcall fun k v))
+   nil)
+  (values))
 
 (defclass map-simple-size () ())
 (defmethod size ((i map-simple-size) map)
