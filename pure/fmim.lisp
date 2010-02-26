@@ -40,7 +40,7 @@
 (defclass full-trie-branch (trie-branch) ())
 ;;; Not needed: position tells us! (defclass trie-leaf (trie-node box) ())
 
-(defmethod check-invariant ((i <fmim>) (map trie-head))
+(defmethod check-invariant ((i <fmim>) (map trie-head) &key)
   (trie-check-invariant (datum map) (node-height map) 0))
 
 (defun trie-check-invariant (trie position key)

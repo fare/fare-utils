@@ -23,7 +23,7 @@
                  :key key :hashmap hashmap :bucketmap bucketmap))
 (defparameter <hash-table> (<hash-table>))
 
-(defmethod check-invariant ((i <hash-table>) map)
+(defmethod check-invariant ((i <hash-table>) map &key)
   (check-invariant (hashmap-interface i) map)
   (for-each
    (hashmap-interface i) map
