@@ -20,9 +20,9 @@
 |#
 
 (defgeneric leftmost (<tree> tree)
-  (:documentation "leftmost node in TREE"))
+  (:documentation "key, value and foundp from the leftmost node in TREE"))
 (defgeneric rightmost (<tree> tree)
-  (:documentation "rightmost node in TREE"))
+  (:documentation "key, value and foundp from rightmost node in TREE"))
 
 (defgeneric locate (<tree> tree key path)
   (:documentation "lookup a tree for a key, return a path to the proper node."))
@@ -81,7 +81,7 @@
     (when (left node)
       (check-invariant i (left node) :lowerp lowerp :lower lower :upperp t :upper key))
     (when (right node)
-      (check-invariant i (right node) :lowerp t :lower key :upperp t :upper upper))))
+      (check-invariant i (right node) :lowerp t :lower key :upperp upperp :upper upper))))
 
 ;;(defmethod node ((i <tree>) &rest keys &key &allow-other-keys)
 ;;  (apply #'make (node-interface i) keys))
@@ -142,10 +142,7 @@
                        value foundp)))))))
 (defmethod first-key-value ((i <binary-tree>) map)
   "Return key and value with the least key"
-  (if (null map)
-      (values nil nil nil)
-      (let ((node (leftmost i map)))
-        (values (node-key node) (node-value node) t))))
+  (leftmost i map))
 (defmethod fold-left ((i <binary-tree>) node f seed)
   (if (null node)
       seed
@@ -184,12 +181,12 @@
 
 (defmethod leftmost ((i <binary-tree>) node)
   (cond
-    ((null node) nil)
+    ((null node) (values nil nil nil))
     ((null (left node)) (values (node-key node) (node-value node) t))
     (t (leftmost i (left node)))))
 (defmethod rightmost ((i <binary-tree>) node)
   (cond
-    ((null node) nil)
+    ((null node) (values nil nil nil))
     ((null (right node)) (values (node-key node) (node-value node) t))
     (t (rightmost i (right node)))))
 
