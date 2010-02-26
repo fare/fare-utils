@@ -19,16 +19,10 @@
   (:documentation "returns the interface for keys of given tree interface"))
 |#
 
-(defgeneric join-nodes (<tree> node1 node2)
-  (:documentation "join two nodes.
-Unlike join, which accepts arbitrary trees,
-join assumes that any ordering and balancing constraints are respected
-in the constituents, and that any ordering constraint is respected
-between them, re-balancing as needed."))
 (defgeneric leftmost (<tree> tree)
-  (:documentation "key, value, foundp for leftmost node in TREE"))
+  (:documentation "leftmost node in TREE"))
 (defgeneric rightmost (<tree> tree)
-  (:documentation "key, value, foundp for rightmost node in TREE"))
+  (:documentation "rightmost node in TREE"))
 
 (defgeneric locate (<tree> tree key path)
   (:documentation "lookup a tree for a key, return a path to the proper node."))
@@ -147,9 +141,11 @@ between them, re-balancing as needed."))
                              :left (left node) :right right)
                        value foundp)))))))
 (defmethod first-key-value ((i <binary-tree>) map)
+  "Return key and value with the least key"
   (if (null map)
       (values nil nil nil)
-      (values (node-key map) (node-value map) t)))
+      (let ((node (leftmost i map)))
+        (values (node-key node) (node-value node) t))))
 (defmethod fold-left ((i <binary-tree>) node f seed)
   (if (null node)
       seed
@@ -196,18 +192,6 @@ between them, re-balancing as needed."))
     ((null node) nil)
     ((null (right node)) (values (node-key node) (node-value node) t))
     (t (rightmost i (right node)))))
-
-(defmethod join-nodes ((i <binary-tree>) a b)
-  (cond
-    ((null a) b)
-    ((null b) a)
-    (t
-     (assert (order< i (rightmost i a) (leftmost i b)))
-     (node i :key (node-key a) :value (node-value a)
-           :left (left a)
-           :right (node i :key (node-key b) :value (node-value b)
-                        :left (join-nodes i (right a) (left b))
-                        :right (right b))))))
 
 ;;; pure AVL-tree
 
