@@ -102,7 +102,7 @@ we could have a
 
 ;;; Simple cases for a lot of the above functions
 (defclass map-simple-empty () ())
-(defmethod check-invariant ((i map-simple-empty &key) (m null))
+(defmethod check-invariant ((i map-simple-empty) (m null) &key)
   m)
 (defmethod empty ((i map-simple-empty))
   '())
