@@ -13,12 +13,14 @@ or a MIT license. Yes they can. Of course, if they choose a proprietary
 software license, they only deserve scorn. But even that, they may do!
 
 
+Reasonably debugged (test suite included):
+* pure data structures (avl-trees, hash-tables, fmim)
+
 Somewhat debugged (need to write a test suite):
-* binary-heaps
-* pure data structures (avl-trees, hash-tables, faim)
+* stateful binary-heaps
 
 Untested:
-* binomial-heaps
+* stateful binomial-heaps
 
 Work In Progress:
 * basic-utilities

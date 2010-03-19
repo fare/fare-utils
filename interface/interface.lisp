@@ -40,7 +40,7 @@ based on provided initarg keywords, returning the object."))
   (:documentation "Update OBJECT by overriding some of its slots
 with those specified as initarg keywords, returning a new object."))
 
-(defgeneric check-invariant (<type> object &key)
+(defgeneric check-invariant (<type> object &key) ;; &allow-other-keys ???
   (:documentation "Check whether an OBJECT fulfills the invariant(s) required
 to play a given ROLE with respect to the given INTERFACE.
 Interface is an interface, role is a class or keyword,

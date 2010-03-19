@@ -36,6 +36,7 @@
 
 (defmethod insert ((i <alist>) map key value)
   (acons key value (drop i map key)))
+
 (defmethod drop ((i <alist>) map key)
   (if (null map)
       (values nil nil nil)
@@ -43,20 +44,26 @@
         (if f
             (values (remove key map :key 'car :test (eq:test-function (eq-interface i))) v t)
             (values map nil nil)))))
+
 (defmethod first-key-value ((i <alist>) map)
   (values (caar map) (cdar map) (not (null map))))
+
 (defmethod fold-left ((i <alist>) map f seed)
   (reduce (lambda (acc pair) (funcall f acc (car pair) (cdr pair)))
           map :initial-value seed))
+
 (defmethod fold-right ((i <alist>) map f seed)
   (reduce (lambda (pair acc) (funcall f (car pair) (cdr pair) acc))
           map :initial-value seed :from-end t))
+
 (defmethod for-each ((i <alist>) map f)
   (loop :for (key . val) :in map :do (funcall f key val))
   (values))
+
 (defmethod divide ((i <alist>) map)
   (let* ((l (length map))
          (l1 (ceiling l 2)))
     (values (subseq map 0 l1) (nthcdr l1 map))))
+
 (defmethod size ((i <alist>) map)
   (length map))

@@ -26,7 +26,9 @@
     :initform 0
     :initarg :height
     :reader node-height)))
+
 (defclass trie-node () ())
+
 (defclass trie-skip (trie-node box)
   ((prefix-bits
     :type (integer 0 *)
@@ -36,7 +38,9 @@
     :type fixnum
     :initarg :prefix-length
     :reader node-prefix-length)))
+
 (defclass trie-branch (trie-node binary-branch) ())
+
 (defclass full-trie-branch (trie-branch) ())
 ;;; Not needed: position tells us! (defclass trie-leaf (trie-node box) ())
 
@@ -75,6 +79,7 @@
             (values nil nil)
             (trie-lookup (datum map) height key)))
       (values nil nil)))
+
 (defun trie-lookup (trie position key)
   (cond
     ((zerop position) (values trie t))
@@ -102,6 +107,7 @@
   (if (zerop position)
       value
       (make-trie-skip position position (ldb (byte position 0) key) value)))
+
 (defun make-trie-skip (position length bits datum)
   (cond
     ((zerop length)
@@ -121,6 +127,7 @@
       :prefix-length length
       :prefix-bits bits
       :datum datum))))
+
 (defun make-trie-branch (pos left right)
   (cond
     ((or (zerop pos)
@@ -135,6 +142,7 @@
      (make-trie-skip pos 1 1 right))
     (t
      nil)))
+
 (defun make-trie-head (height trie)
   (cond
     ((and (plusp height) (null trie))
@@ -168,6 +176,7 @@
                   (values height
                           (trie-insert trie height key value)))))
       (make-trie-head l d))))
+
 (defun trie-insert (trie position key value)
   (if (zerop position) value
       (etypecase trie
@@ -204,6 +213,7 @@
                 pos
                 (left trie)
                 (trie-insert (right trie) pos key value))))))))
+
 (defmethod drop ((i <fmim>) map key)
   (check-type map (or null trie-head))
   (multiple-value-bind (v f)
@@ -216,6 +226,7 @@
              (make-trie-head (node-height map) datum)))
          v f)
         (values map nil nil))))
+
 (defun trie-drop (trie position key)
   ;; from our contract with drop,
   ;; we do assume the key IS in fact in the trie.
@@ -251,12 +262,15 @@
                 (left trie)
                 (trie-drop (right trie) pos key))))
             t))))))
+
 (defmethod first-key-value ((i <fmim>) map)
   (leftmost i map))
+
 (defmethod fold-left ((i <fmim>) map f seed)
   (if (null map)
       seed
       (trie-fold-left (datum map) (node-height map) 0 f seed)))
+
 (defun trie-fold-left (trie position key f seed)
   (if (zerop position)
       (funcall f seed key trie)
@@ -273,10 +287,12 @@
             (right trie) pos (dpb 1 (byte 1 pos) key) f
             (trie-fold-left
              (left trie) pos key f seed)))))))
+
 (defmethod fold-right ((i <fmim>) map f seed)
   (if (null map)
       seed
       (trie-fold-right (datum map) (node-height map) 0 f seed)))
+
 (defun trie-fold-right (trie position key f seed)
   (if (zerop position)
       (funcall f key trie seed)
@@ -293,10 +309,12 @@
             (left trie) pos key f
             (trie-fold-right
              (right trie) pos (dpb 1 (byte 1 pos) key) f seed)))))))
+
 (defmethod leftmost ((i <fmim>) map)
   (if (null map)
       (values nil nil nil)
       (trie-leftmost (datum map) (node-height map) 0)))
+
 (defun trie-leftmost (trie position key)
   (if (zerop position)
       (values key trie t)
@@ -309,10 +327,12 @@
             (datum trie) pos (dpb pbits (byte plen pos) key))))
         (trie-branch
          (trie-leftmost (left trie) (1- position) key)))))
+
 (defmethod rightmost ((i <fmim>) map)
   (if (null map)
       (values nil nil nil)
       (trie-rightmost (datum map) (node-height map) 0)))
+
 (defun trie-rightmost (trie position key)
   (if (zerop position)
       (values key trie t)
@@ -375,6 +395,7 @@
         h (trie-join (make-trie-skip h (- h ha) 0 (datum a))
                      (make-trie-skip h (- h hb) 0 (datum b))
                      h))))))
+
 (defun trie-join (a b position)
   (if (zerop position) a
       (etypecase a
@@ -432,8 +453,10 @@
 
 (defmethod print-object ((object trie-head) stream)
   (format stream "#<fmim ~S>" (convert <alist> <fmim> object)))
+
 (defmethod print-object ((trie trie-branch) stream)
   (format stream "#<tb ~S ~S>" (left trie) (right trie)))
+
 (defmethod print-object ((trie trie-skip) stream)
   (format stream "#<ts ~S ~S ~S>"
           (node-prefix-bits trie)

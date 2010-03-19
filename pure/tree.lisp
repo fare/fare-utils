@@ -21,6 +21,7 @@
 
 (defgeneric leftmost (<tree> tree)
   (:documentation "key, value and foundp from the leftmost node in TREE"))
+
 (defgeneric rightmost (<tree> tree)
   (:documentation "key, value and foundp from rightmost node in TREE"))
 
@@ -71,8 +72,8 @@
   ;;; and use a node-interface with make and update?
   ())
 
-(defmethod check-invariant ((i <binary-tree>)
-                            (node binary-branch) &key lower (lowerp lower) upper (upperp upper))
+(defmethod check-invariant ((i <binary-tree>) (node binary-branch) &key
+                            lower (lowerp lower) upper (upperp upper))
   (let ((key (node-key node)))
     (when lowerp
       (assert (order< i lower key)))
@@ -97,6 +98,7 @@
         (0 (values node path))
         (-1 (locate i (left node) key (cons 'left path)))
         (1 (locate i (right node) key (cons 'right path)))))
+
 (defmethod lookup ((i <binary-tree>) node key)
   (if (null node)
       (values nil nil)
@@ -104,6 +106,7 @@
         (0 (values (node-value node) t))
         (-1 (lookup i (left node) key))
         (1 (lookup i (right node) key)))))
+
 (defmethod insert ((i <binary-tree>) node key value)
   (if (null node)
       (node i :key key :value value)
@@ -114,6 +117,7 @@
                   :left (insert i (left node) key value) :right (right node)))
         (1 (node i :key (node-key node) :value (node-value node)
                  :left (left node) :right (insert i (right node) key value))))))
+
 (defmethod drop ((i <binary-tree>) node key)
   (if (null node)
       (values nil nil nil)
@@ -140,9 +144,11 @@
                (values (node i :key k :value v
                              :left (left node) :right right)
                        value foundp)))))))
+
 (defmethod first-key-value ((i <binary-tree>) map)
   "Return key and value with the least key"
   (leftmost i map))
+
 (defmethod fold-left ((i <binary-tree>) node f seed)
   (if (null node)
       seed
@@ -150,6 +156,7 @@
                       (funcall f
                                (fold-left i (left node) f seed)
                                (node-key node) (node-value node)))))
+
 (defmethod fold-right ((i <binary-tree>) node f seed)
   (if (null node)
       seed
@@ -157,12 +164,14 @@
                        (funcall f
                                 (node-key node) (node-value node)
                                 (fold-right i (right node) f seed)))))
+
 (defmethod for-each ((i <binary-tree>) node f)
   (when node
     (for-each i (left node) f)
     (funcall f (node-key node) (node-value node))
     (for-each i (right node) f))
   (values))
+
 (defmethod divide ((i <binary-tree>) node)
   (cond
     ((null node)
@@ -172,18 +181,19 @@
              (right node)))
     (t
      (values (left node) (insert i (right node) (node-key node) (node-value node))))))
+
 (defmethod divide/list ((i <binary-tree>) node)
   (if (null node) '()
       (let* ((rlist (cons (node i :key (node-key node) :value (node-value node))
                           (if (null (right node)) '() (list (right node))))))
         (if (null (left node)) rlist (cons (left node) rlist)))))
 
-
 (defmethod leftmost ((i <binary-tree>) node)
   (cond
     ((null node) (values nil nil nil))
     ((null (left node)) (values (node-key node) (node-value node) t))
     (t (leftmost i (left node)))))
+
 (defmethod rightmost ((i <binary-tree>) node)
   (cond
     ((null node) (values nil nil nil))
@@ -205,8 +215,10 @@
   0)
 
 (defgeneric node-balance (node))
+
 (defmethod node-balance ((node null))
   0)
+
 (defmethod node-balance ((node avl-tree-node))
   (- (node-height (right node))
      (node-height (left node))))
@@ -290,6 +302,7 @@ node is always called with branches that are of comparable height...
 (defmethod print-object ((x binary-tree-node) stream)
   (format stream "#<bin ~A>"
           (flatten-binary-tree x)))
+
 (defmethod print-object ((x avl-tree-node) stream)
   (format stream "#<avl ~A>"
           (flatten-binary-tree x)))
@@ -303,13 +316,16 @@ node is always called with branches that are of comparable height...
                       (vector (node-key x) (node-value x))
                       (flatten-binary-tree (right x)))))))
 
-;;; Common special case: when keys are numbers
-(defclass <number-map> (<avl-tree> order:<numeric>) ())
+;;; Common special case: when keys are (real) numbers
+(defclass <number-map> (<avl-tree> order:<number>) ())
+
 (defparameter <number-map>
   (memo:memoized 'make-instance '<number-map>))
+
 (defparameter <nm> <number-map>)
 
 (defmethod print-object ((object binary-tree-node) stream)
   (format stream "#<bt ~S>" (convert <alist> <nm> object)))
+
 (defmethod print-object ((object avl-tree-node) stream)
   (format stream "#<at ~S>" (convert <alist> <nm> object)))

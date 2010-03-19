@@ -8,7 +8,7 @@
 (defpackage :order
   (:use :interface :eq :cl :fare-utils)
   (:export
-   #:<order> #:<numeric> #:<string> #:<char>
+   #:<order> #:<number> #:<string> #:<char>
    #:<lessp> #:<compare> #:<key> #:<order-parameter>
    #:order< #:order<= #:order> #:order>= #:order= #:compare
    #:order-interface))
@@ -104,7 +104,7 @@
                     (t 0)))
                 (defparameter ,name (make-instance ',name)))))
   ;;(builtin function call)
-  (builtin <numeric> "")
+  (builtin <number> "")
   (builtin <char> char)
   (builtin <string> string))
 
@@ -133,7 +133,7 @@
 
 
 ;;; simple algorithm using order
-(defun sorted-list-differences (list1 list2 &key (order <numeric>))
+(defun sorted-list-differences (list1 list2 &key (order <number>))
   (labels
       ((rec (list1 list2 only1 common only2)
          (cond

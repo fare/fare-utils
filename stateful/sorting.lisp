@@ -102,7 +102,7 @@
 |#
 
 (defun stable-topological-sort/ordinals (size dependencies)
-  (let* ((minimals (make-instance 'binary-heap :order order:<numeric>))
+  (let* ((minimals (make-instance 'binary-heap :order order:<number>))
          (adjacency-table (adjacency-table/ordinals size dependencies))
          (dependency-count (make-array size :initial-element 0))
          (result nil))
@@ -147,7 +147,7 @@
 (defun stable-cyclic-topological-sort (sequence dependencies &key (test 'equal))
   (labels
       ((heap-order (h1 h2)
-         (order:<key> :order order:<numeric> :key 'find-least-item)))
+         (order:<key> :order order:<number> :key 'find-least-item)))
     (let* ((elements (coerce sequence 'vector))
            (length (length elements))
            (hash (make-hash-table :test test))
@@ -159,9 +159,9 @@
            (results nil))
       (loop :for x :across elements :for i :from 0 :do
             (setf (gethash x hash) i)
-            (setf (aref equivs i) (singleton-binomial-heap i :order #'order:<numeric>))
-            (setf (aref incoming i) (make-instance 'binomial-heap :order #'order:<numeric>))
-            (setf (aref outgoing i) (make-instance 'binomial-heap :order #'order:<numeric>)))
+            (setf (aref equivs i) (singleton-binomial-heap i :order #'order:<number>))
+            (setf (aref incoming i) (make-instance 'binomial-heap :order #'order:<number>))
+            (setf (aref outgoing i) (make-instance 'binomial-heap :order #'order:<number>)))
       (loop :for (x . y) :in dependencies
             :for xi = (gethash x hash)
             :for yi = (gethash y hash) do
