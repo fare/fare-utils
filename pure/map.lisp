@@ -1,7 +1,7 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;;;; Functional mapping of keys to values
 
-#+xcvb (module (:depends-on ("eq" "pure")))
+#+xcvb (module (:depends-on ("interface/interface" "pure/package")))
 
 (in-package :pure)
 
@@ -165,7 +165,7 @@ we could have a
   (cond
     ((null map) '())
     ((null (cdr map)) (list map))
-    (t (multiple-value-list (divide map)))))
+    (t (multiple-value-list (divide i map)))))
 
 (defclass map-simple-map/2 () ())
 
@@ -192,8 +192,8 @@ we could have a
    (fold-left
     i map
     (lambda (f k v) (lambda (acc) (funcall f (funcall fun k v acc))))
-    #'identity
-   seed)))
+    #'identity)
+   seed))
 
 (defclass map-simple-for-each () ())
 
