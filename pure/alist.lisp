@@ -1,7 +1,14 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;; Trivial functional map implementation: alists.
 
-#+xcvb (module (:depends-on ("pure-maps")))
+#+xcvb
+(module
+ (:depends-on
+  ("interface/memoization"
+   "interface/interface"
+   "interface/eq"
+   "pure/package"
+   "pure/map")))
 
 (in-package :pure)
 

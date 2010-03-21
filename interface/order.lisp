@@ -1,7 +1,15 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;;;; Order
 
-#+xcvb (module (:depends-on ("eq")))
+#+xcvb
+(module
+ (:depends-on
+  ("package"
+   "base/strings"
+   "base/symbols"
+   "interface/memoization"
+   "interface/interface"
+   "interface/eq")))
 
 (in-package :cl)
 

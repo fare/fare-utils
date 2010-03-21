@@ -14,7 +14,14 @@
 ;;; * write a better function that gives you node handles for editing/removal purposes
 
 #+xcvb
-(module (:depends-on ("base/utils" "base/macros" "stateful/container")))
+(module
+ (:depends-on
+  ("package"
+   "base/utils"
+   "base/macros"
+   "interface/order"
+   "stateful/package"
+   "stateful/container")))
 
 (in-package :stateful)
 

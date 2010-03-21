@@ -1,6 +1,6 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 
-#+xcvb (module (:depends-on ("package" "basic-utils")))
+#+xcvb (module (:depends-on ("package" "base/utils")))
 
 (in-package :fare-utils)
 

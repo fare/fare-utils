@@ -1,7 +1,9 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;; Sorting Algorithms.
 
-#+xcvb (module (:depends-on ("package" "order")))
+#+xcvb
+(module
+ (:depends-on ("package" "interface/eq" "interface/order" "stateful/package")))
 
 (in-package :stateful)
 

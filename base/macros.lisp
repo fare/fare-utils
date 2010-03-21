@@ -2,7 +2,7 @@
 ;;;;; Miscellaneous small utility definitions by Fare (formerly fare.lisp)
 
 #+xcvb
-(module (:depends-on ("package" "basic-utils" "basic-strings" "basic-symbols")))
+(module (:depends-on ("package" "base/utils" "base/strings" "base/symbols")))
 
 (in-package :fare-utils)
 

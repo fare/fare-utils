@@ -2,7 +2,9 @@
 ;;;;; Generic heap interface
 
 #+xcvb
-(module (:depends-on ("package" "basic-utils" "basic-macros" "order")))
+(module
+ (:depends-on
+  ("package" "base/utils" "base/macros" "interface/order" "stateful/package")))
 
 (in-package :stateful)
 

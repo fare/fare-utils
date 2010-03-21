@@ -1,6 +1,6 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 
-#+xcvb (module (:depends-on ("package" "basic-utils" "streams")))
+#+xcvb (module (:depends-on ("package" "base/utils" "base/streams")))
 
 (in-package :fare-utils)
 

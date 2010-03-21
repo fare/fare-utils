@@ -1,7 +1,10 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;;;; Interfaces for Stateful Data-Structures
 
-#+xcvb (module (:depends-on ("basic-utils" "memoization")))
+#+xcvb
+(module
+ (:depends-on
+  ("package" "interface/interface" "interface/eq" "interface/order")))
 
 (in-package :cl)
 

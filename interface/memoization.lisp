@@ -1,6 +1,6 @@
 ;;; Initially taken from http://fare.tunes.org/files/fun/fibonacci.lisp
 
-#+xcvb (module ())
+#+xcvb (module nil)
 
 (cl:defpackage #:memoization
   (:nicknames #:memo)

@@ -1,7 +1,15 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 ;;;;; Pure trees
 
-#+xcvb (module (:depends-on ("pure-maps" "order")))
+#+xcvb
+(module
+ (:depends-on
+  ("interface/memoization"
+   "interface/interface"
+   "interface/order"
+   "pure/package"
+   "pure/map"
+   "pure/alist")))
 
 (in-package :pure)
 
