@@ -307,23 +307,6 @@ node is always called with branches that are of comparable height...
               :key (node-key right) :value (node-value right)
               :right (right right))))))))
 
-(defmethod print-object ((x binary-tree-node) stream)
-  (format stream "#<bin ~A>"
-          (flatten-binary-tree x)))
-
-(defmethod print-object ((x avl-tree-node) stream)
-  (format stream "#<avl ~A>"
-          (flatten-binary-tree x)))
-
-(defun flatten-binary-tree (x)
-  (etypecase x
-    (null '())
-    (binary-tree-node
-     (remove-if #'null
-                (list (flatten-binary-tree (left x))
-                      (vector (node-key x) (node-value x))
-                      (flatten-binary-tree (right x)))))))
-
 ;;; Common special case: when keys are (real) numbers
 (defclass <number-map> (<avl-tree> order:<number>) ())
 
