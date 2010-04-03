@@ -22,7 +22,7 @@
     :reader eq-interface)))
 
 (defmethod check-invariant ((i <alist>) map &key)
-  (loop :for ((key . val) . rest) :on map :do
+  (loop :for ((key . nil) . rest) :on map :do
     (assert (not (member key rest
                          :key 'car
                          :test (eq:test-function (eq-interface i))))

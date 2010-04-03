@@ -59,7 +59,7 @@
 
 (defun (setf package-exported-symbols) (new p)
   (let ((s (package-exported-symbols-symbol! p)))
-    (set s new)))
+    (setf (symbol-value s) new)))
 
 (defun package-initialize-exported-symbols (p)
   (setf (package-exported-symbols p) (make-hash-table)))

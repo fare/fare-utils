@@ -49,5 +49,6 @@ On success the OBJECT itself is returned. On failure an error is signalled."))
 
 (defmethod check-invariant :around (type object &key #+sbcl &allow-other-keys)
   ;; the #+sbcl works around SBCL bug https://bugs.launchpad.net/sbcl/+bug/537711
+  (declare (ignorable type))
   (call-next-method)
   object)
