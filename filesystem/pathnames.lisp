@@ -6,17 +6,59 @@
 
 (exporting-definitions
 
+;; This is only valid for Unix
 (defvar +root-path+ (make-pathname :directory '(:absolute))
   "pathname for the file hierarchy root")
 
+;; You should only use this with merge-pathnames*
 (defvar +back-path+ (make-pathname :directory '(:relative :back))
   "logical parent path")
 
 (defun pathname-directory-pathname (pathname)
-  (make-pathname :type nil :name nil :defaults pathname))
+  (make-pathname :type nil :name nil :version nil :defaults pathname))
 
 (defun pathname-base-pathname (pathname)
   (make-pathname :directory nil :defaults pathname))
+
+(defun merge-pathnames* (specified &optional (defaults *default-pathname-defaults*))
+  "MERGE-PATHNAMES* is like MERGE-PATHNAMES except that if the SPECIFIED pathname
+does not have an absolute directory, then the HOST and DEVICE come from the DEFAULTS.
+Also, if either argument is NIL, then the other argument is returned unmodified."
+  ;; Same as in ASDF 2.
+  (when (null specified) (return-from merge-pathnames* defaults))
+  (when (null defaults) (return-from merge-pathnames* specified))
+  (let* ((specified (pathname specified))
+         (defaults (pathname defaults))
+         (directory (pathname-directory specified))
+         (directory (if (stringp directory) `(:absolute ,directory) directory))
+         (name (or (pathname-name specified) (pathname-name defaults)))
+         (type (or (pathname-type specified) (pathname-type defaults)))
+         (version (or (pathname-version specified) (pathname-version defaults))))
+    (labels ((ununspecific (x)
+               (if (eq x :unspecific) nil x))
+             (unspecific-handler (p)
+               (if (typep p 'logical-pathname) #'ununspecific #'identity)))
+      (multiple-value-bind (host device directory unspecific-handler)
+          (ecase (first directory)
+            ((nil)
+             (values (pathname-host defaults)
+                     (pathname-device defaults)
+                     (pathname-directory defaults)
+                     (unspecific-handler defaults)))
+            ((:absolute)
+             (values (pathname-host specified)
+                     (pathname-device specified)
+                     directory
+                     (unspecific-handler specified)))
+            ((:relative)
+             (values (pathname-host defaults)
+                     (pathname-device defaults)
+                     (append (pathname-directory defaults) (cdr directory))
+                     (unspecific-handler defaults))))
+        (make-pathname :host host :device device :directory directory
+                       :name (funcall unspecific-handler name)
+                       :type (funcall unspecific-handler type)
+                       :version (funcall unspecific-handler version))))))
 
 (defun pathname-parent (pathname)
   "Takes a pathname and returns the pathname of the parent directory
@@ -29,7 +71,7 @@ of the directory of the given pathname"
     ((equal (pathname-directory pathname) '(:absolute))
      +root-path+)
     (t
-     (merge-pathnames +back-path+
+     (merge-pathnames* +back-path+
 		      (pathname-directory-pathname pathname)))))
 
 (defun top-level-name (name)
@@ -166,7 +208,7 @@ erroring out if some source of non-portability is found"
                    :name name :type type)))
 
 (defun subpathname (path string)
-  (merge-pathnames
+  (merge-pathnames*
    (portable-pathname-from-string string :allow-absolute nil)
    path))
 
@@ -203,9 +245,9 @@ erroring out if some source of non-portability is found"
       ((absolute-pathname-p path)
        path)
       ((absolute-pathname-p *default-pathname-defaults*)
-       (merge-pathnames path))
+       (merge-pathnames* path))
       (t
-       (merge-pathnames path (truename *default-pathname-defaults*))))))
+       (truename (merge-pathnames* path *default-pathname-defaults*))))))
 
 (defun portable-namestring-prefix<= (x y)
   (and (string-prefix-p x y)

@@ -79,7 +79,7 @@
            #:proper-list-p
            #:make-hashset
            #:string-prefix-p #:string-postfix-p #:string-enclosed-p
-           #:+root-path+ #:+back-path+
+           #:+root-path+ #:+back-path+ #:merge-pathnames*
            #:pathname-directory-pathname #:pathname-base-pathname
            #:pathname-parent #:top-level-name #:directory-name-p
            #:portable-pathname-string-component-char-p
