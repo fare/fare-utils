@@ -23,7 +23,12 @@
    #:<binary-tree> #:<avl-tree>
    #:<number-map> #:<nm>
    #:<hash-table> #:<equal-hash-table>
-   #:<fmim>
+   #:<fmim> #:<encoded-key-map>
+   #:map-simple-empty #:map-simple-decons
+   #:map-simple-update-key #:map-simple-join
+   #:map-simple-join/list #:map-simple-divide/list
+   #:map-simple-map/2 #:map-simple-fold-right
+   #:map-simple-for-each #:map-simple-size
 
    ;;; Functional Maps and Containers: Generic Functions
    #:empty
@@ -45,4 +50,7 @@
    #:map/2
    #:convert
 
-   #:check-invariant))
+   #:check-invariant
+
+   #:encode-key #:decode-key
+   ))

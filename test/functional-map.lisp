@@ -234,6 +234,11 @@
     (is (= 1000 (size i m1)))
     (is (= 1000 (size i m2)))))
 
+(defparameter <denm> (<encoded-key-map>
+                      :base-interface <number-map>
+                      :key-encoder (lambda (dk) (* dk 2))
+                      :key-decoder (lambda (ek) (/ ek 2))))
+
 (deftest test-pure-map-interfaces ()
-  (dolist (i (list <alist> <number-map> <hash-table> <fmim>))
+  (dolist (i (list <alist> <number-map> <hash-table> <fmim> <denm>))
     (interface-test i)))

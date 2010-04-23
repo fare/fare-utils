@@ -28,6 +28,7 @@
    "pure/tree"
    "pure/hash-table"
    "pure/fmim"
+   "pure/encoded-key-map"
    "stateful/package"
    "stateful/container"
    "stateful/binary-heap"

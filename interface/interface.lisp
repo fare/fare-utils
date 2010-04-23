@@ -20,7 +20,7 @@
    #:check-invariant
    #:make
    #:update
-
+   #:base-interface
    ))
 
 (in-package :interface)
@@ -52,3 +52,6 @@ On success the OBJECT itself is returned. On failure an error is signalled."))
   (declare (ignorable type))
   (call-next-method)
   object)
+
+(defgeneric base-interface (<interface>)
+  (:documentation "from the parametric variant of a mixin, extract the base interface"))
