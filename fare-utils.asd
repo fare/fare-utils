@@ -60,7 +60,7 @@
 
    ;;; IPS pure functional datastructures
    (:module "pure"
-    :depends-on ("base" "interface")
+    :depends-on ("interface")
     :components
     ((:file "package")
      (:file "map" :depends-on ("package"))
@@ -72,7 +72,7 @@
 
    ;;; Stateful containers
    (:module "stateful"
-    :depends-on ("base" "interface")
+    :depends-on ("interface")
     :components
     ((:file "package")
      (:file "container" :depends-on ("package"))
