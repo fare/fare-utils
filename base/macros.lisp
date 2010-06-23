@@ -493,7 +493,7 @@ shall be declared with a serial dependency in system definitions.
 
 
 ;;; Nesting binding forms (from a suggestion by marco baringer)
-(defmacro with-nesting (() &rest things)
+(defmacro with-nesting ((#-ccl &optional) &rest things)
   (reduce #'(lambda (outer inner) (append outer (list inner)))
           things :from-end t))
 

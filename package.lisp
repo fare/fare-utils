@@ -78,7 +78,8 @@
            #:first-char #:last-char #:but-last-char
            #:proper-list-p
            #:make-hashset
-           #:string-prefix-p #:string-postfix-p #:string-enclosed-p
+           #:string-prefix-p #:string-suffix-p #:string-enclosed-p
+           #:string-strip-prefix #:string-strip-suffix
            #:+root-path+ #:+back-path+ #:merge-pathnames*
            #:pathname-directory-pathname #:pathname-base-pathname
            #:pathname-parent #:top-level-name #:directory-name-p
@@ -100,6 +101,7 @@
            #:ensure-absolute-pathname
            #:portable-namestring-prefix<=
            #:ensure-pathname-is-directory
+           #:rename-file-overwriting-target
            #:unwilden
            #:append1 #:append1f #:appendf #:nconcf #:funcallf
            #:with-nesting
