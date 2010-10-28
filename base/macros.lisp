@@ -239,6 +239,13 @@ outputs a tag plus a list of variable and their values, returns the last value"
               (,f "~{~S~^ ~}~%" (setf ,res (multiple-value-list ,x)))))
          exprs)
       (apply 'values ,res)))))
+(defun package-functions (package-designator)
+  (loop :for s :being :each :present-symbol :of package-designator
+    :when (and (fboundp s) (not (macro-function s))) :collect s))
+(defun trace-package-functions (package-designator)
+  (eval `(trace ,@(package-functions package-designator))))
+(defun untrace-package-functions (package-designator)
+  (eval `(untrace ,@(package-functions package-designator))))
 
 (defmacro xtime ((&rest msg) &body body)
   `(prog1 (time (progn ,@body)) (format *error-output* ,@msg)))

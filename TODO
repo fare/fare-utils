@@ -9,3 +9,6 @@ TODO
 * move stateful datastructures to a stateful: package.
   Question: should I use separate interfaces as in the pure: package,
   or dispatch directly on objects as in usual OO style?
+
+* have generic state-passing updaters in the style of setf.
+  (updatef (lookup i m k) v) ==>  ((update-expander lookup) v i m k) ==> (insert i m k v)
