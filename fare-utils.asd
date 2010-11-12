@@ -33,7 +33,8 @@
      (:file "objects" :depends-on ("macros"))
      (:file "streams" :depends-on ("utils"))
      (:file "hash-tables" :depends-on ("macros"))
-     (:file "more-strings" :depends-on ("strings" "streams"))))
+     (:file "more-strings" :depends-on ("strings" "streams"))
+     (:file "parse-cl-syntax" :depends-on ("macros"))))
 
    ;;; Utilities wrt Lisp
    (:module "filesystem"
@@ -64,6 +65,8 @@
     :components
     ((:file "package")
      (:file "map" :depends-on ("package"))
+     (:file "updatef" :depends-on ("package"))
+     (:file "updatef-expanders" :depends-on ("updatef"))
      (:file "alist" :depends-on ("map"))
      (:file "tree" :depends-on ("map" "alist"))
      (:file "hash-table" :depends-on ("tree"))

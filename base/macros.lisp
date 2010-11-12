@@ -513,3 +513,27 @@ shall be declared with a serial dependency in system definitions.
        (flet ,(mapcar #'(lambda (c v) `(,c (x) (push x ,v))) collectors vars)
          ,@body
          (values ,@(mapcar #'(lambda (v) `(nreverse ,v)) vars))))))
+
+(defmacro fluid-let* (bindings &body body)
+  (cond
+    (bindings
+     (assert (length=-p bindings 2))
+     `(fluid-let1
+       (,(caar bindings) ,(cadar bindings))
+       (fluid-let* ,(cdr bindings) ,@body body)))
+    (t
+     `(progn ,@body))))
+
+(defmacro fluid-let1 ((place val) &body body)
+  (multiple-value-bind (vars vals store-vars writer-form reader-form)
+      (get-setf-expansion place)
+    (with-gensyms (oldvals)
+      `(let (,@(mapcar 'list vars vals) ,@store-vars)
+         (let ((,oldvals (multiple-value-list ,reader-form)))
+           (unwind-protect
+                (progn
+                  (multiple-value-setq ,store-vars ,val)
+                  ,writer-form
+                  ,@body)
+             (multiple-value-setq ,store-vars (apply #'values ,oldvals))
+             ,writer-form))))))

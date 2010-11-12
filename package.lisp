@@ -106,4 +106,9 @@
            #:append1 #:append1f #:appendf #:nconcf #:funcallf
            #:with-nesting
            #:while-collecting
+           #:parse-macro-lambda-list
+           #:list-starts-with-p
+           #:parse-body
+           #:parse-defsetf-lambda-list
+           #:identifierp
            ))

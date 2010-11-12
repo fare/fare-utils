@@ -53,4 +53,12 @@
    #:check-invariant
 
    #:encode-key #:decode-key
+
+   ;; updatef
+   #:updatef
+   #:define-updatef-expander
+   #:defupdatef
+   #:define-updatef-function
+   #:get-updatef-expansion
+   #:updatef-function
    ))
