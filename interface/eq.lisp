@@ -30,7 +30,7 @@
 
 (defclass <eq-simple> (<eq>) ())
 (defmethod test-function ((i <eq-simple>))
-  (lambda (x y) (== i x y)))
+  #'(lambda (x y) (== i x y)))
 
 (defclass <eq-slot> (<eq>)
   ((test :initform #'eql :initarg :test :reader test-function)))

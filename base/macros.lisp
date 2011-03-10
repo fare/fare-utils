@@ -230,7 +230,7 @@ outputs a tag plus a list of variable and their values, returns the last value"
   ;"if not in debugging mode, just compute and return last value"
   ; #-do-test (declare (ignore tag)) #-do-test (car (last exprs)) #+do-test
   (let ((res (gensym))(f (gensym)))
-  `(let ((,res))
+  `(let (,res (*print-readably* nil))
     (flet ((,f (fmt &rest args) (apply #'format *error-output* fmt args)))
       (,f "~&~A~%" ,tag)
       ,@(mapcan

@@ -66,7 +66,7 @@ returning the two lists of the values returned by the function."
     :with link = head
     :for tail :on list
     :for elt :in list
-    :for i :below n :do
+    :count n :do
     (let ((cons (cons elt nil)))
       (rplacd link cons)
       (setf link cons))

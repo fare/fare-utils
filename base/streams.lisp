@@ -16,14 +16,18 @@ Otherwise, signal an error.")
     (with-output-to-string (s) (funcall thunk s)))
   (:method ((x (eql t)) thunk)
     (funcall thunk *standard-output*) nil)
+  #-genera
   (:method ((x stream) thunk)
     (funcall thunk x) nil)
   (:method ((x string) thunk)
     (assert (fill-pointer x))
     (with-output-to-string (s x) (funcall thunk s)))
   (:method (x thunk)
-    (declare (ignore thunk))
-    (error "not a valid stream designator ~S" x)))
+    (declare (ignorable thunk))
+    (cond
+      #+genera
+      ((typep x 'stream) (funcall thunk x) nil)
+      (t (error "not a valid stream designator ~S" x)))))
 
 (def*macro with-output ((x &optional (value x)) &body body)
   `(call-with-output ,value #'(lambda (,x) ,@body)))
@@ -58,4 +62,4 @@ Otherwise, signal an error.")
       (funcall fun o))))
 
 (def*macro with-user-output-file ((s f) &body body)
-  `(call-with-user-output-file ,f (lambda (,s) ,@body)))
+  `(call-with-user-output-file ,f #'(lambda (,s) ,@body)))

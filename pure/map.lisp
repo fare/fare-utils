@@ -152,7 +152,7 @@ we could have a
 (defclass map-simple-join () ())
 
 (defmethod join ((i map-simple-join) map1 map2)
-  (fold-left i map1 (lambda (m k v) (insert i m k v)) map2))
+  (fold-left i map1 #'(lambda (m k v) (insert i m k v)) map2))
 
 (defclass map-simple-join/list () ())
 
@@ -191,7 +191,7 @@ we could have a
   (funcall
    (fold-left
     i map
-    (lambda (f k v) (lambda (acc) (funcall f (funcall fun k v acc))))
+    #'(lambda (f k v) #'(lambda (acc) (funcall f (funcall fun k v acc))))
     #'identity)
    seed))
 
@@ -200,17 +200,17 @@ we could have a
 (defmethod for-each ((i map-simple-for-each) map fun)
   (fold-left
    i map
-   (lambda (s k v) (declare (ignore s)) (funcall fun k v))
+   #'(lambda (s k v) (declare (ignore s)) (funcall fun k v))
    nil)
   (values))
 
 (defclass map-simple-size () ())
 
 (defmethod size ((i map-simple-size) map)
-  (fold-left i map (lambda (x k v) (declare (ignore k v)) (1+ x)) 0))
+  (fold-left i map #'(lambda (x k v) (declare (ignore k v)) (1+ x)) 0))
 
 (defmethod convert ((i2 <map>) (i1 <map>) map1)
   (fold-right
    i1 map1
-   (lambda (k v map2) (insert i2 map2 k v))
+   #'(lambda (k v map2) (insert i2 map2 k v))
    (empty i2)))

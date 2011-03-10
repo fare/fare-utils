@@ -38,7 +38,7 @@
 (defmacro with-atomic-file-creation ((s filename &optional tmpname) &body body)
   "create some file contents and atomically commit them to file when they are
 complete"
-  `(call-with-atomic-file-creation (lambda (,s) ,@body) ,filename ,tmpname))
+  `(call-with-atomic-file-creation #'(lambda (,s) ,@body) ,filename ,tmpname))
 
 #| There is still a small race condition, since there is a small moment just
 after the file is opened that we don't have protection against async signals;

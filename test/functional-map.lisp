@@ -9,7 +9,7 @@
 (defun sort-alist (alist) (sort (copy-seq alist) #'< :key #'car))
 (defun shuffle-list (list)
   (mapcar #'cdr
-          (sort (mapcar (lambda (x) (cons (random most-positive-fixnum) x)) list)
+          (sort (mapcar #'(lambda (x) (cons (random most-positive-fixnum) x)) list)
                 #'< :key #'car)))
 (defun make-alist (n &optional (formatter "~D"))
   (loop :for i :from 1 :to n :collect
@@ -24,7 +24,7 @@
 
 (defparameter *al-1* (shuffle-list *alist-100-decimal*))
 (defparameter *al-2* (remove-if-not #'evenp *alist-100-decimal* :key #'car))
-(defparameter *al-3* (remove-if-not (lambda (x) (< (length x) 5)) *alist-100-latin* :key #'cdr))
+(defparameter *al-3* (remove-if-not #'(lambda (x) (< (length x) 5)) *alist-100-latin* :key #'cdr))
 (defparameter *al-5* (remove-duplicates (append *al-2* *al-3*) :key #'car :from-end t))
 
 (defun alist-from (i map)
@@ -125,13 +125,13 @@
       (alist-from i
                   (fold-left
                    i (from-alist i (make-alist 2))
-                   (lambda (m k v) (insert i m k v))
+                   #'(lambda (m k v) (insert i m k v))
                    (from-alist i '((20 . "20") (30 . "30")))))))
   ;; fold-left and size
   (is (= 100
          (size i
                (fold-left i (from-alist i *alist-100-decimal*)
-                          (lambda (m k v) (insert i m k v))
+                          #'(lambda (m k v) (insert i m k v))
                           (from-alist i *alist-100-latin*)))))
 
   ;; fold-right
@@ -142,21 +142,21 @@
        (alist-from i
                    (fold-right
                     i (from-alist i (make-alist 2))
-                    (lambda (k v m) (insert i m k v))
+                    #'(lambda (k v m) (insert i m k v))
                     (from-alist i '((20 . "20") (30 . "30")))))))
 
   ;; for-each
   (is (eql nil (while-collecting (c)
-                 (for-each i (empty i) (lambda (k v) (c (cons k v)))))))
+                 (for-each i (empty i) #'(lambda (k v) (c (cons k v)))))))
   (is (equal-alist
        *alist-10-latin*
        (while-collecting (c)
          (with-output-to-string (o)
            (for-each i (from-alist i *alist-10-latin*)
-                     (lambda (k v) (c (cons k v))))))))
+                     #'(lambda (k v) (c (cons k v))))))))
   (is (= 1129 (length (with-output-to-string (o)
                         (for-each i (from-alist i *alist-100-english*)
-                                  (lambda (x y)
+                                  #'(lambda (x y)
                                     (format o "~A~A" x y)))))))
 
   ;; join
@@ -236,8 +236,8 @@
 
 (defparameter <denm> (<encoded-key-map>
                       :base-interface <number-map>
-                      :key-encoder (lambda (dk) (* dk 2))
-                      :key-decoder (lambda (ek) (/ ek 2))))
+                      :key-encoder #'(lambda (dk) (* dk 2))
+                      :key-decoder #'(lambda (ek) (/ ek 2))))
 
 (deftest test-pure-map-interfaces ()
   (dolist (i (list <alist> <number-map> <hash-table> <fmim> <denm>))

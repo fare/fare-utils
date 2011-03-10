@@ -41,7 +41,7 @@
     (funcall thunk)))
 
 (defmacro with-evaluation-time ((time) &body body)
-  `(call-with-evaluation-time ,time (lambda () ,@body)))
+  `(call-with-evaluation-time ,time #'(lambda () ,@body)))
 
 (defmacro initialize-evaluation-time ()
   (check-evaluation-time +coffee-time+)

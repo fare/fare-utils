@@ -56,11 +56,11 @@
   (values (caar map) (cdar map) (not (null map))))
 
 (defmethod fold-left ((i <alist>) map f seed)
-  (reduce (lambda (acc pair) (funcall f acc (car pair) (cdr pair)))
+  (reduce #'(lambda (acc pair) (funcall f acc (car pair) (cdr pair)))
           map :initial-value seed))
 
 (defmethod fold-right ((i <alist>) map f seed)
-  (reduce (lambda (pair acc) (funcall f (car pair) (cdr pair) acc))
+  (reduce #'(lambda (pair acc) (funcall f (car pair) (cdr pair) acc))
           map :initial-value seed :from-end t))
 
 (defmethod for-each ((i <alist>) map f)

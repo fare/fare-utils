@@ -60,11 +60,11 @@ An updatef expansion is an ordered collection of five objects:
         ,access-fn
         (make-instance
          'updatef-expander :expander
-         (lambda (,envvar ,wholevar &rest ,args)
-           ,@(unless wholep `((declare (ignore ,wholevar))))
-           ,@(unless envp `((declare (ignore ,envvar))))
-           (destructuring-bind (,@destructuring-lambda-list) ,args
-             ,@body)))))))
+         #'(lambda (,envvar ,wholevar &rest ,args)
+             ,@(unless wholep `((declare (ignore ,wholevar))))
+             ,@(unless envp `((declare (ignore ,envvar))))
+             (destructuring-bind (,@destructuring-lambda-list) ,args
+               ,@body)))))))
 
 (defun get-updatef-expansion-tmpvars (environment args)
   (loop
@@ -132,9 +132,9 @@ An updatef expansion is an ordered collection of five objects:
            ,access-fn
            (make-instance
             'defupdatef-long-expander :n-bind-vars (length bind-vars) :expander
-            (lambda (,environment ,@bind-vars ,@lambda-list)
-              ,@(unless envp `((declare (ignore ,environment))))
-              ,@body))))))))
+            #'(lambda (,environment ,@bind-vars ,@lambda-list)
+                ,@(unless envp `((declare (ignore ,environment))))
+                ,@body))))))))
 
 (defmacro define-updatef-function (access-fn lambda-list &body body)
   "pure analogue to `(DEFUN (SETF ,FUNCTION) ,LAMBDA-LIST ,@BODY)"
@@ -144,9 +144,9 @@ An updatef expansion is an ordered collection of five objects:
       ,access-fn
       (make-instance
        'defupdatef-function-expander :expander
-       (lambda ,lambda-list
-         ,decls
-         (block ,access-fn ,@body))))))
+       #'(lambda ,lambda-list
+           ,decls
+           (block ,access-fn ,@body))))))
 
 (defun updatef-function (sym)
   (assert (symbolp sym))
@@ -159,8 +159,8 @@ An updatef expansion is an ordered collection of five objects:
       (defupdatef-short-expander
        (let ((i (updatef-expander u)))
          (if (and (fboundp i) (not (macro-function i)))
-             (lambda (v &rest args)
-               (apply i (append args (list v))))
+             #'(lambda (v &rest args)
+                 (apply i (append args (list v))))
              (error "updatef inverse for ~S is not a function" sym))))
       (t
        (error "Updater for symbol ~S is not a function" sym)))))

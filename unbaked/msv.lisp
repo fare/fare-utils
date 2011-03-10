@@ -127,6 +127,7 @@
   `(progn
      (flush-all-msv)
      (with-magic-special-variables ,@body)))
+#-genera
 (defmethod make-load-form ((msv magic-special-variable-cell) &optional environment)
    (declare (ignore environment))
    `(register-magic-special-variable

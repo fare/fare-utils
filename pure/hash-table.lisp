@@ -37,9 +37,9 @@
   (check-invariant (hashmap-interface i) map)
   (for-each
    (hashmap-interface i) map
-   (lambda (hash bucket)
-     (declare (ignore hash))
-     (check-invariant (bucketmap-interface i) bucket))))
+   #'(lambda (hash bucket)
+       (declare (ignore hash))
+       (check-invariant (bucketmap-interface i) bucket))))
 
 (defmethod empty ((i <hash-table>))
   (empty (hashmap-interface i)))
@@ -102,24 +102,24 @@
 
 (defmethod fold-left ((i <hash-table>) node f seed)
   (fold-left (hashmap-interface i) node
-             (lambda (a h bucket)
-               (declare (ignore h))
-               (fold-left (bucketmap-interface i) bucket f a))
+             #'(lambda (a h bucket)
+                 (declare (ignore h))
+                 (fold-left (bucketmap-interface i) bucket f a))
              seed))
 
 (defmethod fold-right ((i <hash-table>) node f seed)
   (fold-right (hashmap-interface i) node
-              (lambda (h bucket a)
-                (declare (ignore h))
-                (fold-right (bucketmap-interface i) bucket f a))
+              #'(lambda (h bucket a)
+                  (declare (ignore h))
+                  (fold-right (bucketmap-interface i) bucket f a))
               seed))
 
 (defmethod for-each ((i <hash-table>) map f)
   (for-each
    (hashmap-interface i) map
-   (lambda (hash bucket)
-     (declare (ignore hash))
-     (for-each (bucketmap-interface i) bucket f))))
+   #'(lambda (hash bucket)
+       (declare (ignore hash))
+       (for-each (bucketmap-interface i) bucket f))))
 
 (defmethod divide ((i <hash-table>) map)
   (if (empty-p (hashmap-interface i) map)
@@ -150,6 +150,6 @@
 
 (defmethod size ((i <hash-table>) map)
   (fold-left (hashmap-interface i) map
-             (lambda (acc hash bucket) (declare (ignore hash))
-                     (+ acc (size (bucketmap-interface i) bucket)))
+             #'(lambda (acc hash bucket) (declare (ignore hash))
+                       (+ acc (size (bucketmap-interface i) bucket)))
              0))
