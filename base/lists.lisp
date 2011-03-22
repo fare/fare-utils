@@ -8,7 +8,8 @@
 
 ;; Pairs to alist
 (defun plist->alist (plist)
-  "transform a list of consecutive pairs into an alist"
+  "transform a list of consecutive pairs into an alist
+   PLEASE instead use ALEXANDRIA:PLIST-ALIST"
   (assert (and (listp plist) (evenp (list-length plist))))
   (loop :for (key val) :on plist by #'cddr :collect (cons key val)))
 #| (if (null plist) nil
@@ -208,3 +209,13 @@ May alter the cons cells that constitute the spine of the alist"
 			   ,al-setter))
 		       ,store)
                `(cdr ,cons)))))
+
+(defun make-collector ()
+  "Create a collector closure, that when called with one argument,
+   tucks the argument at the end of a list, when called with no argument,
+   returns the list and resets it for further potential use"
+  (let ((acc ()))
+    (lambda (&optional (x nil addp))
+      (cond
+        (addp (push x acc) t)
+        (t (prog1 (nreverse acc) (setf acc nil)))))))

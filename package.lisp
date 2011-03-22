@@ -52,7 +52,7 @@
            #:length<=n-p #:length<n-p #:length=-p #:length=n-p
            #:length>-p #:length>=-p #:length>=n-p #:length>n-p #:let1
            #:list->vector #:list-of-integers
-           #:literalp #:make-defpackage-form
+           #:literalp #:make-collector #:make-defpackage-form
            #:make-node #:make-predicate-symbol
            #:make-single-arg-form #:mapcar2 #:mapmacro #:mappend
            #:maybe-adjust-size-down #:maybe-adjust-size-up
