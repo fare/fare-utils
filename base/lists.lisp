@@ -215,7 +215,7 @@ May alter the cons cells that constitute the spine of the alist"
    tucks the argument at the end of a list, when called with no argument,
    returns the list and resets it for further potential use"
   (let ((acc ()))
-    (lambda (&optional (x nil addp))
-      (cond
-        (addp (push x acc) t)
-        (t (prog1 (nreverse acc) (setf acc nil)))))))
+    #'(lambda (&optional (x nil addp))
+        (cond
+          (addp (push x acc) t)
+          (t (prog1 (nreverse acc) (setf acc nil)))))))
