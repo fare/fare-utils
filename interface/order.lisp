@@ -70,7 +70,7 @@
 (defclass <lessp> (<order-from-lessp>)
   ((lessp :initarg :lessp :reader lessp-function)))
 (defun <lessp> (lessp)
-  (memo:memoized 'make-instance '<lessp> :lessp lessp))
+  (fmemo:memoized 'make-instance '<lessp> :lessp lessp))
 (macrolet ((delegate (&rest names)
              `(progn
                 ,@(loop :for (name suffix) :in names :collect
@@ -120,7 +120,7 @@
   ((order-key :initarg :key :reader key-function)
    (order-key-interface :initarg :order :reader order-interface)))
 (defun <key> (&key key order)
-  (memo:memoized 'make-instance '<key> :key key :order order))
+  (fmemo:memoized 'make-instance '<key> :key key :order order))
 (macrolet ((delegate (&rest names)
              `(progn
                 ,@(loop :for name :in names :collect

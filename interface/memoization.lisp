@@ -2,15 +2,15 @@
 
 #+xcvb (module nil)
 
-(cl:defpackage #:memoization
-  (:nicknames #:memo)
+(cl:defpackage #:fare-memoization
+  (:nicknames #:fmemo)
   (:use #:common-lisp)
   (:export #:memoize #:unmemoize
 	   #:define-memo-function
 	   #:memoizing #:memo-lambda
            #:memoized #:memoized-apply))
 
-(in-package :memoization)
+(in-package :fare-memoization)
 
 ;;; One may want to provide customized equality predicates and hashing functions for arguments,
 ;;; but that is not provided by CL hashing primitives.

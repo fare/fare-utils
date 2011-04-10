@@ -29,7 +29,7 @@
             () "Key ~S is present twice in alist ~S" key map)))
 
 (defun <alist> (&optional (eq eq:<eq>))
-  (memo:memoized 'make-instance '<alist> :eq eq))
+  (fmemo:memoized 'make-instance '<alist> :eq eq))
 
 (defparameter <alist> (<alist>))
 

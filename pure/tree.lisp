@@ -240,7 +240,7 @@
   (assert (member (node-balance node) '(-1 0 1))))
 
 #| Minimum number of nodes in a tree of height n (maximum is 2^n-1)
-(memo:define-memo-function f (n)
+(fmemo:define-memo-function f (n)
   (cond ((zerop n) 0)
         ((= n 1) 1)
         (t (+ 1 (f (1- n)) (f (- n 2))))))
@@ -311,7 +311,7 @@ node is always called with branches that are of comparable height...
 (defclass <number-map> (<avl-tree> order:<number>) ())
 
 (defparameter <number-map>
-  (memo:memoized 'make-instance '<number-map>))
+  (fmemo:memoized 'make-instance '<number-map>))
 
 (defparameter <nm> <number-map>)
 

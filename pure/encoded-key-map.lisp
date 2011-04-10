@@ -86,7 +86,7 @@
   (funcall (key-decoder i) k))
 
 (defun <encoded-key-map> (&key base-interface key-encoder key-decoder)
-  (memo:memoized 'make-instance '<parametric-encoded-key-map>
+  (fmemo:memoized 'make-instance '<parametric-encoded-key-map>
                  :base-interface base-interface
                  :key-encoder key-encoder
                  :key-decoder key-decoder))

@@ -207,7 +207,7 @@ which would cause an endless loop at macro-expansion time, anyway.
 	    `(if (equal res ,result)
 		 (progn (format *error-output* " -- GOOD!~%") t)
 	       (progn
-		 (format *error-output* 
+		 (format *error-output*
 			 ,(conc-string " whereas " format
 				       " was expected. -- BAD!~%")
 			 ,result)
@@ -397,12 +397,15 @@ outputs a tag plus a list of variable and their values, returns the last value"
    ((stringp e) (apply #'error e r))
    (t e)))
 
+(defun form-starting-with-p (tag x)
+  (and (consp x) (equal tag (car x))))
+
 (defun single-arg-form-p (tag x &optional on-error)
   "checks whether X is an instance of a something made with a maker
 defined by (MAKE-SINGLE-ARG-FORM TAG). If ON-ERROR is defined, and
 X looks like it is such an instance but is malformed, then ON-ERROR
 is invoked as an ERROR-BEHAVIOUR."
-  (and (consp x) (eq tag (car x))
+  (and (form-starting-with-p tag x)
        (or (and (consp (cdr x)) (null (cddr x)))
 	   (error-behaviour on-error tag x))))
 

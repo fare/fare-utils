@@ -77,6 +77,7 @@
            #:with-output #:with-user-output-file #:xtime #:_
            #:first-char #:last-char #:but-last-char
            #:proper-list-p
+           #:form-starting-with-p
            #:make-hashset
            #:string-prefix-p #:string-suffix-p #:string-enclosed-p
            #:string-strip-prefix #:string-strip-suffix
@@ -111,4 +112,7 @@
            #:parse-body
            #:parse-defsetf-lambda-list
            #:identifierp
+           #:package-functions
+           #:trace-package-functions
+           #:untrace-package-functions
            ))

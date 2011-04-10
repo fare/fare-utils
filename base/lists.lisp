@@ -107,6 +107,7 @@ returning the two lists of the values returned by the function."
       (if nx (return ny)
 	(if ny (return nil)
 	  (setf x (cdr x) y (cdr y)))))))
+
 (defun length=n-p (x n)
   ;(= (length x) n)
   (check-type n (integer 0 *))
