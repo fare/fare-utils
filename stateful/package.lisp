@@ -13,8 +13,8 @@
   (:export
    #:container #:container-add-list!
    #:container-contents #:container-empty #:container-empty-p
-   #:container-from-list! #:container-size #:container-sized
-   #:containers-empty-p
+   #:container-from-list! #:container-size
+   #:container-empty-p
    #:copy-container
    #:empty-container!
    #:check-not-empty

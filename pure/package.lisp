@@ -22,7 +22,7 @@
    #:<map> #:<alist>
    #:<binary-tree> #:<avl-tree>
    #:<number-map> #:<nm>
-   #:<hash-table> #:<equal-hash-table>
+   #:<hash-table>
    #:<fmim> #:<encoded-key-map>
    #:map-simple-empty #:map-simple-decons
    #:map-simple-update-key #:map-simple-join

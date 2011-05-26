@@ -17,8 +17,10 @@
   (:use :interface :eq :cl :fare-utils)
   (:export
    #:<order> #:<number> #:<string> #:<char>
-   #:<lessp> #:<compare> #:<key> #:<order-parameter>
-   #:order< #:order<= #:order> #:order>= #:order= #:compare
+   #:<order-from-lessp> #:<lessp>
+   #:<order-from-compare> #:<compare>
+   #:<key> #:<order-parameter>
+   #:order< #:order<= #:order> #:order>= #:== #:compare
    #:order-interface))
 
 (in-package :order)
@@ -66,6 +68,13 @@
   (ecase (compare i x y)
     ((-1 1) nil)
     ((0) t)))
+
+(defclass <compare> (<order-from-compare>)
+  ((compare :initarg :lessp :reader compare-function)))
+(defun <compare> (compare)
+  (fmemo:memoized 'make-instance '<compare> :lessp compare))
+(defmethod compare ((i <compare>) x y)
+  (funcall (compare-function i) x y))
 
 (defclass <lessp> (<order-from-lessp>)
   ((lessp :initarg :lessp :reader lessp-function)))
