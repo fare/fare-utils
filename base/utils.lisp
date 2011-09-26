@@ -168,7 +168,7 @@
 
 (defun featurify (bool)
   (if #+common-lisp bool #-common-lisp (not bool)
-      'common-lisp '(not common-lisp)))
+      ':common-lisp '(:not :common-lisp)))
 (defun unfeaturify (bool-feature)
   (equal bool-feature (featurify t)))))
 

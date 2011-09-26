@@ -166,7 +166,7 @@ where KEYWORD defaults to :ARG and SUPPLIED-P defaults to ARG."
 	   (kw (if (and (consp ks) (consp (car ks))) (caar ks)
 		 (conc-keyword key)))
 	   (suppliedp (if (and (listp ks) (<= 2 (length ks))) (second ks)
-			(conc-symbol key :-supplied-p)))
+                          key #|(conc-symbol key :-supplied-p)|#))
 	   (if-supplied (if (and (listp ks) (<= 3 (length ks)))
 			    (third ks)
 			  key)))

@@ -78,10 +78,9 @@ TODO:
 
 (defmethod insert-item! ((container doubly-linked-list) item)
   ;; insert item as the next
-  (with-slots (next) container
-    (let ((new (make-instance 'doubly-linked-list-node :content item)))
-      (join-dl-chains new new (doubly-linked-next container) container)
-      new)))
+  (let ((new (make-instance 'doubly-linked-list-node :content item)))
+    (join-dl-chains new new (doubly-linked-next container) container)
+    new))
 
 (defmethod pop-item! ((container doubly-linked-list))
   (let* ((next (doubly-linked-next container)))

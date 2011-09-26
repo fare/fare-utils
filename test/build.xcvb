@@ -1,0 +1,9 @@
+#+xcvb
+(module
+ (:depends-on
+  ("package"
+   "strings"
+   "functional-map"
+   "updatef")
+  :build-depends-on ((:build "/fare-utils") (:asdf "hu.dwim.stefil"))
+  :supersedes-asdf ("fare-utils-test")))

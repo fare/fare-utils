@@ -1,3 +1,4 @@
+#+xcvb (module (:depends-on ("package")))
 (in-package :fare-utils-test)
 
 (declaim (optimize (speed 1) (debug 3) (space 3)))

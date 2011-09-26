@@ -4,7 +4,7 @@
 
 (in-package :fare-utils)
 
-;;; File replacement function
+;;; File replacement functions
 (defun clobber-file-with-vector (file vector &key (external-format :default))
   (with-open-file (s file
                      :direction :output

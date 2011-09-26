@@ -240,8 +240,11 @@ outputs a tag plus a list of variable and their values, returns the last value"
          exprs)
       (apply 'values ,res)))))
 (defun package-functions (package-designator)
-  (loop :for s :being :each :present-symbol :of package-designator
-    :when (and (fboundp s) (not (macro-function s))) :collect s))
+  (loop :with p = (find-package package-designator)
+    :for s :being :each :present-symbol :of p
+    :when (and (eq p (symbol-package s))
+               (fboundp s) (not (macro-function s)))
+    :collect s))
 (defun trace-package-functions (package-designator)
   (eval `(trace ,@(package-functions package-designator))))
 (defun untrace-package-functions (package-designator)
