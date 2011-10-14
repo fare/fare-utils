@@ -4,7 +4,7 @@
 
 (in-package :fare-utils)
 
-(def*generic call-with-output (x thunk)
+(def*generic call-with-output (x fun)
   (:documentation
    "Calls FUN with an actual stream argument, behaving like FORMAT with respect to stream'ing:
 If OBJ is a stream, use it as the stream.
@@ -12,27 +12,52 @@ If OBJ is NIL, use a STRING-OUTPUT-STREAM as the stream, and return the resultin
 If OBJ is T, use *STANDARD-OUTPUT* as the stream.
 If OBJ is a string with a fill-pointer, use it as a string-output-stream.
 Otherwise, signal an error.")
-  (:method ((x null) thunk)
-    (with-output-to-string (s) (funcall thunk s)))
-  (:method ((x (eql t)) thunk)
-    (funcall thunk *standard-output*) nil)
+  (:method ((x null) fun)
+    (with-output-to-string (s) (funcall fun s)))
+  (:method ((x (eql t)) fun)
+    (funcall fun *standard-output*) nil)
   #-genera
-  (:method ((x stream) thunk)
-    (funcall thunk x) nil)
-  (:method ((x string) thunk)
+  (:method ((x stream) fun)
+    (funcall fun x) nil)
+  (:method ((x string) fun)
     (assert (fill-pointer x))
-    (with-output-to-string (s x) (funcall thunk s)))
-  (:method (x thunk)
-    (declare (ignorable thunk))
+    (with-output-to-string (s x) (funcall fun s)))
+  (:method (x fun)
+    (declare (ignorable fun))
     (cond
       #+genera
-      ((typep x 'stream) (funcall thunk x) nil)
+      ((typep x 'stream) (funcall fun x) nil)
       (t (error "not a valid stream designator ~S" x)))))
 
 (def*macro with-output ((x &optional (value x)) &body body)
   `(call-with-output ,value #'(lambda (,x) ,@body)))
 
-;;; Probably something similar for with call-with-input...
+(def*generic call-with-input (x fun)
+  (:documentation
+   "Calls FUN with an actual stream argument, coercing behaving like READ with respect to stream'ing:
+If OBJ is a stream, use it as the stream.
+If OBJ is NIL, use a STRING-OUTPUT-STREAM as the stream, and return the resulting string.
+If OBJ is T, use *STANDARD-OUTPUT* as the stream.
+If OBJ is a string with a fill-pointer, use it as a string-output-stream.
+Otherwise, signal an error.")
+  (:method ((x null) fun)
+    (funcall fun *terminal-io*))
+  (:method ((x (eql t)) fun)
+    (funcall fun *standard-input*) nil)
+  #-genera
+  (:method ((x stream) fun)
+    (funcall fun x) nil)
+  (:method ((x string) fun)
+    (with-input-from-string (s x) (funcall fun s)))
+  (:method (x fun)
+    (declare (ignorable fun))
+    (cond
+      #+genera
+      ((typep x 'stream) (funcall fun x) nil)
+      (t (error "not a valid stream designator ~S" x)))))
+
+(def*macro with-input ((x &optional (value x)) &body body)
+  `(call-with-input ,value #'(lambda (,x) ,@body)))
 
 (def*parameter *standard-readtable* (copy-readtable nil))
 (def*parameter *safe-package* :cl)

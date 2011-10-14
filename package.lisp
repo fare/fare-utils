@@ -19,7 +19,8 @@
            #:accessors-equal-p #:acond #:acond2 #:adjust-size #:aif
            #:aif2 #:alist->hash-table #:append/list #:association
            #:base-char-p #:binary-heap #:binomial-heap #:boolean
-           #:cached-size-mixin #:call-with-output #:check-not-empty
+           #:cached-size-mixin #:call-with-input #:call-with-output
+           #:check-not-empty
            #:clobber-file-if-different #:clobber-file-with-vector
            #:combinationp #:compose #:compose/2 #:conc-gensym
            #:conc-keyword #:conc-string #:conc-symbol #:conc-symbol-in
@@ -72,7 +73,7 @@
            #:test-only #:the* #:ttest #:ttest* #:unfeaturify
            #:vector->list #:vector-container-mixin
            #:vector-container-ref #:with-buffered-file-contents
-           #:with-gensyms #:with-magic-special-variables
+           #:with-gensyms #:with-input #:with-magic-special-variables
            #:with-magic-special-variables-safely #:with-msv #:with-msv*
            #:with-output #:with-user-output-file #:xtime #:_
            #:first-char #:last-char #:but-last-char
