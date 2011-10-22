@@ -2,15 +2,19 @@
 
 (declaim (optimize (debug 3) (space 1) (speed 1)))
 
-(defvar *standard-readtable* (copy-readtable nil))
-(defun standard-read (&key
-                      (stream *standard-input*)
-                      (eof-error-p t) (eof-value nil)
-                      (recursive-p nil))
-  (let ((*readtable* *standard-readtable*))
-    (with-standard-io-syntax
-      (read-preserving-whitespace
-       stream eof-error-p eof-value recursive-p))))
+;;; First, a trivial recursive-decent parser for arithmetic expressions
+;;; using +-*/, ()[]{}, integers and identifiers made of
+;;; alphanumeric characters starting with an alphabetic one.
+;;; Space doesn't count between other tokens.
+;;; End of stream, punctuation ;.,!? or ending parentheses \]}
+;;; properly terminate an expression.
+;;; Other characters are an error.
+;;; The result read is a SEXP corresponding to your expression.
+;;; Multiple sum terms are collected in a single sum SEXP,
+;;; with a slight simplification for differences.
+;;; Product terms are collected in a single product SEXP,
+;;; with a slight simplification for divisions.
+;;; Identifiers are upcased as symbols in your current package.
 
 (defun oppositep (x)
   (single-arg-form-p '- x))
@@ -33,7 +37,7 @@
   nil)
 
 (defun terminatorp (char)
-  (and (position char #(nil #\) #\] #\} #\; #\return #\linefeed)) t))
+  (and (position char #(nil #\) #\] #\} #\; #\. #\, #\! #\?)) t))
 
 (defun parse-infix-sum (stream)
   (let ((*count* 0))
@@ -153,13 +157,18 @@
       (error "unmatched paren ~S after ~S" paren sum))
     (list 'identity sum)))
 
-(defun string-parse-sum (string)
-  (with-input-from-string (s string)
-    (parse-sum s)))
+
+;;; Now to test things.
+;;; First, our parser without reader interception.
+;;; Second, our parser through reader interception.
 
 (defsuite* (test-reader-interception
             :in root-suite
             :documentation "Testing reader interception"))
+
+(defun string-parse-sum (string)
+  (with-input-from-string (s string)
+    (parse-sum s)))
 
 (defun string-parse-sum-via-read (x)
   (with-reader-interception (x 'parse-sum)
@@ -184,5 +193,5 @@
 (deftest test-parse-sum ()
   (test-parser 'string-parse-sum))
 
-(deftest test-reader-interception ()
+(deftest test-intercepted-read ()
   (test-parser 'string-parse-sum-via-read))
