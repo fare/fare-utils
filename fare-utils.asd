@@ -83,4 +83,10 @@
      (:file "binomial-heap" :depends-on ("container"))
      (:file "fifo" :depends-on ("container"))
      (:file "dllist" :depends-on ("container"))
-     (:file "sorting" :depends-on ("binary-heap" "binomial-heap"))))))
+     (:file "sorting" :depends-on ("binary-heap" "binomial-heap"))))
+
+   ;;; Stateful containers
+   (:module "syntax"
+    :depends-on ("pure")
+    :components
+    ((:file "reader-interception")))))
