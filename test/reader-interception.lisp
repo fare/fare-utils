@@ -2,18 +2,58 @@
 
 (declaim (optimize (debug 3) (space 1) (speed 1)))
 
-;;; First, a trivial recursive-decent parser for arithmetic expressions
+;;; Testing the reader-interception code from syntax/reader-interception.lisp
+;;; We use a reader for a trivial infix mini-language defined below.
+;;; First, test the below parser directly, without reader interception.
+;;; Second, test the parser through reader interception.
+
+(defsuite* (test-reader-interception
+            :in root-suite
+            :documentation "Testing reader interception"))
+
+(defun string-parse-sum (string)
+  (with-input-from-string (s string)
+    (parse-sum s)))
+
+(defun string-parse-sum-via-read (x)
+  (with-input-from-string (s x)
+    (with-reader-interception (s 'parse-sum) ;; we could use either s or x as the hint
+      (read s))))
+
+(defvar *infix-expressions*
+  '(("42" . 42)
+    ("1+(2*3)/4*(5-6*7)+-8+9" .
+     (+ 1 (* (identity (* 2 3)) (/ 4) (identity (- 5 (* 6 7)))) (- 8) 9))
+    ("a*a+2*a*b+b*b" .
+     (+ (* a a) (* 2 a b) (* b b)))
+    ("(-b+deltaroot)/2/a" .
+     (/ (identity (+ (- b) deltaroot)) 2 a))
+    ("b*b-4*a*c" .
+     (- (* b b) (* 4 a c)))))
+
+(defun test-parser (parser)
+  (loop :for (string . sexp) :in *infix-expressions* :do
+    (eval `(is (equal (,parser ,string) ',sexp)))))
+
+(deftest test-parse-sum ()
+  (test-parser 'string-parse-sum))
+
+(deftest test-intercepted-read ()
+  (test-parser 'string-parse-sum-via-read))
+
+
+;;; Here is our trivial recursive-decent parser, for arithmetic expressions
 ;;; using +-*/, ()[]{}, integers and identifiers made of
 ;;; alphanumeric characters starting with an alphabetic one.
 ;;; Space doesn't count between other tokens.
 ;;; End of stream, punctuation ;.,!? or ending parentheses \]}
 ;;; properly terminate an expression.
 ;;; Other characters are an error.
-;;; The result read is a SEXP corresponding to your expression.
+;;; The result read is a SEXP corresponding to your expression,
+;;; Using + - * / identity
 ;;; Multiple sum terms are collected in a single sum SEXP,
-;;; with a slight simplification for differences.
-;;; Product terms are collected in a single product SEXP,
-;;; with a slight simplification for divisions.
+;;; with a slight simplification for differences:
+;;; we don't distinguish a-b and a+-b.
 ;;; Identifiers are upcased as symbols in your current package.
 
 (defun oppositep (x)
@@ -156,42 +196,3 @@
     (unless (eql char (paren-closer paren))
       (error "unmatched paren ~S after ~S" paren sum))
     (list 'identity sum)))
-
-
-;;; Now to test things.
-;;; First, our parser without reader interception.
-;;; Second, our parser through reader interception.
-
-(defsuite* (test-reader-interception
-            :in root-suite
-            :documentation "Testing reader interception"))
-
-(defun string-parse-sum (string)
-  (with-input-from-string (s string)
-    (parse-sum s)))
-
-(defun string-parse-sum-via-read (x)
-  (with-reader-interception (x 'parse-sum)
-    (with-input-from-string (s x)
-      (read s))))
-
-(defvar *infix-expressions*
-  '(("42" . 42)
-    ("1+(2*3)/4*(5-6*7)+-8+9" .
-     (+ 1 (* (identity (* 2 3)) (/ 4) (identity (- 5 (* 6 7)))) (- 8) 9))
-    ("a*a+2*a*b+b*b" .
-     (+ (* a a) (* 2 a b) (* b b)))
-    ("(-b+deltaroot)/2/a" .
-     (/ (identity (+ (- b) deltaroot)) 2 a))
-    ("b*b-4*a*c" .
-     (- (* b b) (* 4 a c)))))
-
-(defun test-parser (parser)
-  (loop :for (string . sexp) :in *infix-expressions* :do
-    (eval `(is (equal (,parser ,string) ',sexp)))))
-
-(deftest test-parse-sum ()
-  (test-parser 'string-parse-sum))
-
-(deftest test-intercepted-read ()
-  (test-parser 'string-parse-sum-via-read))

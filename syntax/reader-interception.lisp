@@ -8,15 +8,18 @@
 
 (in-package :reader-interception)
 
-(defmacro with-reader-interception
-    ((hint reader) &body body)
+(defmacro with-reader-interception ((hint reader) &body body)
   "You may override the Common Lisp reader, e.g. around LOAD or COMPILE-FILE,
 by using WITH-READER-INTERCEPTION (HINT READER) BODY...
+thus replacing the CL syntax with any syntax of your choice.
+By combining this with ASDF 2.018's :around-compile hook,
+you could compile any language with CL via a proper translation frontend.
 You *must* specify a HINT to pass to PREPARE-READER-INTERCEPTION,
 to help the interception find the first (next) character that will be read,
 so it can intercept reading from there.
 You must specify your READER, a function taking a STREAM as argument,
-and either returning an object or raising an END-OF-FILE error.
+and either returning an object or raising an error
+such as READER-ERROR or END-OF-FILE.
 Inside the BODY, the *READTABLE* is set so that you may READ
 from a stream starting with the hinted character, and
 it will use your specified parser instead of the CL reader.
