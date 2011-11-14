@@ -1,22 +1,10 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
-(in-package :cl-user)
-
-(proclaim
- #+sbcl
- '(optimize
-   (sb-c::merge-tail-calls 3)
-   (sb-c::insert-debug-catch 0)
-   (speed 3) (space 3) (debug 2))
- #+clozure
- '(optimize (speed 3) (space 3) (debug 2))
- #-(or sbcl clozure)
- '(optimize (speed 3) (space 3) (debug 1)))
-
-#+clozure
-(setf ccl::*compile-time-evaluation-policy*
-      (ccl::new-compiler-policy :allow-tail-recursion-elimination (constantly t)))
-
-(asdf:defsystem :fare-utils
+(defsystem :fare-utils
+  :description "Basic functions and macros, interfaces, pure and stateful datastructures"
+  :long-description "fare-utilities is a small collection of utilities.
+It contains a lot of basic everyday functions and macros,
+but also a library of pure and stateful datastructures,
+and Lisp extensions for memoization and reader interception."
   :components
   ((:file "package")
 
