@@ -64,7 +64,7 @@
            #:null-string-p #:plist->alist #:pop-last-item
            #:pop-last-item! #:pop-least-item #:pop-least-item! #:pop-item!
            #:post-decf #:post-incf #:propmacro #:propmacros
-           #:prune-node! #:push-last-item! #:quit-lisp #:quotep #:rcons
+           #:prune-node! #:push-last-item! #:quotep #:rcons
            #:remove-nth #:rlist* #:safe-read #:safe-write #:search-tree
            #:set-container-contents-from-list! #:simplify-string
            #:single-arg #:single-arg-form-p #:sized-container-mixin

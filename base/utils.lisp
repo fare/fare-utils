@@ -181,16 +181,4 @@
 (defun NIY (&rest args)
   "fallback function for unimplemented functionality"
   (error "Not Implemented Yet~@[: ~S~]" args))
-
-(defun quit-lisp ()
-  "Quit the lisp implementation"
-  #+cmu (extensions:quit)
-  #+sbcl (sb-ext:quit)
-  #+clisp (ext:quit)
-  #+allegro (excl:exit)
-  #+lispworks (lispworks:quit)
-  #+ccl (ccl:quit)
-  #+genera (error "You probably don't want to Halt the Machine.")
-  #-(or cmu sbcl clisp allegro lispworks ccl genera) (NIY))
-
 )
