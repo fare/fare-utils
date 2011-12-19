@@ -55,15 +55,22 @@ with a hash-table H, being called with arguments ARGS"
 ;;  `(progn (defun ,name ,formals ,@body) (memoize ',name)))
 (defmacro define-memo-function (name formals &body body)
   (let* ((args (gensym "ARGS"))
-         (h (gensym "HASH"))
-         (keys (when (consp name) (cdr name)))
+         (all-keys (when (consp name) (cdr name)))
+         (mht-keys (loop :for (k v) :on all-keys :by #'cddr
+                     :unless (eq k :memo-variable) :append (list k v)))
+         (memo-variable-p (getf all-keys :memo-variable))
+         (memo-variable (or memo-variable-p (gensym "HASH")))
          (name (if (consp name) (car name) name))
-         (fun (gensym (symbol-name name))))
-    `(let ((,h (make-hash-table :test 'equal ,@keys)))
-       (defun ,name (&rest ,args)
-         (labels ((,fun ,formals (block ,name ,@body))
-                  (,name (&rest ,args) (compute-memoized-function #',fun ,h ,args)))
-           (apply #',name ,args))))))
+         (fun (gensym (symbol-name name)))
+         (mht `(make-hash-table :test 'equal ,@mht-keys))
+         (def
+          `(defun ,name (&rest ,args)
+             (labels ((,fun ,formals (block ,name ,@body))
+                      (,name (&rest ,args) (compute-memoized-function #',fun ,memo-variable ,args)))
+               (apply #',name ,args)))))
+    (if memo-variable-p
+        `(progn (defvar ,memo-variable ,mht) ,def)
+        `(let ((,memo-variable ,mht)) ,def))))
 
 ;;; This is your generic memoized function.
 ;;; If you want to make sure that a given function is only ever called once
