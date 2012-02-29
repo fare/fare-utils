@@ -4,7 +4,7 @@
 
 (in-package :fare-utils)
 
-(def*generic call-with-output (x fun)
+(def*generic call-with-output-stream (x fun)
   (:documentation
    "Calls FUN with an actual stream argument, behaving like FORMAT with respect to stream'ing:
 If OBJ is a stream, use it as the stream.
@@ -29,10 +29,10 @@ Otherwise, signal an error.")
       ((typep x 'stream) (funcall fun x) nil)
       (t (error "not a valid stream designator ~S" x)))))
 
-(def*macro with-output ((x &optional (value x)) &body body)
-  `(call-with-output ,value #'(lambda (,x) ,@body)))
+(def*macro with-output-stream ((x &optional (value x)) &body body)
+  `(call-with-output-stream ,value #'(lambda (,x) ,@body)))
 
-(def*generic call-with-input (x fun)
+(def*generic call-with-input-stream (x fun)
   (:documentation
    "Calls FUN with an actual stream argument, coercing behaving like READ with respect to stream'ing:
 If OBJ is a stream, use it as the stream.
@@ -56,7 +56,7 @@ Otherwise, signal an error.")
       ((typep x 'stream) (funcall fun x) nil)
       (t (error "not a valid stream designator ~S" x)))))
 
-(def*macro with-input ((x &optional (value x)) &body body)
+(def*macro with-input-stream ((x &optional (value x)) &body body)
   `(call-with-input ,value #'(lambda (,x) ,@body)))
 
 (def*parameter *standard-readtable* (copy-readtable nil))

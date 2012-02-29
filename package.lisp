@@ -19,7 +19,8 @@
            #:accessors-equal-p #:acond #:acond2 #:adjust-size #:aif
            #:aif2 #:alist->hash-table #:append/list #:association
            #:base-char-p #:binary-heap #:binomial-heap #:boolean
-           #:cached-size-mixin #:call-with-input #:call-with-output
+           #:cached-size-mixin
+           #:call-with-input-stream #:call-with-output-stream
            #:check-not-empty
            #:clobber-file-if-different #:clobber-file-with-vector
            #:combinationp #:compose #:compose/2 #:conc-gensym
@@ -75,7 +76,8 @@
            #:vector-container-ref #:with-buffered-file-contents
            #:with-gensyms #:with-input #:with-magic-special-variables
            #:with-magic-special-variables-safely #:with-msv #:with-msv*
-           #:with-output #:with-user-output-file #:xtime #:_
+           #:with-output-stream #:with-input-stream
+           #:with-user-output-file #:xtime #:_
            #:first-char #:last-char #:but-last-char
            #:proper-list-p
            #:form-starting-with-p

@@ -6,7 +6,7 @@
 (in-package :fare-utils)
 
 (def*fun join-strings (strings &key stream separator)
-  (with-output (stream)
+  (with-output-stream (stream)
     (loop
       :with sep = (->string separator)
       :for (string . more-strings) :on strings :do
