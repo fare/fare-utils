@@ -8,7 +8,7 @@
 ;;; Second, test the parser through reader interception.
 
 (defsuite* (test-reader-interception
-            :in root-suite
+            :in test-suite
             :documentation "Testing reader interception"))
 
 (defun string-parse-sum (string)

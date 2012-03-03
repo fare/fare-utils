@@ -4,7 +4,7 @@
 (declaim (optimize (speed 1) (debug 3) (space 3)))
 
 (defsuite* (test-functional-map
-            :in root-suite
+            :in test-suite
             :documentation "Testing pure functional maps"))
 
 (defun sort-alist (alist) (sort (copy-seq alist) #'< :key #'car))

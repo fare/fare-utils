@@ -2,7 +2,7 @@
 (in-package :fare-utils-test)
 
 (defsuite* (test-strings
-            :in root-suite
+            :in test-suite
             :documentation "Test string functions"))
 
 (deftest test-strcat ()

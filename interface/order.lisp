@@ -7,7 +7,6 @@
   ("package"
    "base/strings"
    "base/symbols"
-   "interface/memoization"
    "interface/interface"
    "interface/eq")))
 
@@ -72,14 +71,14 @@
 (defclass <compare> (<order-from-compare>)
   ((compare :initarg :lessp :reader compare-function)))
 (defun <compare> (compare)
-  (fmemo:memoized 'make-instance '<compare> :lessp compare))
+  (fmemo:memoized-funcall 'make-instance '<compare> :lessp compare))
 (defmethod compare ((i <compare>) x y)
   (funcall (compare-function i) x y))
 
 (defclass <lessp> (<order-from-lessp>)
   ((lessp :initarg :lessp :reader lessp-function)))
 (defun <lessp> (lessp)
-  (fmemo:memoized 'make-instance '<lessp> :lessp lessp))
+  (fmemo:memoized-funcall 'make-instance '<lessp> :lessp lessp))
 (macrolet ((delegate (&rest names)
              `(progn
                 ,@(loop :for (name suffix) :in names :collect
@@ -129,7 +128,7 @@
   ((order-key :initarg :key :reader key-function)
    (order-key-interface :initarg :order :reader order-interface)))
 (defun <key> (&key key order)
-  (fmemo:memoized 'make-instance '<key> :key key :order order))
+  (fmemo:memoized-funcall 'make-instance '<key> :key key :order order))
 (macrolet ((delegate (&rest names)
              `(progn
                 ,@(loop :for name :in names :collect

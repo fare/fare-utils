@@ -311,7 +311,7 @@ node is always called with branches that are of comparable height...
 (defclass <number-map> (<avl-tree> order:<number>) ())
 
 (defparameter <number-map>
-  (fmemo:memoized 'make-instance '<number-map>))
+  (fmemo:memoized-funcall 'make-instance '<number-map>))
 
 (defparameter <nm> <number-map>)
 

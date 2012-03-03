@@ -28,8 +28,9 @@
   (assert (typep key 'eq:<hashable>))
   (assert (typep hashmap '<map>))
   (assert (typep bucketmap '<map>))
-  (fmemo:memoized 'make-instance '<hash-table>
-                 :key key :hashmap hashmap :bucketmap bucketmap))
+  (fmemo:memoized-funcall
+   'make-instance '<hash-table>
+   :key key :hashmap hashmap :bucketmap bucketmap))
 
 (defparameter <hash-table> (<hash-table>))
 

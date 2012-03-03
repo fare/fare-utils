@@ -5,6 +5,7 @@
 It contains a lot of basic everyday functions and macros,
 but also a library of pure and stateful datastructures,
 and Lisp extensions for memoization and reader interception."
+  :depends-on (:fare-memoization)
   :components
   ((:file "package")
 
@@ -42,9 +43,8 @@ and Lisp extensions for memoization and reader interception."
    (:module "interface"
     :depends-on ("base")
     :components
-    ((:file "memoization")
-     (:file "interface")
-     (:file "eq" :depends-on ("interface" "memoization"))
+    ((:file "interface")
+     (:file "eq" :depends-on ("interface"))
      (:file "order" :depends-on ("eq"))))
 
    ;;; IPS pure functional datastructures
@@ -78,3 +78,7 @@ and Lisp extensions for memoization and reader interception."
     :depends-on ("pure")
     :components
     ((:file "reader-interception")))))
+
+(defmethod perform ((op test-op) (system (eql (find-system :fare-utils))))
+  (asdf:load-system :fare-utils-test)
+  (funcall (read-from-string "fare-utils-test:test-suite")))

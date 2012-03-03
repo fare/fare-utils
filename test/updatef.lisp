@@ -4,7 +4,7 @@
 (declaim (optimize (speed 1) (debug 3) (space 3)))
 
 (defsuite* (test-updatef
-            :in root-suite
+            :in test-suite
             :documentation "Testing pure update"))
 
 (deftest test-updatef ()
