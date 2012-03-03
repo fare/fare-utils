@@ -54,7 +54,7 @@ a pathname to be open as a stream to read from with specified external-format"
     (stream
      (let ((next (read-char hint nil nil)))
        (when next
-         (unread-char next)
+         (unread-char next hint)
          (prepare-character next)))))
   (values))
 
