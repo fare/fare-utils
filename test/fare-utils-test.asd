@@ -6,5 +6,4 @@
   ((:file "package")
    (:file "strings" :depends-on ("package"))
    (:file "functional-map" :depends-on ("package"))
-   (:file "updatef" :depends-on ("package"))
-   (:file "reader-interception" :depends-on ("package"))))
+   (:file "updatef" :depends-on ("package"))))

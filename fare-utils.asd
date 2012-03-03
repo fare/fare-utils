@@ -71,13 +71,7 @@ and Lisp extensions for memoization and reader interception."
      (:file "binomial-heap" :depends-on ("container"))
      (:file "fifo" :depends-on ("container"))
      (:file "dllist" :depends-on ("container"))
-     (:file "sorting" :depends-on ("binary-heap" "binomial-heap"))))
-
-   ;;; Stateful containers
-   (:module "syntax"
-    :depends-on ("pure")
-    :components
-    ((:file "reader-interception")))))
+     (:file "sorting" :depends-on ("binary-heap" "binomial-heap"))))))
 
 (defmethod perform ((op test-op) (system (eql (find-system :fare-utils))))
   (asdf:load-system :fare-utils-test)
