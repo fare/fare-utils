@@ -2,6 +2,7 @@
 (module
  (:fullname
   "fare-utils"
+  :build-depends-on ("/fare-memoization")
   :depends-on
   ("package"
    "base/utils"
@@ -18,7 +19,6 @@
    "filesystem/files"
    "filesystem/atomic"
    "unbaked/msv"
-   "interface/memoization"
    "interface/interface"
    "interface/eq"
    "interface/order"

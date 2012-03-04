@@ -4,8 +4,7 @@
 #+xcvb
 (module
  (:depends-on
-  ("interface/memoization"
-   "interface/interface"
+  ("interface/interface"
    "interface/eq"
    "pure/package"
    "pure/map"
