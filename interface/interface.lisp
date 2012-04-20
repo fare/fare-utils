@@ -15,12 +15,14 @@
    ;;; Classes
    #:<interface>
    #:<type>
+   #:<classy>
 
    ;;; General purpose gfs
    #:check-invariant
    #:make
    #:update
    #:base-interface
+   #:instantiate
    ))
 
 (in-package :interface)
@@ -55,3 +57,15 @@ On success the OBJECT itself is returned. On failure an error is signalled."))
 
 (defgeneric base-interface (<interface>)
   (:documentation "from the parametric variant of a mixin, extract the base interface"))
+
+
+;;; Classy Interface (i.e. has some associated class)
+
+(defclass <classy> (<interface>)
+  ((class :reader interface-class :allocation :class)))
+
+(defgeneric instantiate (<interface> &key &allow-other-keys))
+
+(defmethod instantiate ((i <classy>) &rest keys &key &allow-other-keys)
+  (apply 'make-instance (interface-class i) keys))
+
