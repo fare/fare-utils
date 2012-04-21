@@ -14,11 +14,12 @@
       (when more-strings
         (princ sep stream)))))
 
+(unless (fboundp 'last-char)
 (def*fun last-char (string)
   (check-type string string)
   (let ((l (length string)))
     (unless (zerop l)
-      (char string (1- l)))))
+      (char string (1- l))))))
 
 (def*fun but-last-char (string)
   (check-type string string)
@@ -26,10 +27,11 @@
     (unless (zerop l)
       (subseq string 0 (1- l)))))
 
+(unless (fboundp 'first-char)
 (def*fun first-char (string)
   (check-type string string)
   (unless (zerop (length string))
-    (char string 0)))
+    (char string 0))))
 
 (def*fun string-prefix-p (prefix string)
   (let* ((x (string prefix))

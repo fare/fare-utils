@@ -61,7 +61,7 @@ CMUCL's EXT:ONCE-ONLY has a different interface."
 (defun xfuncall (x f &rest args) (apply f x args))
 (exporting-definitions
 (define-modify-macro funcallf (f &rest args) xfuncall)
-(define-modify-macro appendf (&rest args) append "Append onto list")
+;;(define-modify-macro appendf (&rest args) append "Append onto list") ;; imported from ASDF
 (define-modify-macro nconcf (&rest args) nconc "Destructively append onto list")
 (defun append1 (l x) (append l (list x)))
 (define-modify-macro append1f (x) append1 "Append one element onto list"))
@@ -289,6 +289,14 @@ outputs a tag plus a list of variable and their values, returns the last value"
   (loop :for x :across vector :collect x))
 (defun list->vector (list)
   (apply #'vector list))
+(defmacro vector-bind ((&rest variables) vector &body body)
+  (evaluating-once (vector)
+    `(progn
+       (check-type ,vector (vector * ,(length variables)))
+       (symbol-macrolet ,(loop :for v :in variables :for i :from 0
+                           :collect `(,v (aref ,vector ,i)))
+         ,@body))))
+
 
 ;;; Streams
 

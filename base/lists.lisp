@@ -108,6 +108,7 @@ returning the two lists of the values returned by the function."
 	(if ny (return nil)
 	  (setf x (cdr x) y (cdr y)))))))
 
+(unless (fboundp 'length=n-p) ; already defined in ASDF
 (defun length=n-p (x n)
   ;(= (length x) n)
   (check-type n (integer 0 *))
@@ -116,7 +117,7 @@ returning the two lists of the values returned by the function."
     :for i :downfrom n :do
     (cond
       ((zerop i) (return (null l)))
-      ((not (consp l)) (return nil)))))
+      ((not (consp l)) (return nil))))))
 
 (defun length<-p (x y)
   ;(= (length x) (length y))
@@ -220,3 +221,11 @@ May alter the cons cells that constitute the spine of the alist"
         (cond
           (addp (push x acc) t)
           (t (prog1 (nreverse acc) (setf acc nil)))))))
+
+(defun split-list (list predicate &key key)
+  (loop :for e :in list
+    :when (funcall predicate (if key (funcall key e) e))
+    :collect e :into yes
+    :else
+    :collect e :into no
+    :finally (return (values yes no))))

@@ -74,7 +74,7 @@
       s))))
 
 (eval-now
-(exporting-definitions
+(unless (fboundp 'strcat)
 (defun strcat (&rest strings)
   (apply #'concatenate 'string strings))
 ;; The below definition would save space, but makes debugging hell,

@@ -24,14 +24,14 @@
 
 (in-package :order)
 
-(defclass <order> (<eq>) ())
+(define-interface <order> (<eq>) ())
 (defgeneric order< (i x y))
 (defgeneric order<= (i x y))
 (defgeneric order> (i x y))
 (defgeneric order>= (i x y))
 (defgeneric compare (i x y))
 
-(defclass <order-from-lessp> (<order>) ())
+(define-interface <order-from-lessp> (<order>) ())
 (defmethod order<= ((i <order-from-lessp>) x y)
   (not (order< i y x)))
 (defmethod order> ((i <order-from-lessp>) x y)
@@ -46,7 +46,7 @@
     ((order> i x y) 1)
     (t 0)))
 
-(defclass <order-from-compare> (<order>) ())
+(define-interface <order-from-compare> (<order>) ())
 (defmethod order< ((i <order-from-compare>) x y)
   (ecase (compare i x y)
     ((-1) t)
@@ -68,17 +68,16 @@
     ((-1 1) nil)
     ((0) t)))
 
-(defclass <compare> (<order-from-compare>)
-  ((compare :initarg :lessp :reader compare-function)))
-(defun <compare> (compare)
-  (fmemo:memoized-funcall 'make-instance '<compare> :lessp compare))
+(define-interface <compare> (<order-from-compare>)
+  ((compare :initarg :compare :reader compare-function))
+  (:parametric (compare) (make-interface :compare compare)))
 (defmethod compare ((i <compare>) x y)
   (funcall (compare-function i) x y))
 
-(defclass <lessp> (<order-from-lessp>)
-  ((lessp :initarg :lessp :reader lessp-function)))
-(defun <lessp> (lessp)
-  (fmemo:memoized-funcall 'make-instance '<lessp> :lessp lessp))
+(define-interface <lessp> (<order-from-lessp>)
+  ((lessp :initarg :lessp :reader lessp-function))
+  (:parametric (lessp) (make-interface :lessp lessp)))
+
 (macrolet ((delegate (&rest names)
              `(progn
                 ,@(loop :for (name suffix) :in names :collect
@@ -107,7 +106,7 @@
 
 (macrolet ((builtin (name prefix)
              `(progn
-                (defclass ,name (<order>) ())
+                (define-interface ,name (<order>) () (:singleton))
                 ,@(loop :for n :in '(< <= > >=) :collect
                     `(defmethod ,(conc-symbol :order n) ((i ,name) x y)
                        (,(conc-symbol prefix n) x y)))
@@ -117,18 +116,16 @@
                   (cond
                     ((,(conc-symbol prefix '<) x y) -1)
                     ((,(conc-symbol prefix '>) x y) 1)
-                    (t 0)))
-                (defparameter ,name (make-instance ',name)))))
+                    (t 0))))))
   ;;(builtin function call)
   (builtin <number> "")
   (builtin <char> char)
   (builtin <string> string))
 
-(defclass <key> ()
+(define-interface <key> ()
   ((order-key :initarg :key :reader key-function)
-   (order-key-interface :initarg :order :reader order-interface)))
-(defun <key> (&key key order)
-  (fmemo:memoized-funcall 'make-instance '<key> :key key :order order))
+   (order-key-interface :initarg :order :reader order-interface))
+  (:parametric (&key key order) (make-interface :key key :order order)))
 (macrolet ((delegate (&rest names)
              `(progn
                 ,@(loop :for name :in names :collect
@@ -138,7 +135,7 @@
                               (funcall (key-function i) y)))))))
   (delegate order< order<= order> order>= == compare))
 
-(defclass <order-parameter> ()
+(define-interface <order-parameter> ()
   ((order-interface :initarg :order :reader order-interface)))
 (macrolet ((delegate (&rest names)
              `(progn

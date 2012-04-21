@@ -17,6 +17,10 @@
    #:<type>
    #:<classy>
 
+   ;;; Macros
+   #:define-interface
+   #:make-interface
+
    ;;; General purpose gfs
    #:check-invariant
    #:make
@@ -27,11 +31,27 @@
 
 (in-package :interface)
 
-(defclass <interface> ()
+(defmacro define-interface (name super-interfaces slots &rest options)
+  (multiple-value-bind (interface-options class-options)
+      (split-list options #'(lambda (x) (member x '(:singleton :parametric))) :key 'car)
+    `(progn
+       (defclass ,name ,super-interfaces ,slots ,@class-options)
+       ,@(let ((singleton (find :singleton interface-options :key 'car)))
+           (when singleton `((defvar ,name (fmemo:memoized-funcall 'make-instance ',name)))))
+       ,@(let ((parametric (find :parametric interface-options :key 'car)))
+           (when parametric
+             (destructuring-bind (formals &body body) (cdr parametric)
+               `((defun ,name ,formals
+                   (flet ((make-interface (&rest r)
+                            (fmemo:memoized-apply 'make-instance ',name r)))
+                     ,@body))))))
+       ',name)))
+
+(define-interface <interface> ()
   ()
   (:documentation "An interface, encapsulating an algorithm"))
 
-(defclass <type> (<interface>) ()
+(define-interface <type> (<interface>) ()
   (:documentation "An interface encapsulating a particular type of objects"))
 
 (defgeneric make (<type> &key)
@@ -61,11 +81,10 @@ On success the OBJECT itself is returned. On failure an error is signalled."))
 
 ;;; Classy Interface (i.e. has some associated class)
 
-(defclass <classy> (<interface>)
+(define-interface <classy> (<interface>)
   ((class :reader interface-class :allocation :class)))
 
 (defgeneric instantiate (<interface> &key &allow-other-keys))
 
 (defmethod instantiate ((i <classy>) &rest keys &key &allow-other-keys)
   (apply 'make-instance (interface-class i) keys))
-

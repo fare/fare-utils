@@ -1,7 +1,6 @@
 #+xcvb
 (module
- (:fullname
-  "fare-utils"
+ (:fullname "/fare-utils"
   :build-depends-on ("/fare-memoization")
   :depends-on
   ("package"
@@ -36,6 +35,4 @@
    "stateful/fifo"
    "stateful/dllist"
    "stateful/sorting")
-  :supersedes-asdf
-  ("fare-utils")))
-
+  :supersedes-asdf ("fare-utils")))
