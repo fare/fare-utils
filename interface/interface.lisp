@@ -27,6 +27,21 @@
    #:update
    #:base-interface
    #:instantiate
+
+   ;;; Boxes!
+   #:box #:box-ref #:box-set!
+   #:<box> #:make-box #:unbox
+   #:<classy-box>
+   #:<value-box> #:value-box #:simple-value-box
+   #:<thunk-box> #:thunk-box #:simple-thunk-box
+   #:<promise-box> #:promise-box #:delay #:force
+   #:<one-use-box> #:one-use-box
+   #:<one-use-value-box> #:one-use-value-box
+   #:<one-use-thunk-box> #:one-use-thunk-box
+   #:make-one-use-function #:one-use-lambda
+   #:<emptyable-box> #:empty #:empty-p
+   #:<mutable-box> #:mutable-box #:immutable-box #:set-box!
+   #:<box!> #:box!
    ))
 
 (in-package :interface)

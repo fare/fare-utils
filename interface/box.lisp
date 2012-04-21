@@ -10,7 +10,7 @@
 ;;; A class for box objects themselves
 (defclass box () ())
 
-(defgeneric %unbox (box &key)
+(defgeneric box-ref (box)
   (:documentation "open a box and return its contents"))
 
 ;;; An interface for boxes
@@ -18,10 +18,10 @@
 ;;; A box: you can make it, or get something out of it
 (define-interface <box> (<interface>) ())
 
-(defgeneric make-box (<box> generator &key)
+(defgeneric make-box (<box> generator)
   (:documentation "Make a box from a generator for the value inside the box"))
 
-(defgeneric unbox (<box> box &key)
+(defgeneric unbox (<box> box)
   (:documentation "Return the value inside the box"))
 
 
@@ -33,7 +33,7 @@
 
 (defmethod unbox ((i <classy-box>) box &rest keys &key &allow-other-keys)
   (declare (ignorable i))
-  (apply '%unbox box keys))
+  (apply 'box-ref box keys))
 
 
 ;;;; Boxes that hold a value
@@ -41,7 +41,7 @@
 (defclass value-box (box)
   ((value :initarg :value :reader box-value)))
 
-(defmethod %unbox ((box value-box) &key)
+(defmethod box-ref ((box value-box))
   (if (slot-boundp box 'value)
     (box-value box)
     (call-next-method)))
@@ -49,7 +49,7 @@
 (defclass simple-value-box (value-box)
   ((value :initarg :generator)))
 
-(defmethod %unbox ((box simple-value-box) &key)
+(defmethod box-ref ((box simple-value-box))
   (box-value box))
 
 (define-interface <value-box> (<classy-box>)
@@ -63,7 +63,7 @@
 (defclass simple-thunk-box (box)
   ((thunk :initarg :generator)))
 
-(defmethod %unbox ((box simple-thunk-box) &key)
+(defmethod box-ref ((box simple-thunk-box))
   (funcall (box-thunk box)))
 
 (define-interface <thunk-box> (<classy-box>)
@@ -72,7 +72,7 @@
 
 ;;;; Boxes that hold a promise
 
-(defclass promise-box (value-box simple-thunk-box) ())
+(defclass promise-box (value-box simple-thunk-box immutable-box) ())
 
 (define-interface <promise-box> (<value-box> <simple-thunk-box>)
   ((class :initform 'promise-box)))
@@ -81,22 +81,22 @@
   `(make-instance 'promise-box :thunk #'(lambda () ,@body)))
 
 (defun force (promise)
-  (%unbox promise))
+  (box-ref promise))
 
 
 ;;;; Boxes that can only be used once
 (defclass one-use-box (box)
-  ((usedp :type boolean :initform nil :accessor %box-usedp)))
+  ((usedp :type boolean :initform nil :accessor box-usedp)))
 
 (define-interface <one-use-box> (<classy-box>)
   ((class :initform 'one-use-box)))
 
-(defmethod %unbox :before ((box one-use-box) &key)
-  (when (%box-usedp box)
+(defmethod box-ref :before ((box one-use-box))
+  (when (box-usedp box)
     (error "Tried to use ~A more than once" box)))
 
-(defmethod %unbox :after ((box one-use-box) &key)
-  (setf (%box-usedp box) t))
+(defmethod box-ref :after ((box one-use-box))
+  (setf (box-usedp box) t))
 
 ;;; Some concrete classes following that pattern.
 (defclass one-use-value-box (one-use-box value-box) ())
@@ -143,36 +143,43 @@
 ;;; Some boxes can be empty
 (define-interface <emptyable-box> (<box>) ())
 
-(defgeneric empty (<emptyable-box> &key)
+(defgeneric empty (<emptyable-box>)
   (:documentation "Return an empty box"))
 
-(defgeneric empty-p (<emptyable-box> box &key)
+(defgeneric empty-p (<emptyable-box> box)
   (:documentation "Return a boolean indicating whether the box was empty"))
 
 ;;; Some boxes can be refilled
+
 (defclass mutable-box (box) ())
-(defgeneric %set-box! (box value))
+(defclass immutable-box (box) ())
 
 (define-interface <mutable-box> (<box>) ())
+
+(defgeneric box-set! (box value)
+  (:documentation "set the contents of a box (if applicable)"))
+
+(defmethod box-set! ((box immutable-box) value)
+  (error "Trying to set an immutable box"))
+
 (defgeneric set-box! (<box> box value))
 
 (defmethod set-box! ((i <classy-box>) box value)
   (declare (ignorable i))
-  (%set-box! box value))
-
+  (box-set! box value))
 
 (defclass box! (mutable-box emptyable-box value-box) ())
 
 (define-interface <box!> (<mutable-box> <classy-box> <emptyable-box>)
   ((class :initform 'box!)))
 
-(defmethod %set-box! ((box box!) value)
+(defmethod box-set! ((box box!) value)
   (setf (slot-value box 'value) value))
 
-(defmethod empty-p ((i <box!>) box &key)
+(defmethod empty-p ((i <box!>) box)
   (declare (ignorable i))
   (slot-boundp box 'value))
 
-(defmethod empty ((i <box!>) &key)
+(defmethod empty ((i <box!>))
   (declare (ignorable i))
-  (make-instance (interface-class <box!>)) 'value)
+  (make-instance 'box!))

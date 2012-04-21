@@ -7,11 +7,13 @@
 
 (defclass <map> () ())
 
+#| ;; Already defined in interface for boxes.
 (defgeneric empty (<map>)
   (:documentation "Return an empty map"))
 
 (defgeneric empty-p (<map> map)
   (:documentation "Return a boolean indicating whether the map was empty"))
+|#
 
 (defgeneric lookup (<map> map key)
   (:documentation "Lookup what map associates to a key,
