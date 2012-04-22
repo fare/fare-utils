@@ -19,6 +19,7 @@
    "filesystem/atomic"
    "unbaked/msv"
    "interface/interface"
+   "interface/box"
    "interface/eq"
    "interface/order"
    "pure/package"

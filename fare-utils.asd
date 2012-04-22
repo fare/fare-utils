@@ -44,6 +44,7 @@ and Lisp extensions for memoization and reader interception."
     :depends-on ("base")
     :components
     ((:file "interface")
+     (:file "box" :depends-on ("interface"))
      (:file "eq" :depends-on ("interface"))
      (:file "order" :depends-on ("eq"))))
 

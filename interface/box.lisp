@@ -1,9 +1,8 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 
-#+xcvb (module (:depends-on ("interface/interface" "pure/package")))
+#+xcvb (module (:depends-on ("interface/interface")))
 
 (in-package :interface)
-
 
 ;;;; Interface
 
@@ -18,7 +17,7 @@
 ;;; A box: you can make it, or get something out of it
 (define-interface <box> (<interface>) ())
 
-(defgeneric make-box (<box> generator)
+(defgeneric make-box (<box> generator &key &allow-other-keys)
   (:documentation "Make a box from a generator for the value inside the box"))
 
 (defgeneric unbox (<box> box)
@@ -31,9 +30,9 @@
 (defmethod make-box ((i <classy-box>) generator &rest keys &key &allow-other-keys)
   (apply 'instantiate i :generator generator keys))
 
-(defmethod unbox ((i <classy-box>) box &rest keys &key &allow-other-keys)
+(defmethod unbox ((i <classy-box>) box)
   (declare (ignorable i))
-  (apply 'box-ref box keys))
+  (box-ref box))
 
 
 ;;;; Boxes that hold a value
@@ -120,24 +119,6 @@
 
 (defmacro one-use-lambda (formals &body body)
   `(make-one-use-function #'(lambda ,formals ,@body)))
-
-
-#|
-;;;; Boxes that can only be opened with a key
-
-(defclass lock-box ()
-  ((lock :initarg :lock :reader %box-lock)))
-
-(define-interface <lock-box> (<lock> <box>) ())
-
-(defmethod unbox :before ((i <lock-box>) box &key key)
-  (unless (unlockedp (lock-interface i) (box-lock i box) key)
-    (error "Tried to access ~A with invalid key ~A" box key)))
-
-(defmethod make-box :before ((i <lock-box>) generator &key key)
-  (declare (ignorable i generator))
-  (setf (slot-value box 'key) key))
-|#
 
 
 ;;; Some boxes can be empty

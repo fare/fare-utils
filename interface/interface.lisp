@@ -47,13 +47,13 @@
 (in-package :interface)
 
 (defmacro define-interface (name super-interfaces slots &rest options)
-  (multiple-value-bind (interface-options class-options)
-      (split-list options #'(lambda (x) (member x '(:singleton :parametric))) :key 'car)
+  (let ((class-options
+         (remove-if #'(lambda (x) (member x '(:singleton :parametric))) options :key 'car)))
     `(progn
        (defclass ,name ,super-interfaces ,slots ,@class-options)
-       ,@(let ((singleton (find :singleton interface-options :key 'car)))
+       ,@(let ((singleton (find :singleton options :key 'car)))
            (when singleton `((defvar ,name (fmemo:memoized-funcall 'make-instance ',name)))))
-       ,@(let ((parametric (find :parametric interface-options :key 'car)))
+       ,@(let ((parametric (find :parametric options :key 'car)))
            (when parametric
              (destructuring-bind (formals &body body) (cdr parametric)
                `((defun ,name ,formals
