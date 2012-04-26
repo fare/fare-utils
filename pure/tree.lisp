@@ -70,9 +70,6 @@
     :initform nil
     :reader node-value)))
 
-(defclass box ()
-  ((datum :initarg :datum :reader datum)))
-
 (defclass binary-tree-node (binary-branch association-pair)
   ;;; Or should we have a box instead of an association-pair ???
   ;;; Or let the user just inherit from binary-branch,

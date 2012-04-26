@@ -23,7 +23,7 @@
 (defparameter <fmim> (make-instance '<fmim>))
 
 ;;; (big-endian) patricia tree (aka trie)
-(defclass trie-head (box)
+(defclass trie-head (simple-value-box)
   ((height
     :type fixnum
     :initform 0
@@ -48,7 +48,7 @@
 ;;; Not needed: position tells us! (defclass trie-leaf (trie-node box) ())
 
 (defmethod check-invariant ((i <fmim>) (map trie-head) &key)
-  (trie-check-invariant (datum map) (node-height map) 0))
+  (trie-check-invariant (box-ref map) (node-height map) 0))
 
 (defun trie-check-invariant (trie position key)
   (declare (optimize (debug 3)))
@@ -65,7 +65,7 @@
          (assert (<= (integer-length pbits) plen))
          (assert (<= plen position))
          (let ((pos (- position plen)))
-           (trie-check-invariant (datum trie) pos (dpb pbits (byte plen pos) key)))))
+           (trie-check-invariant (box-ref trie) pos (dpb pbits (byte plen pos) key)))))
        (trie-branch
          (let ((pos (1- position)))
            (trie-check-invariant (left trie) pos key)
@@ -80,7 +80,7 @@
             (height (node-height map)))
         (if (< height len)
             (values nil nil)
-            (trie-lookup (datum map) height key)))
+            (trie-lookup (box-ref map) height key)))
       (values nil nil)))
 
 (defun trie-lookup (trie position key)
@@ -96,7 +96,7 @@
                (plen (node-prefix-length trie))
                (pos (- position plen)))
           (if (= pbits (ldb (byte plen pos) key))
-              (trie-lookup (datum trie) pos key)
+              (trie-lookup (box-ref trie) pos key)
               (values nil nil))))
        (trie-branch
         (let ((pos (1- position)))
@@ -123,7 +123,7 @@
       :prefix-length (+ length (node-prefix-length datum))
       :prefix-bits (dpb bits (byte length (node-prefix-length datum))
                         (node-prefix-bits datum))
-      :datum (datum datum)))
+      :datum (box-ref datum)))
     (t
      (make-instance
       'trie-skip
@@ -154,7 +154,7 @@
           (typep trie 'trie-skip)
           (zerop (ldb (byte 1 (1- (node-prefix-length trie))) (node-prefix-bits trie))))
      (let* ((plen (integer-length (node-prefix-bits trie)))
-            (datum (datum trie))
+            (datum (box-ref trie))
             (height (- height (- (node-prefix-length trie) plen)))
             (trie (make-trie-skip height plen (node-prefix-bits trie) datum)))
        (make-instance 'trie-head :height height :datum trie)))
@@ -169,7 +169,7 @@
         (if (null map)
             (values len (make-trie-skip len len key value))
             (let ((height (node-height map))
-                  (trie (datum map)))
+                  (trie (box-ref map)))
               (if (< height len)
                   (values len
                           (make-trie-branch
@@ -189,8 +189,8 @@
                 (pos (- position plen)))
            (if (= pbits (ldb (byte plen pos) key))
                (make-trie-skip position plen pbits
-                               (trie-insert (datum trie) pos key value))
-               (let* ((datum (datum trie))
+                               (trie-insert (box-ref trie) pos key value))
+               (let* ((datum (box-ref trie))
                       (len (1- plen))
                       (pos (1- position))
                       (trie1 (make-trie-skip
@@ -224,7 +224,7 @@
     (if f
         (values
          (multiple-value-bind (datum non-empty-p)
-             (trie-drop (datum map) (node-height map) key)
+             (trie-drop (box-ref map) (node-height map) key)
            (when non-empty-p
              (make-trie-head (node-height map) datum)))
          v f)
@@ -242,7 +242,7 @@
                 (pos (- position plen)))
            (assert (= pbits (ldb (byte plen pos) key)))
            (multiple-value-bind (datum non-empty-p)
-               (trie-drop (datum trie) pos key)
+               (trie-drop (box-ref trie) pos key)
              (if non-empty-p
                  (values (make-trie-skip position plen pbits datum) t)
                  (values nil nil)))))
@@ -272,7 +272,7 @@
 (defmethod fold-left ((i <fmim>) map f seed)
   (if (null map)
       seed
-      (trie-fold-left (datum map) (node-height map) 0 f seed)))
+      (trie-fold-left (box-ref map) (node-height map) 0 f seed)))
 
 (defun trie-fold-left (trie position key f seed)
   (if (zerop position)
@@ -283,7 +283,7 @@
                 (plen (node-prefix-length trie))
                 (pos (- position plen)))
            (trie-fold-left
-            (datum trie) pos (dpb pbits (byte plen pos) key) f seed)))
+            (box-ref trie) pos (dpb pbits (byte plen pos) key) f seed)))
         (trie-branch
          (let ((pos (1- position)))
            (trie-fold-left
@@ -294,7 +294,7 @@
 (defmethod fold-right ((i <fmim>) map f seed)
   (if (null map)
       seed
-      (trie-fold-right (datum map) (node-height map) 0 f seed)))
+      (trie-fold-right (box-ref map) (node-height map) 0 f seed)))
 
 (defun trie-fold-right (trie position key f seed)
   (if (zerop position)
@@ -305,7 +305,7 @@
                 (plen (node-prefix-length trie))
                 (pos (- position plen)))
            (trie-fold-right
-            (datum trie) pos (dpb pbits (byte plen pos) key) f seed)))
+            (box-ref trie) pos (dpb pbits (byte plen pos) key) f seed)))
         (trie-branch
          (let ((pos (1- position)))
            (trie-fold-right
@@ -316,7 +316,7 @@
 (defmethod leftmost ((i <fmim>) map)
   (if (null map)
       (values nil nil nil)
-      (trie-leftmost (datum map) (node-height map) 0)))
+      (trie-leftmost (box-ref map) (node-height map) 0)))
 
 (defun trie-leftmost (trie position key)
   (if (zerop position)
@@ -327,14 +327,14 @@
                 (plen (node-prefix-length trie))
                 (pos (- position plen)))
            (trie-leftmost
-            (datum trie) pos (dpb pbits (byte plen pos) key))))
+            (box-ref trie) pos (dpb pbits (byte plen pos) key))))
         (trie-branch
          (trie-leftmost (left trie) (1- position) key)))))
 
 (defmethod rightmost ((i <fmim>) map)
   (if (null map)
       (values nil nil nil)
-      (trie-rightmost (datum map) (node-height map) 0)))
+      (trie-rightmost (box-ref map) (node-height map) 0)))
 
 (defun trie-rightmost (trie position key)
   (if (zerop position)
@@ -345,7 +345,7 @@
                 (plen (node-prefix-length trie))
                 (pos (- position plen)))
            (trie-rightmost
-            (datum trie) pos (dpb pbits (byte plen pos) key))))
+            (box-ref trie) pos (dpb pbits (byte plen pos) key))))
         (trie-branch
          (let ((pos (1- position)))
            (trie-rightmost (right trie) pos (dpb 1 (byte 1 pos) key)))))))
@@ -356,7 +356,7 @@
      (values nil nil))
     (trie-head
      (let ((height (node-height map))
-           (datum (datum map)))
+           (datum (box-ref map)))
        (if (zerop height)
            (values map nil)
            (etypecase datum
@@ -371,7 +371,7 @@
                      (position (- height plen)))
                 (if (zerop position)
                     (values map nil)
-                    (etypecase (datum datum)
+                    (etypecase (box-ref datum)
                       (trie-branch
                        (flet ((f (bit datum)
                                 (make-trie-head height
@@ -395,8 +395,8 @@
             (hb (node-height b))
             (h (max ha hb)))
        (make-trie-head
-        h (trie-join (make-trie-skip h (- h ha) 0 (datum a))
-                     (make-trie-skip h (- h hb) 0 (datum b))
+        h (trie-join (make-trie-skip h (- h ha) 0 (box-ref a))
+                     (make-trie-skip h (- h hb) 0 (box-ref b))
                      h))))))
 
 (defun trie-join (a b position)
@@ -418,7 +418,7 @@
                      (b1
                       (make-trie-skip
                        pos (1- plen)
-                       (ldb (byte (1- plen) 0) pbits) (datum b))))
+                       (ldb (byte (1- plen) 0) pbits) (box-ref b))))
                 (if (zerop bh)
                     (make-trie-branch
                      position (trie-join (left a) b1 pos) (right a))
@@ -432,7 +432,7 @@
                 (a1
                  (make-trie-skip
                   pos (1- plen)
-                  (ldb (byte (1- plen) 0) pbits) (datum a))))
+                  (ldb (byte (1- plen) 0) pbits) (box-ref a))))
            (etypecase b
              (trie-branch
                 (if (zerop ah)
@@ -447,7 +447,7 @@
                      (b1
                       (make-trie-skip
                        pos (1- plenb)
-                       (ldb (byte (1- plenb) 0) pbitsb) (datum b))))
+                       (ldb (byte (1- plenb) 0) pbitsb) (box-ref b))))
                 (if (= ah bh)
                     (make-trie-skip position 1 0 (trie-join a1 b1 pos))
                     (if (zerop ah)
@@ -464,7 +464,7 @@
   (format stream "#<ts ~S ~S ~S>"
           (node-prefix-bits trie)
           (node-prefix-length trie)
-          (datum trie)))
+          (box-ref trie)))
 
 #|
 You could implement sets of integers as bitmaps,
