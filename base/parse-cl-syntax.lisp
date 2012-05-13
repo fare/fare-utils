@@ -1,3 +1,5 @@
+#+xcvb (module (:depends-on ("base/macros")))
+
 (in-package :fare-utils)
 
 (defun list-starts-with-p (start list)
