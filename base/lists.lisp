@@ -144,6 +144,12 @@ returning the two lists of the values returned by the function."
 (defun length>=n-p (x n)
   (not (length<n-p x n)))
 
+(defun first-and-only (x)
+  (check-type x cons)
+  (assert (null (cdr x)))
+  (car x))
+
+
 ;;; CONS-trees
 (defun cons-tree-map (fun x)
   (cond

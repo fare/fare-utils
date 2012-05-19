@@ -49,7 +49,8 @@
    #:export-symbols #:export-symbols* #:exporting-definitions
    #:extremum #:featurify
    #:file-contents-equal-vector-p #:fill-array #:find-item
-   #:find-least-item #:find-node #:firstn #:get-file-contents
+   #:find-least-item #:find-node #:first-and-only #:firstn
+   #:get-file-contents
    #:hash-table->alist #:hashmacro #:hashmacros #:heap #:if-bind #:when-bind
    #:if-testing #:if2 #:initialize-instance #:insert-item!
    #:insert-node! #:integers-below #:integers-between #:it
