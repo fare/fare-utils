@@ -514,9 +514,16 @@ shall be declared with a serial dependency in system definitions.
 
 
 ;;; Nesting binding forms (from a suggestion by marco baringer)
-(defmacro with-nesting ((#-ccl &optional) &rest things)
+(defmacro with-nesting ((&key (from-end t)) &rest things)
+  (if from-end `(nest ,@things) `(tsen ,@things)))
+
+(defmacro nest (&rest things)
   (reduce #'(lambda (outer inner) (append outer (list inner)))
           things :from-end t))
+
+(defmacro tsen (&rest things)
+  (reduce #'(lambda (inner outer) (append outer (list inner)))
+          things :from-end nil))
 
 ;;; Collecting data
 

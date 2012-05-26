@@ -113,7 +113,7 @@
    #:rename-file-overwriting-target
    #:unwilden
    #:append1 #:append1f #:appendf #:nconcf #:funcallf
-   #:with-nesting
+   #:with-nesting #:nest #:tsen
    #:while-collecting
    #:parse-macro-lambda-list
    #:list-starts-with-p
