@@ -141,6 +141,7 @@
   (:documentation "set the contents of a box (if applicable)"))
 
 (defmethod box-set! ((box immutable-box) value)
+  (declare (ignorable box value))
   (error "Trying to set an immutable box"))
 
 (defgeneric set-box! (<box> box value))

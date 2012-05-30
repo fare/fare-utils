@@ -1,7 +1,7 @@
 #+xcvb
 (module
  (:fullname "/fare-utils"
-  :build-depends-on ("/fare-memoization")
+  :build-depends-on ("/asdf" "/fare-memoization")
   :depends-on
   ("package"
    "base/utils"
