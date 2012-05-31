@@ -403,9 +403,11 @@ outputs a tag plus a list of variable and their values, returns the last value"
 
 (defun error-behaviour (e &rest r)
   "generic way to specify behaviour in exceptional situations"
-  (cond
-   ((functionp e) (apply e r))
-   ((stringp e) (apply #'error e r))
+  (typecase e
+   (function (apply e r))
+   ((eql t) (error "Something bad happened. Check the backtrace."))
+   (cons (apply 'error-behaviour (append e r)))
+   ((or string symbol) (apply #'error e r))
    (t e)))
 
 (defun form-starting-with-p (tag x)
