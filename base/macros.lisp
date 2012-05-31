@@ -405,6 +405,7 @@ outputs a tag plus a list of variable and their values, returns the last value"
   "generic way to specify behaviour in exceptional situations"
   (typecase e
    (function (apply e r))
+   (null nil)
    ((eql t) (error "Something bad happened. Check the backtrace."))
    (cons (apply 'error-behaviour (append e r)))
    ((or string symbol) (apply #'error e r))
