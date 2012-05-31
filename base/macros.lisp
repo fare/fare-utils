@@ -403,13 +403,20 @@ outputs a tag plus a list of variable and their values, returns the last value"
 
 (defun error-behaviour (e &rest r)
   "generic way to specify behaviour in exceptional situations"
-  (typecase e
+  (etypecase e
    (function (apply e r))
    (null nil)
    ((eql t) (error "Something bad happened. Check the backtrace."))
    (cons (apply 'error-behaviour (append e r)))
-   ((or string symbol) (apply #'error e r))
-   (t e)))
+   ((or string symbol)
+    (with-standard-io-syntax
+      (let ((*read-eval* nil)
+	    (*print-readably* nil)
+	    (*print-pretty* nil)
+	    (*print-length* nil)
+	    (*print-level* nil)
+	    (*print-circle* t))
+	(apply #'error e r))))))
 
 (defun form-starting-with-p (tag x)
   (and (consp x) (equal tag (car x))))
