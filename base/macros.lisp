@@ -412,9 +412,6 @@ outputs a tag plus a list of variable and their values, returns the last value"
     (with-standard-io-syntax
       (let ((*read-eval* nil)
 	    (*print-readably* nil)
-	    (*print-pretty* nil)
-	    (*print-length* nil)
-	    (*print-level* nil)
 	    (*print-circle* t))
 	(apply #'error e r))))))
 
