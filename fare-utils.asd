@@ -33,12 +33,6 @@ and Lisp extensions for memoization and reader interception."
      (:file "files")
      (:file "atomic")))
 
-   ;;; Half-baked stuff
-   (:module "unbaked"
-    :depends-on ("base")
-    :components
-    ((:file "msv"))) ; Magic Special Variables
-
    ;;; Stateful containers
    (:module "stateful"
     :depends-on ("base")
