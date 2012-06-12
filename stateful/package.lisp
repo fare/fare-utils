@@ -4,12 +4,12 @@
 #+xcvb
 (module
  (:depends-on
-  ("package" "interface/interface" "interface/eq" "interface/order")))
+  ("package" #|"interface/interface" "interface/eq" "interface/order"|#)))
 
 (in-package :cl)
 
 (defpackage :stateful
-  (:use :cl :fare-utils :interface :eq :order)
+  (:use :cl :fare-utils #|:interface :eq :order|#)
   (:export
    #:container #:container-add-list!
    #:container-contents #:container-empty #:container-empty-p

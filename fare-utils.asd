@@ -5,7 +5,7 @@
 It contains a lot of basic everyday functions and macros,
 but also a library of pure and stateful datastructures,
 and Lisp extensions for memoization and reader interception."
-  :depends-on ((:version :asdf "2.019") :fare-memoization)
+  :depends-on ((:version :asdf "2.019") :fare-memoization #|:lisp-interface-library|#)
   :components
   ((:file "package")
 
@@ -39,40 +39,19 @@ and Lisp extensions for memoization and reader interception."
     :components
     ((:file "msv"))) ; Magic Special Variables
 
-   ;;; Interface-Passing Style generic libraries
-   (:module "interface"
-    :depends-on ("base")
-    :components
-    ((:file "interface")
-     (:file "box" :depends-on ("interface"))
-     (:file "eq" :depends-on ("interface"))
-     (:file "order" :depends-on ("eq"))))
-
-   ;;; IPS pure functional datastructures
-   (:module "pure"
-    :depends-on ("interface")
-    :components
-    ((:file "package")
-     (:file "map" :depends-on ("package"))
-     (:file "updatef" :depends-on ("package"))
-     (:file "updatef-expanders" :depends-on ("updatef"))
-     (:file "alist" :depends-on ("map"))
-     (:file "tree" :depends-on ("map" "alist"))
-     (:file "hash-table" :depends-on ("tree"))
-     (:file "fmim" :depends-on ("map" "tree"))
-     (:file "encoded-key-map" :depends-on ("map"))))
-
    ;;; Stateful containers
    (:module "stateful"
-    :depends-on ("interface")
+    :depends-on ("base")
     :components
     ((:file "package")
      (:file "container" :depends-on ("package"))
+     #|;; Instead of reimplementing that here, move any new code to cl-containers.
      (:file "binary-heap" :depends-on ("container"))
      (:file "binomial-heap" :depends-on ("container"))
+     |#
      (:file "fifo" :depends-on ("container"))
      (:file "dllist" :depends-on ("container"))
-     (:file "sorting" :depends-on ("binary-heap" "binomial-heap"))))))
+     #|(:file "sorting" :depends-on ("binary-heap" "binomial-heap"))|#))))
 
 (defmethod perform ((op test-op) (system (eql (find-system :fare-utils))))
   (asdf:load-system :fare-utils-test)

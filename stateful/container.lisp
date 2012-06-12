@@ -4,7 +4,7 @@
 #+xcvb
 (module
  (:depends-on
-  ("package" "base/utils" "base/macros" "interface/order" "stateful/package")))
+  ("package" "base/utils" "base/macros" #|"interface/order"|# "stateful/package")))
 
 (in-package :stateful)
 
@@ -88,7 +88,7 @@
 ;;;; Generic container mixins
 
 ;;; Heaps
-(defclass heap (order:<order> container)
+(defclass heap (#|order:<order>|# container)
   ())
 
 ;;; containers with nodes

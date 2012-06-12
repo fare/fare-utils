@@ -4,6 +4,4 @@
   :depends-on (:fare-utils :hu.dwim.stefil)
   :components
   ((:file "package")
-   (:file "strings" :depends-on ("package"))
-   (:file "functional-map" :depends-on ("package"))
-   (:file "updatef" :depends-on ("package"))))
+   (:file "strings" :depends-on ("package"))))

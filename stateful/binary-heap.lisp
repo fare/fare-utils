@@ -25,7 +25,7 @@
 
 (in-package :stateful)
 
-(def*class binary-heap (heap order:<order-parameter>
+(def*class binary-heap (heap #|order:<order-parameter>|#
                         vector-container-mixin sized-container-mixin)
   ())
 
