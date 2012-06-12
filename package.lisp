@@ -10,11 +10,9 @@
 |#
 
 (defpackage #:fare-utils
-  (:use #:common-lisp)
+  (:use #:common-lisp #:asdf)
   #+genera (:import-from #:scl #:boolean)
   #+clisp (:shadow :with-gensyms)
-  (:import-from #:asdf ;; import and reexport some utilities from asdf.
-   #:length=n-p #:orf #:appendf #:strcat #:first-char #:last-char)
   (:export
    #:$buffer-size #:*package-misdefinition-warning-hook*
    #:*safe-package* #:*standard-readtable*
