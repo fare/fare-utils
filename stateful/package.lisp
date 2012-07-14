@@ -8,7 +8,7 @@
 
 (in-package :cl)
 
-(defpackage :stateful
+(defpackage :fare-stateful
   (:use :cl :fare-utils #|:interface :eq :order|#)
   (:export
    #:container #:container-add-list!

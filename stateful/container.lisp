@@ -6,7 +6,7 @@
  (:depends-on
   ("package" "base/utils" "base/macros" #|"interface/order"|# "stateful/package")))
 
-(in-package :stateful)
+(in-package :fare-stateful)
 
 (exporting-definitions
 

@@ -5,7 +5,7 @@
 It contains a lot of basic everyday functions and macros,
 but also a library of pure and stateful datastructures,
 and Lisp extensions for memoization and reader interception."
-  :depends-on ((:version :asdf "2.019") :fare-memoization #|:lisp-interface-library|#)
+  :depends-on ((:version :asdf "2.019"))
   :components
   ((:file "package")
 

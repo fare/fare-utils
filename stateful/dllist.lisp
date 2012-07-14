@@ -18,7 +18,7 @@ TODO:
 
 |#
 
-(in-package :stateful)
+(in-package :fare-stateful)
 
 (defclass doubly-linked-mixin ()
   ((previous :accessor doubly-linked-previous)

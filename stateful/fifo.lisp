@@ -3,7 +3,7 @@
 
 #+xcvb (module (:depends-on ("package" "base/utils" "stateful/package")))
 
-(in-package :stateful)
+(in-package :fare-stateful)
 
 (exporting-definitions
 
