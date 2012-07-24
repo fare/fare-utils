@@ -112,6 +112,7 @@ returning the two lists of the values returned by the function."
 	(if ny (return nil)
 	  (setf x (cdr x) y (cdr y)))))))
 
+#|
 (unless (fboundp 'length=n-p) ; already defined in ASDF
 (defun length=n-p (x n)
   ;(= (length x) n)
@@ -122,6 +123,7 @@ returning the two lists of the values returned by the function."
     (cond
       ((zerop i) (return (null l)))
       ((not (consp l)) (return nil))))))
+|#
 
 (defun length<-p (x y)
   ;(= (length x) (length y))

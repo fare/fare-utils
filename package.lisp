@@ -16,7 +16,7 @@
   (:export
    #:$buffer-size #:*package-misdefinition-warning-hook*
    #:*safe-package* #:*standard-readtable*
-   #:+all-chars-base-feature+ #:absolute-pathname-p
+   #:+all-chars-base-feature+ ;; #:absolute-pathname-p
    #:accessors-equal-p #:acond #:acond2 #:adjust-size #:aif
    #:aif2 #:alist->hash-table #:association
    #:base-char-p #:binary-heap #:binomial-heap #:boolean
@@ -53,7 +53,7 @@
    #:if-testing #:if2 #:initialize-instance #:insert-item!
    #:insert-node! #:integers-below #:integers-between #:it
    #:join-strings #:kwote #:least-item #:length<-p #:length<=-p
-   #:length<=n-p #:length<n-p #:length=-p #:length=n-p
+   #:length<=n-p #:length<n-p #:length=-p ;; #:length=n-p
    #:length>-p #:length>=-p #:length>=n-p #:length>n-p #:let1
    #:list->vector #:list-of-integers
    #:literalp #:make-collector #:make-defpackage-form
@@ -71,7 +71,7 @@
    #:remove-nth #:rlist* #:safe-read #:safe-write #:search-tree
    #:set-container-contents-from-list! #:simplify-string
    #:single-arg #:single-arg-form-p #:sized-container-mixin
-   #:strcat #:string-all-base-char-p #:string-basic-p
+   #:string-all-base-char-p #:string-basic-p ;; #:strcat
    #:->string #:style-warn #:test-form #:test-forms
    #:test-only #:the* #:ttest #:ttest* #:unfeaturify
    #:vector->list #:vector-container-mixin
@@ -80,15 +80,15 @@
    #:with-magic-special-variables-safely #:with-msv #:with-msv*
    #:with-output-stream #:with-input-stream
    #:with-user-output-file #:xtime #:_
-   #:first-char #:last-char #:but-last-char
+   #:but-last-char ;; #:first-char #:last-char
    ;; #:proper-list-p
    #:form-starting-with-p
    #:make-hashset
    #:split-list
    #:string-prefix-p #:string-suffix-p #:string-enclosed-p
    #:string-strip-prefix #:string-strip-suffix
-   #:+root-path+ #:+back-path+ #:merge-pathnames*
-   #:pathname-directory-pathname #:pathname-base-pathname
+   #:+root-path+ #:+back-path+ ;; #:merge-pathnames*
+   ;; #:pathname-directory-pathname #:pathname-base-pathname
    ;; #:pathname-parent
    #:top-level-name #:directory-name-p
    #:portable-pathname-string-component-char-p
@@ -100,7 +100,7 @@
    #:portable-pathname-output
    #:portable-namestring
    #:portable-pathname-from-string
-   #:subpathname
+   ;; #:subpathname
    #:pathname-absolute-p
    #:portable-namestring-absolute-p
    #:portable-pathname-absolute-p
@@ -113,7 +113,7 @@
    #:unwilden
    #:append1 #:append1f #:funcallf ;; #:appendf #:nconcf
    #:with-nesting #:nest #:tsen
-   #:while-collecting
+   ;; #:while-collecting
    #:parse-macro-lambda-list
    #:list-starts-with-p
    ;; #:parse-body

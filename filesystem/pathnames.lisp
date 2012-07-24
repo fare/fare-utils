@@ -14,8 +14,10 @@
 (defvar +back-path+ (make-pathname :directory '(:relative :back))
   "logical parent path")
 
+#| don't use this. Probably use ASDF:PATHNAME-ROOT
 (defun pathname-base-pathname (pathname)
   (make-pathname :directory nil :defaults pathname))
+|#
 
 #| use ASDF:PATHNAME-PARENT-DIRECTORY-PATHNAME
 (defun pathname-parent (pathname)
@@ -39,7 +41,7 @@ of the directory of the given pathname"
 
 (defun directory-name-p (name)
   (and (stringp name)
-       (eql #\/ (last-char name))))
+       (eql #\/ (asdf:last-char name))))
 
 (defun portable-pathname-string-component-char-p (c)
   (declare (type character c))
@@ -166,7 +168,7 @@ erroring out if some source of non-portability is found"
     (make-pathname :directory (unless (equal r '(:relative)) (nreverse r))
                    :name name :type type)))
 
-#|
+#| ;; use ASDF:SUBPATHNAME
 (defun subpathname (path string)
   (merge-pathnames*
    (portable-pathname-from-string string :allow-absolute nil)
@@ -179,7 +181,7 @@ erroring out if some source of non-portability is found"
     (and (consp directory) (eq (car directory) :absolute))))
 
 (defun portable-namestring-absolute-p (namestring)
-  (eql (first-char namestring) #\/))
+  (eql (asdf:first-char namestring) #\/))
 
 (defun portable-pathname-absolute-p (name)
   (etypecase name
@@ -218,10 +220,10 @@ erroring out if some source of non-portability is found"
      (cond
        ((equal x "")
 	(error "empty namestring"))
-       ((eql (last-char x) #\/)
+       ((eql (asdf:last-char x) #\/)
 	(pathname x))
        (t
-	(pathname (strcat x "/")))))
+	(pathname (asdf:strcat x "/")))))
     (pathname
      (if (or (pathname-name x)
              (pathname-type x)

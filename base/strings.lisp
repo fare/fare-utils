@@ -32,7 +32,7 @@
 
 (defun conc-string (&rest rest)
   "make a string by concatenating stuff"
-  (apply #'strcat (mapcar #'->string rest)))
+  (apply #'asdf:strcat (mapcar #'->string rest)))
 ))
 
 (eval-now
@@ -73,6 +73,7 @@
       (coerce s 'simple-base-string)
       s))))
 
+#| use ASDF:STRCAT
 (eval-now
 (unless (fboundp 'strcat)
 (defun strcat (&rest strings)
@@ -83,3 +84,4 @@
 ;;    (let ((basicp (every #'string-basic-p strings)))
 ;;    (apply #'concatenate (if basicp 'base-string 'string) strings))
 ))
+|#
