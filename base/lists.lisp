@@ -31,11 +31,13 @@
   "N first elements of list L -- complement of (NTHCDR N L)"
   (subseq l 0 n))
 
+#| ;; use ALEXANDRIA:MAPPEND instead
 (defun append/list (list)
   (reduce #'append list :from-end t))
 (defun mappend (&rest rest)
   "like mapcan, but works on lists resulting from quasi-quoted expressions"
   (append/list (apply #'mapcar rest)))
+|#
 
 (defun mapcar2 (fun list)
   "simple mapcar for functions returning 2 values,
@@ -95,10 +97,12 @@ returning the two lists of the values returned by the function."
 (defmacro dolist-with-rest (formals list &body body)
   `(dolist-with-rest-fun ,list #'(lambda ,formals ,@body)))
 
+#| use ALEXANDRIA:EXTREMUM instead
 (defun extremum (sequence predicate &key (key #'identity))
   (reduce #'(lambda (x y)
 	      (if (funcall predicate (funcall key x) (funcall key y)) x y))
           sequence))
+|#
 
 (defun length=-p (x y)
   ;(= (length x) (length y))
@@ -177,7 +181,7 @@ where KEYWORD defaults to :ARG and SUPPLIED-P defaults to ARG."
 	   (if-supplied (if (and (listp ks) (<= 3 (length ks)))
 			    (third ks)
 			  key)))
-      (with-gensyms (foo)
+      (let ((foo (gensym)))
       `(let ((,foo (make-keys ,@(rest keys))))
 	 (if ,suppliedp (cons ,kw (cons ,if-supplied ,foo)) ,foo))))))
 
@@ -202,7 +206,12 @@ where KEYWORD defaults to :ARG and SUPPLIED-P defaults to ARG."
 May alter the cons cells that constitute the spine of the alist"
    (multiple-value-bind (al-dummies al-vals al-newvals al-setter al-getter)
        (get-setf-expansion alist env)
-     (with-gensyms (x-val al-val assoc cons head store)
+     (let ((x-val (gensym))
+           (al-val (gensym))
+           (assoc (gensym))
+           (cons (gensym))
+           (head (gensym))
+           (store (gensym)))
        (values `(,x-val ,@al-dummies ,al-val ,assoc ,cons ,head)
                `(,x ,@al-vals
 		 ,al-getter

@@ -17,6 +17,7 @@
 (defun pathname-base-pathname (pathname)
   (make-pathname :directory nil :defaults pathname))
 
+#| use ASDF:PATHNAME-PARENT-DIRECTORY-PATHNAME
 (defun pathname-parent (pathname)
   "Takes a pathname and returns the pathname of the parent directory
 of the directory of the given pathname"
@@ -30,6 +31,7 @@ of the directory of the given pathname"
     (t
      (merge-pathnames* +back-path+
 		      (pathname-directory-pathname pathname)))))
+|#
 
 (defun top-level-name (name)
   "This function takes a name, and returns everything up to the first \"/\" in the name"
@@ -193,6 +195,7 @@ erroring out if some source of non-portability is found"
        (ignore-errors (portable-pathname-from-string x))
        t))
 
+#|;; use ASDF:ENSURE-PATHNAME-ABSOLUTE instead.
 (defun ensure-absolute-pathname (x)
   (let ((path (pathname x)))
     (cond
@@ -202,12 +205,13 @@ erroring out if some source of non-portability is found"
        (merge-pathnames* path))
       (t
        (truename (merge-pathnames* path *default-pathname-defaults*))))))
-
+|#
 (defun portable-namestring-prefix<= (x y)
   (and (string-prefix-p x y)
        (or (= (length x) (length y))
            (eql #\/ (char y (length x))))))
 
+#| use ASDF:ENSURE-DIRECTORY-PATHNAME instead
 (defun ensure-pathname-is-directory (x)
   (etypecase x
     (string
@@ -224,6 +228,7 @@ erroring out if some source of non-portability is found"
              (not (member (pathname-version x) '(nil :unspecific :newest))))
        (error "pathname ~S isn't a directory" x)
        x))))
+|#
 
 (defun unwilden (pathspec)
   (block :u

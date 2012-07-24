@@ -10,23 +10,23 @@
 |#
 
 (defpackage #:fare-utils
-  (:use #:common-lisp #:asdf)
+  (:use #:common-lisp) ;; #:asdf
   #+genera (:import-from #:scl #:boolean)
-  #+clisp (:shadow :with-gensyms)
+  ;; #+clisp (:shadow :with-gensyms)
   (:export
    #:$buffer-size #:*package-misdefinition-warning-hook*
    #:*safe-package* #:*standard-readtable*
    #:+all-chars-base-feature+ #:absolute-pathname-p
    #:accessors-equal-p #:acond #:acond2 #:adjust-size #:aif
-   #:aif2 #:alist->hash-table #:append/list #:association
+   #:aif2 #:alist->hash-table #:association
    #:base-char-p #:binary-heap #:binomial-heap #:boolean
    #:cached-size-mixin
    #:call-with-input-stream #:call-with-output-stream
    #:check-not-empty
    #:clobber-file-if-different #:clobber-file-with-vector
-   #:combinationp #:compose #:compose/2 #:conc-gensym
+   #:combinationp #:conc-gensym ;; #:multiple-value-compose #:multiple-value-compose/2
    #:conc-keyword #:conc-string #:conc-symbol #:conc-symbol-in
-   #:cond2 #:cons-tree-map #:copy-array #:copy-array-shape
+   #:cond2 #:cons-tree-map ;; #:copy-array #:copy-array-shape
    #:copy-list-without-nth
    #:copy-symbol-function #:copy-symbol-value #:dbg #:dbg-time
    #:declaim-type #:declare-type #:def*class #:def*constant
@@ -45,7 +45,7 @@
    #:enable-fun #:equal-array #:error-behaviour #:eval-now
    #:eval-once #:evaluating-once #:exchange-nodes #:export*
    #:export-symbols #:export-symbols* #:exporting-definitions
-   #:extremum #:featurify
+   #:featurify ;; #:extremum
    #:file-contents-equal-vector-p #:fill-array #:find-item
    #:find-least-item #:find-node #:first-and-only #:firstn
    #:get-file-contents
@@ -58,7 +58,7 @@
    #:list->vector #:list-of-integers
    #:literalp #:make-collector #:make-defpackage-form
    #:make-node #:make-predicate-symbol
-   #:make-single-arg-form #:mapcar2 #:mapmacro #:mappend
+   #:make-single-arg-form #:mapcar2 #:mapmacro ;; #:mappend #:append/list
    #:maybe-adjust-size-down #:maybe-adjust-size-up
    #:msg #:multiple-value-quote #:mvbind
    #:mvcall #:mvlist #:mvprog1 #:mvquote #:mvsetq
@@ -76,12 +76,12 @@
    #:test-only #:the* #:ttest #:ttest* #:unfeaturify
    #:vector->list #:vector-container-mixin
    #:vector-container-ref #:with-buffered-file-contents
-   #:with-gensyms #:with-input #:with-magic-special-variables
+   #:with-input #:with-magic-special-variables ;; #:with-gensyms
    #:with-magic-special-variables-safely #:with-msv #:with-msv*
    #:with-output-stream #:with-input-stream
    #:with-user-output-file #:xtime #:_
    #:first-char #:last-char #:but-last-char
-   #:proper-list-p
+   ;; #:proper-list-p
    #:form-starting-with-p
    #:make-hashset
    #:split-list
@@ -89,7 +89,8 @@
    #:string-strip-prefix #:string-strip-suffix
    #:+root-path+ #:+back-path+ #:merge-pathnames*
    #:pathname-directory-pathname #:pathname-base-pathname
-   #:pathname-parent #:top-level-name #:directory-name-p
+   ;; #:pathname-parent
+   #:top-level-name #:directory-name-p
    #:portable-pathname-string-component-char-p
    #:portable-pathname-string-component-p
    #:portable-pathname-type-component-p
@@ -105,17 +106,17 @@
    #:portable-pathname-absolute-p
    #:absolute-portable-namestring-p
    #:portable-namestring-p
-   #:ensure-absolute-pathname
+   ;;#:ensure-absolute-pathname ;; use ASDF:ENSURE-PATHNAME-ABSOLUTE
    #:portable-namestring-prefix<=
-   #:ensure-pathname-is-directory
+   ;;#:ensure-pathname-is-directory
    #:rename-file-overwriting-target
    #:unwilden
-   #:append1 #:append1f #:appendf #:nconcf #:funcallf
+   #:append1 #:append1f #:funcallf ;; #:appendf #:nconcf
    #:with-nesting #:nest #:tsen
    #:while-collecting
    #:parse-macro-lambda-list
    #:list-starts-with-p
-   #:parse-body
+   ;; #:parse-body
    #:parse-defsetf-lambda-list
    #:identifierp
    #:package-functions

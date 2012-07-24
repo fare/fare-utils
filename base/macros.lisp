@@ -9,12 +9,14 @@
 
 ;;; Help in defining macros
 
+#| use ALEXANDRIA:WITH-GENSYMS
 (def*macro with-gensyms (syms &body body)
   "Replaces given symbols with gensyms. Useful for creating macros.
 This version by Paul Graham in On Lisp.
 Mostly the same as cliki's WITH-UNIQUE-NAMES."
   ;; Note: we probably should be using it from alexandria or something
   `(let ,(mapcar #'(lambda (s) `(,s (gensym ,(symbol-name s)))) syms) ,@body))
+|#
 
 (def*macro evaluating-once (vars &body body)
   "Macro to use while defining a macro that needs to enforce that the
@@ -62,7 +64,7 @@ CMUCL's EXT:ONCE-ONLY has a different interface."
 (exporting-definitions
 (define-modify-macro funcallf (f &rest args) xfuncall)
 ;;(define-modify-macro appendf (&rest args) append "Append onto list") ;; imported from ASDF
-(define-modify-macro nconcf (&rest args) nconc "Destructively append onto list")
+;;(define-modify-macro nconcf (&rest args) nconc "Destructively append onto list") ;; now from alexandria
 (defun append1 (l x) (append l (list x)))
 (define-modify-macro append1f (x) append1 "Append one element onto list"))
 
@@ -272,12 +274,14 @@ outputs a tag plus a list of variable and their values, returns the last value"
   "make a new array of same shape as given array"
   (make-array (array-dimensions array)
 	      :element-type (array-element-type array)))
+#| use ALEXANDRIA:COPY-ARRAY instead
 (defun copy-array (array)
   "make a fresh (shallow) copy of an array"
   (let ((new-array (copy-array-shape array)))
     (loop :for i :below (array-total-size array) :do
       (setf (row-major-aref new-array i) (row-major-aref array i)))
     new-array))
+|#
 (defun fill-array (array value)
   "fill an array with a value"
   (fill
@@ -309,10 +313,12 @@ outputs a tag plus a list of variable and their values, returns the last value"
 
 ; -----------------------------------------------------------------------------
 ;;; Higher-Order Functions
-(defun compose/2 (f g)
+#| use ALEXANDRIA:MULTIPLE-VALUE-COMPOSE and ALEXANDRIA:COMPOSE
+(defun multiple-value-compose/2 (f g)
   #'(lambda (&rest rest) (multiple-value-call f (apply g rest))))
-(defun compose (&rest rest)
-  (reduce #'compose/2 rest :from-end t :initial-value #'identity))
+(defun multiple-value-compose (&rest rest)
+  (reduce #'multiple-value-compose/2 rest :from-end t :initial-value #'identity))
+|#
 
 ;;; Basic combinators
 ;; they call for some combinator-defining macros, that would handle
@@ -329,11 +335,12 @@ outputs a tag plus a list of variable and their values, returns the last value"
 
 (defmacro aif (test then &optional else)
   `(let ((it ,test)) (if it ,then ,else)))
-(with-gensyms (result test)
 (defmacro if2 (test2 then &optional else)
+  (let ((result (gensym)) (test (gensym)))
   `(mvbind (,result ,test) ,test2
-     (if (or ,test ,result) ,then ,else)))
+     (if (or ,test ,result) ,then ,else))))
 (defmacro aif2 (test2 then &optional else)
+  (let ((test (gensym)))
   `(mvbind (it ,test) ,test2
      (if (or ,test it) ,then ,else))))
 
@@ -427,6 +434,7 @@ is invoked as an ERROR-BEHAVIOUR."
        (or (and (consp (cdr x)) (null (cddr x)))
 	   (error-behaviour on-error tag x))))
 
+#| ;; if you need it, use it from alexandria
 (defun proper-list-p (x)
   "Returns T if X is a proper list, NIL if it isn't. Checks for circularity"
   (labels
@@ -443,6 +451,7 @@ is invoked as an ERROR-BEHAVIOUR."
          (recurse (cddr x) (cdr y))))
     (check x nil)
     (recurse (cdr x) x)))
+|#
 
 (defun single-arg (x) (cadr x))
 (defmacro make-single-arg-form (name &optional
@@ -459,7 +468,7 @@ is invoked as an ERROR-BEHAVIOUR."
 to be evaluated as function call, macro call, or special form?"
   (and (consp x)
        (if on-error
-	   (or (proper-list-p x) (error-behaviour on-error x))
+	   (or (listp #|not bothering with proper-list-p|# x) (error-behaviour on-error x))
 	 t)))
 (defun literalp (x)
   "predicate that tells whether X is the source form for a literal expression."
@@ -547,7 +556,7 @@ shall be declared with a serial dependency in system definitions.
 (defmacro fluid-let1 ((place val) &body body)
   (multiple-value-bind (vars vals store-vars writer-form reader-form)
       (get-setf-expansion place)
-    (with-gensyms (oldvals)
+    (let ((oldvals (gensym)))
       `(let (,@(mapcar 'list vars vals) ,@store-vars)
          (let ((,oldvals (multiple-value-list ,reader-form)))
            (unwind-protect

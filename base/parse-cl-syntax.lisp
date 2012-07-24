@@ -5,6 +5,7 @@
 (defun list-starts-with-p (start list)
   (and (consp list) (eq start (car list))))
 
+#| use ALEXANDRIA:PARSE-BODY instead
 (defun parse-body (body &key documentation whole)
   "Parses BODY into (values remaining-forms declarations doc-string).
 Documentation strings are recognized only if DOCUMENTATION is true.
@@ -25,7 +26,7 @@ arguments when given."
        (setf doc current))
       (t
        (return (values body decls doc))))))
-
+|#
 
 ;;; decoding a macro-lambda-list or destructuring-lambda-list
 (eval-when (:compile-toplevel :load-toplevel :execute)

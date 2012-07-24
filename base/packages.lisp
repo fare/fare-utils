@@ -40,7 +40,7 @@
            (sort (loop :for package :being :the :hash-keys :of h :using (:hash-value symbols)
                    :collect (list* x (s (package-name package)) (sl symbols)))
                  #'string<
-                 :key (compose #'symbol-name #'second)))
+                 :key #'(lambda (x) (symbol-name (second x)))))
          (fs (name pl)
            (loop :for p :in pl :thereis (find-symbol name p)))
          (sx (sym)

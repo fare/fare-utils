@@ -25,7 +25,7 @@
     h))
 
 (defmacro hashmacro (name &rest rest)
-  (with-gensyms (hashname)
+  (let ((hashname (gensym "HASHNAME")))
   `(let ((,hashname (make-hash-table ,@rest)))
      (defmacro ,name (obj) `(gethash ,obj ,,hashname)))))
 

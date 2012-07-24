@@ -23,7 +23,7 @@
                                         (element-type ''(unsigned-byte 8))
                                         (external-format :default))
                                        &body body)
-  (with-gensyms (stream length)
+  (let ((stream (gensym)) (length (gensym)))
     (evaluating-once (buffer-size element-type external-format)
       `(with-open-file (,stream ,file
                         :direction :input
