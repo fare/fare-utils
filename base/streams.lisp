@@ -57,7 +57,7 @@ Otherwise, signal an error.")
       (t (error "not a valid stream designator ~S" x)))))
 
 (def*macro with-input-stream ((x &optional (value x)) &body body)
-  `(call-with-input ,value #'(lambda (,x) ,@body)))
+  `(call-with-input-stream ,value #'(lambda (,x) ,@body)))
 
 (def*parameter *standard-readtable* (copy-readtable nil))
 (def*parameter *safe-package* :cl)

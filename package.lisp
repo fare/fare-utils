@@ -29,7 +29,9 @@
    #:cond2 #:cons-tree-map ;; #:copy-array #:copy-array-shape
    #:copy-list-without-nth
    #:copy-symbol-function #:copy-symbol-value #:dbg #:dbg-time
-   #:declaim-type #:declare-type #:def*class #:def*constant
+   #:declaim-type #:declare-type
+   #:define-package-mix
+   #:def*class #:def*constant
    #:def*fun #:def*generic #:def*macro #:def*method
    #:def*package #:def*parameter #:def*setf #:def*struct
    #:def*type #:def*var #:defconstant* #:define*-compiler-macro
