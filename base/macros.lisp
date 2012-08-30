@@ -536,6 +536,15 @@ shall be declared with a serial dependency in system definitions.
 (defmacro nest (&rest things)
   (reduce #'(lambda (outer inner) (append outer (list inner)))
           things :from-end t))
+#| Note: in Scheme, you could do
+(define-syntax nest
+  (syntax-rules ()
+    ((nest x) x)
+    ((nest (x ...) y z ...) (x ... (nest y z ...)))))
+or in Racket, directly use the related but different form nest from scheme/nest:
+http://docs.racket-lang.org/scheme/nest.html?q=nest#(form._((lib._scheme/nest..rkt)._nest))
+(racket:nest (x ...) . body) ==> (my:nest x ... body)
+|#
 
 (defmacro tsen (&rest things)
   (reduce #'(lambda (inner outer) (append outer (list inner)))
