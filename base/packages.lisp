@@ -103,9 +103,8 @@
       (loop :for (kw . ()) :in clauses
         :when (member kw '(:import-from :shadowing-import-from)) :do
         (map () #'ensure-imported (cddr clauses)))
-      `(defpackage ,package
+      `(defpackage ,package (:use)
          ,@(loop :for p :in mixed-packages
              :collect `(:import-from ,p ,@(import-from p)))
          ,@clauses
-         (:export ,@(loop :for s :being :the :hash-keys :of h :collect s))))))
-)
+         (:export ,@(loop :for s :being :the :hash-keys :of h :collect s)))))))
