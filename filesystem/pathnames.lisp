@@ -41,7 +41,7 @@ of the directory of the given pathname"
 
 (defun directory-name-p (name)
   (and (stringp name)
-       (eql #\/ (asdf:last-char name))))
+       (eql #\/ (last-char name))))
 
 (defun portable-pathname-string-component-char-p (c)
   (declare (type character c))
@@ -181,7 +181,7 @@ erroring out if some source of non-portability is found"
     (and (consp directory) (eq (car directory) :absolute))))
 
 (defun portable-namestring-absolute-p (namestring)
-  (eql (asdf:first-char namestring) #\/))
+  (eql (first-char namestring) #\/))
 
 (defun portable-pathname-absolute-p (name)
   (etypecase name
@@ -220,10 +220,10 @@ erroring out if some source of non-portability is found"
      (cond
        ((equal x "")
 	(error "empty namestring"))
-       ((eql (asdf:last-char x) #\/)
+       ((eql (last-char x) #\/)
 	(pathname x))
        (t
-	(pathname (asdf:strcat x "/")))))
+	(pathname (strcat x "/")))))
     (pathname
      (if (or (pathname-name x)
              (pathname-type x)

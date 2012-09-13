@@ -32,7 +32,7 @@
 
 (defun conc-string (&rest rest)
   "make a string by concatenating stuff"
-  (apply #'asdf:strcat (mapcar #'->string rest)))
+  (apply #'strcat (mapcar #'->string rest)))
 ))
 
 (eval-now
