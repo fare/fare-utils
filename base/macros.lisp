@@ -534,8 +534,9 @@ shall be declared with a serial dependency in system definitions.
   (if from-end `(nest ,@things) `(tsen ,@things)))
 
 (defmacro nest (&rest things)
-  (reduce #'(lambda (outer inner) (append outer (list inner)))
+  (reduce #'(lambda (outer inner) `(,@outer ,inner))
           things :from-end t))
+
 #| Note: in Scheme, you could do
 (define-syntax nest
   (syntax-rules ()
