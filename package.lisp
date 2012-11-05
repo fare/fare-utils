@@ -44,7 +44,7 @@
    #:define-values-post-modify-macro #:defmsv #:defsubst
    #:defun-inline #:delete-item! #:delete-node! #:disable-fun
    #:dolist-with-rest #:dolist-with-rest-fun #:empty-container!
-   #:enable-fun #:equal-array #:error-behaviour #:eval-now
+   #:enable-fun #:equal-array #:error-behavior #:eval-now
    #:eval-once #:evaluating-once #:exchange-nodes #:export*
    #:export-symbols #:export-symbols* #:exporting-definitions
    #:featurify ;; #:extremum
@@ -60,7 +60,7 @@
    #:list->vector #:list-of-integers
    #:literalp #:make-collector #:make-defpackage-form
    #:make-node #:make-predicate-symbol
-   #:make-single-arg-form #:mapcar2 #:mapmacro ;; #:mappend #:append/list
+   #:make-single-arg-form #:mapcar2 #:mapmacro #:append/list ;; #:mappend
    #:maybe-adjust-size-down #:maybe-adjust-size-up
    #:msg #:multiple-value-quote #:mvbind
    #:mvcall #:mvlist #:mvprog1 #:mvquote #:mvsetq

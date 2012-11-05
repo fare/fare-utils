@@ -408,13 +408,13 @@ outputs a tag plus a list of variable and their values, returns the last value"
 ; -----------------------------------------------------------------------------
 ;;; Manipulating Source
 
-(defun error-behaviour (e &rest r)
-  "generic way to specify behaviour in exceptional situations"
+(defun error-behavior (e &rest r)
+  "generic way to specify behavior in exceptional situations"
   (etypecase e
    (function (apply e r))
    (null nil)
    ((eql t) (error "Something bad happened. Check the backtrace."))
-   (cons (apply 'error-behaviour (append e r)))
+   (cons (apply 'error-behavior (append e r)))
    ((or string symbol)
     (with-standard-io-syntax
       (let ((*read-eval* nil)
@@ -429,10 +429,10 @@ outputs a tag plus a list of variable and their values, returns the last value"
   "checks whether X is an instance of a something made with a maker
 defined by (MAKE-SINGLE-ARG-FORM TAG). If ON-ERROR is defined, and
 X looks like it is such an instance but is malformed, then ON-ERROR
-is invoked as an ERROR-BEHAVIOUR."
+is invoked as an ERROR-BEHAVIOR."
   (and (form-starting-with-p tag x)
        (or (and (consp (cdr x)) (null (cddr x)))
-	   (error-behaviour on-error tag x))))
+	   (error-behavior on-error tag x))))
 
 #| ;; if you need it, use it from alexandria
 (defun proper-list-p (x)
@@ -468,7 +468,7 @@ is invoked as an ERROR-BEHAVIOUR."
 to be evaluated as function call, macro call, or special form?"
   (and (consp x)
        (if on-error
-	   (or (listp #|not bothering with proper-list-p|# x) (error-behaviour on-error x))
+	   (or (listp #|not bothering with proper-list-p|# x) (error-behavior on-error x))
 	 t)))
 (defun literalp (x)
   "predicate that tells whether X is the source form for a literal expression."

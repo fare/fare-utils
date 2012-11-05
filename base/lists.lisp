@@ -31,9 +31,10 @@
   "N first elements of list L -- complement of (NTHCDR N L)"
   (subseq l 0 n))
 
-#| ;; use ALEXANDRIA:MAPPEND instead
 (defun append/list (list)
   (reduce #'append list :from-end t))
+
+#| ;; use ALEXANDRIA:MAPPEND instead
 (defun mappend (&rest rest)
   "like mapcan, but works on lists resulting from quasi-quoted expressions"
   (append/list (apply #'mapcar rest)))
