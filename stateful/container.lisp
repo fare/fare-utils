@@ -62,7 +62,7 @@
 (defgeneric pop-item! (container)
   (:method :before (container)
            (check-not-empty container))
-  (:method :before (container)
+  (:method (container)
            (pop-least-item! container)))
 (defgeneric pop-last-item! (container)
   (:method :before (container)
