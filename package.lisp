@@ -111,7 +111,6 @@
    ;;#:ensure-absolute-pathname ;; use ASDF:ENSURE-PATHNAME-ABSOLUTE
    #:portable-namestring-prefix<=
    ;;#:ensure-pathname-is-directory
-   #:rename-file-overwriting-target
    #:unwilden
    #:append1 #:append1f #:funcallf ;; #:appendf #:nconcf
    #:with-nesting #:nest #:tsen

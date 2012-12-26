@@ -5,13 +5,6 @@
 
 (in-package #:fare-utils)
 
-(defun rename-file-overwriting-target (source target)
-  #+clisp ;; But for a bug in CLISP 2.48, we should use :if-exists :overwrite and be atomic
-  (posix:copy-file source target :method :rename)
-  #-clisp
-  (rename-file source target
-               #+clozure :if-exists #+clozure :rename-and-delete))
-
 (defun make-tmpname-for (filename)
   (make-pathname
    :type (conc-string (pathname-type filename)
@@ -29,10 +22,7 @@
     (unwind-protect
          (prog1
              (funcall fun s)
-           #+clisp
-           (posix:copy-file tmpname filename :method :rename)
-           #-clisp
-           (rename-file tmpname filename #+clozure :if-exists #+clozure :overwrite))
+           (rename-file-overwriting-target tmpname filename))
       (ignore-errors (delete-file tmpname) nil))))
 
 (defmacro with-atomic-file-creation ((s filename &optional tmpname) &body body)
