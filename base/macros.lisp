@@ -466,10 +466,10 @@ is invoked as an ERROR-BEHAVIOR."
 (defun combinationp (x &optional on-error)
   "Is the form X a combination of a head and arguments,
 to be evaluated as function call, macro call, or special form?"
-  (and (consp x)
-       (if on-error
-	   (or (listp #|not bothering with proper-list-p|# x) (error-behavior on-error x))
-	 t)))
+  (declare (ignorable on-error)) ;; I don't want to either import or duplicate alexandria:proper-list-p
+  ;;(and (consp x) (if on-error (or (proper-list-p x) (error-behavior on-error x)) t))
+  (consp x))
+  
 (defun literalp (x)
   "predicate that tells whether X is the source form for a literal expression."
   (typep x '(or boolean number character array keyword)))

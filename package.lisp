@@ -10,7 +10,7 @@
 |#
 
 (defpackage #:fare-utils
-  (:use #:common-lisp #:asdf-utils)
+  (:use #:common-lisp #:asdf/driver)
   #+genera (:import-from #:scl #:boolean)
   ;; #+clisp (:shadow :with-gensyms)
   (:export
