@@ -21,7 +21,6 @@
    #:aif2 #:alist->hash-table #:association
    #:base-char-p #:binary-heap #:binomial-heap #:boolean
    #:cached-size-mixin
-   #:call-with-input-stream #:call-with-output-stream
    #:check-not-empty
    #:clobber-file-if-different #:clobber-file-with-vector
    #:combinationp #:conc-gensym ;; #:multiple-value-compose #:multiple-value-compose/2
@@ -80,7 +79,6 @@
    #:vector-container-ref #:with-buffered-file-contents
    #:with-input #:with-magic-special-variables ;; #:with-gensyms
    #:with-magic-special-variables-safely #:with-msv #:with-msv*
-   #:with-output-stream #:with-input-stream
    #:with-user-output-file #:xtime #:_
    #:but-last-char ;; #:first-char #:last-char
    ;; #:proper-list-p

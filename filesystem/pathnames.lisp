@@ -66,7 +66,7 @@ of the directory of the given pathname"
   "DIRECTORY being the directory component of a pathname,
 output to OUT a portable representation of it,
 erroring out if some source of non-portability is found"
-  (with-output-stream (out)
+  (with-output (out)
     (labels ((d2s (x)
 	       (dolist (c x)
 		 (unless (portable-pathname-string-component-p c)
@@ -96,19 +96,19 @@ erroring out if some source of non-portability is found"
 	 (error "Invalid directory ~S" directory))))))
 
 (defun portable-pathname-name-output (name &key out)
-  (with-output-stream (out)
+  (with-output (out)
     (unless (portable-pathname-string-component-p name)
       (error "Non-portable pathname name ~S" name))
     (write-string name out)))
 
 (defun portable-pathname-type-output (type &key out)
-  (with-output-stream (out)
+  (with-output (out)
     (unless (portable-pathname-type-component-p type)
       (error "Non-portable pathname type ~S" type))
     (write-string type out)))
 
 (defun portable-pathname-output (pathname &key out (allow-absolute t) (allow-relative t))
-  (with-output-stream (out)
+  (with-output (out)
     (let* ((p (pathname pathname))
 	   (directory (pathname-directory p))
 	   (name (pathname-name p))
