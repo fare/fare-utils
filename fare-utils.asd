@@ -5,7 +5,7 @@
 It contains a lot of basic everyday functions and macros,
 but also a library of pure and stateful datastructures,
 and Lisp extensions for memoization and reader interception."
-  :depends-on (:asdf)
+  :depends-on (:asdf-driver)
   :components
   ((:file "package")
 
