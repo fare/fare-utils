@@ -92,20 +92,20 @@
       (funcall *package-misdefinition-warning-hook*
                "Symbol ~W declared as exported from package ~A but isn't"
                s (package-name (find-package p)))))
-  (export s p)
+  (export (list s) p)
   (setf (gethash s (package-ensure-exported-symbols p)) t)
   t))
 
-(defmacro export-symbols* (p &rest symbols)
+(defmacro ensure-symbols-exported* (p &rest symbols)
   `(eval-now
     ,@(loop :for s :in symbols :collect
             `(package-ensure-symbol-exported ',s ',p))))
 
-(defmacro export* (s &optional (p *package*))
-  `(export-symbols* ,(package-name (find-package p)) ,s))
+(defmacro ensure-symbol-exported (s &optional (p *package*))
+  `(ensure-symbols-exported* ,(package-name (find-package p)) ,s))
 
-(defmacro export-symbols (&rest symbols)
-  `(export-symbols* ,(package-name *package*) ,@symbols))
+(defmacro ensure-symbols-exported (&rest symbols)
+  `(ensure-symbols-exported* ,(package-name *package*) ,@symbols))
 
 (defmacro exporting-definitions (&body body)
   `(progn
@@ -124,14 +124,14 @@
                                   (symbolp (cadr def2)))
                              (cadr def2))
                             (t (return)))))
-                (when sym (list `(export* ,sym))))))))
+                (when sym (list `(ensure-symbol-exported ,sym))))))))
 
-(export-symbols
+(ensure-symbols-exported
  eval-now
  declaim-type declare-type the*
  style-warn
  *package-misdefinition-warning-hook*
- export-symbols* export* export-symbols
+ ensure-symbols-exported* ensure-symbols-exported ensure-symbol-exported
  exporting-definitions define-exporter)
 
 (exporting-definitions
@@ -140,7 +140,7 @@
   `(defmacro ,exporter (symbol &rest args)
     `(progn
       (,',definer ,symbol ,@args)
-      (export* ,symbol))))
+      (ensure-symbol-exported ,symbol))))
 
 (define-exporter define*-exporter define-exporter)
 

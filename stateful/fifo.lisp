@@ -11,7 +11,7 @@
   (head nil)
   (tail nil))
 
-(export-symbols make-fifo fifo-head fifo-tail)
+(ensure-symbols-exported make-fifo fifo-head fifo-tail)
 
 (defun fifo-empty-p (fifo)
   (null (fifo-head fifo)))

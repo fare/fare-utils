@@ -43,9 +43,10 @@
    #:define-values-post-modify-macro #:defmsv #:defsubst
    #:defun-inline #:delete-item! #:delete-node! #:disable-fun
    #:dolist-with-rest #:dolist-with-rest-fun #:empty-container!
-   #:enable-fun #:equal-array #:error-behavior #:eval-now
-   #:eval-once #:evaluating-once #:exchange-nodes #:export*
-   #:export-symbols #:export-symbols* #:exporting-definitions
+   #:enable-fun
+   #:ensure-symbol-exported #:ensure-symbols-exported #:ensure-symbols-exported*
+   #:equal-array #:error-behavior #:eval-now
+   #:eval-once #:evaluating-once #:exchange-nodes #:exporting-definitions
    #:featurify ;; #:extremum
    #:file-contents-equal-vector-p #:fill-array #:find-item
    #:find-least-item #:find-node #:first-and-only #:firstn
