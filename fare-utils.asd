@@ -43,7 +43,6 @@ and Lisp extensions for memoization and reader interception."
      (:file "binary-heap" :depends-on ("container"))
      (:file "binomial-heap" :depends-on ("container"))
      |#
-     (:file "fifo" :depends-on ("container"))
      (:file "dllist" :depends-on ("container"))
      #|(:file "sorting" :depends-on ("binary-heap" "binomial-heap"))|#))))
 
