@@ -85,6 +85,14 @@ CMUCL's EXT:ONCE-ONLY has a different interface."
 	  (values ,@store-vars)))))
 |#
 
+(defmacro locative (place &environment env)
+  "Given a place, return as two values a getter and a setter for that place"
+  (multiple-value-bind (vars vals store-vars writer-form reader-form)
+      (get-setf-expansion place env)
+    `(let* (,@(mapcar #'list vars vals))
+       (values
+        #'(lambda () ,reader-form)
+        #'(lambda (,@store-vars) ,writer-form)))))
 
 (defmacro define-values-modify-macro (name val-vars lambda-list function)
   "Multiple-values variant on define-modify macro, by Tim Moore"
@@ -408,19 +416,24 @@ outputs a tag plus a list of variable and their values, returns the last value"
 ; -----------------------------------------------------------------------------
 ;;; Manipulating Source
 
+(defun condition-name-p (name)
+  (and (symbolp name)
+       (subtypep name 'condition)
+       t))
+
 (defun error-behavior (e &rest r)
   "generic way to specify behavior in exceptional situations"
   (etypecase e
-   (function (apply e r))
    (null nil)
    ((eql t) (error "Something bad happened. Check the backtrace."))
-   (cons (apply 'error-behavior (append e r)))
-   ((or string symbol)
+   ((or string (and symbol (satisfies condition-name-p)))
     (with-standard-io-syntax
       (let ((*read-eval* nil)
 	    (*print-readably* nil)
 	    (*print-circle* t))
-	(apply #'error e r))))))
+	(apply #'error e r))))
+   ((or function (and symbol (satisfies fboundp))) (apply e r))
+   (cons (apply 'error-behavior (append e r)))))
 
 (defun form-starting-with-p (tag x)
   (and (consp x) (equal tag (car x))))
