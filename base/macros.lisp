@@ -546,9 +546,11 @@ shall be declared with a serial dependency in system definitions.
 (defmacro with-nesting ((&key (from-end t)) &rest things)
   (if from-end `(nest ,@things) `(tsen ,@things)))
 
-(defmacro nest (&rest things)
-  (reduce #'(lambda (outer inner) `(,@outer ,inner))
-          things :from-end t))
+(eval-now
+  (unless (fboundp 'nest) ;; newer versions of UIOP provide it already
+    (defmacro nest (&rest things)
+      (reduce #'(lambda (outer inner) `(,@outer ,inner))
+              things :from-end t))))
 
 #| Note: in Scheme, you could do
 (define-syntax nest
