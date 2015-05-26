@@ -6,7 +6,7 @@
             :documentation "Test string functions"))
 
 (deftest test-strcat ()
-  (is (equal (asdf:strcat "foo" "bar" "baz") "foobarbaz")))
+  (is (equal (strcat "foo" "bar" "baz") "foobarbaz")))
 
 (deftest test-join-strings ()
   (is (equal (join-strings '("/bin" "/usr/bin" "/usr/local/bin") :separator ":")

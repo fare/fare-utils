@@ -1,12 +1,14 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
-(defsystem :fare-utils
+(defsystem "fare-utils"
+  :version "1.0.0.1"
   :description "Basic functions and macros, interfaces, pure and stateful datastructures"
   :long-description "fare-utilities is a small collection of utilities.
 It contains a lot of basic everyday functions and macros,
 but also a library of pure and stateful datastructures,
 and Lisp extensions for memoization and reader interception."
-  :depends-on (#-asdf3 :asdf-driver)
-  :version "1.0.0"
+  :license "MIT" ;; also BSD or bugroff
+  :author "Francois-Rene Rideau"
+  :depends-on ((:version "asdf" "3.0"))
   :components
   ((:file "package")
 
@@ -45,8 +47,5 @@ and Lisp extensions for memoization and reader interception."
      (:file "binomial-heap" :depends-on ("container"))
      |#
      (:file "dllist" :depends-on ("container"))
-     #|(:file "sorting" :depends-on ("binary-heap" "binomial-heap"))|#))))
-
-(defmethod perform ((op test-op) (system (eql (find-system :fare-utils))))
-  (asdf:load-system :fare-utils-test)
-  (funcall (read-from-string "fare-utils-test:test-suite")))
+     #|(:file "sorting" :depends-on ("binary-heap" "binomial-heap"))|#)))
+  :in-order-to ((test-op (test-op "fare-utils-test"))))
