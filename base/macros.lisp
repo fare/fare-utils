@@ -313,11 +313,13 @@ outputs a tag plus a list of variable and their values, returns the last value"
 ;;; Streams
 
 (defun n-stream-has-char-p (c s)
-  (and (peek-char c s) (read-char s)))
+  (and (eql (peek-char nil s) c) (read-char s)))
 
 (defun n-stream-eol-p (s)
-  (let ((x (n-stream-has-char-p #\return s)))
-    (or (n-stream-has-char-p #\linefeed s) x)))
+  (let* ((cr (n-stream-has-char-p #\return s))
+         (lf (n-stream-has-char-p #\linefeed s)))
+    (or (and cr lf +crlf+) cr lf)))
+
 
 ; -----------------------------------------------------------------------------
 ;;; Higher-Order Functions

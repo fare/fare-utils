@@ -1,11 +1,9 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 (defsystem "fare-utils"
-  :version "1.0.0.1"
+  :version "1.0.0.2"
   :description "Basic functions and macros, interfaces, pure and stateful datastructures"
-  :long-description "fare-utilities is a small collection of utilities.
-It contains a lot of basic everyday functions and macros,
-but also a library of pure and stateful datastructures,
-and Lisp extensions for memoization and reader interception."
+  :long-description "fare-utils is a small collection of utilities.
+It contains a lot of basic everyday functions and macros"
   :license "MIT" ;; also BSD or bugroff
   :author "Francois-Rene Rideau"
   :depends-on ((:version "asdf" "3.0"))
