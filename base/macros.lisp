@@ -48,17 +48,6 @@ CMUCL's EXT:ONCE-ONLY has a different interface."
 
 
 
-#| ;; not very useful
-(def*macro define-enclosing-macro (name args before after &key unprotected)
-  `(defmacro ,name (,@args &body body)
-     `(progn
-	,,before
-	(,,(if unprotected ''prog1 ''unwind-protect)
-	,@body
-	,,after))))
-|#
-
-
 ;; Simple modify-macro's
 (defun xfuncall (x f &rest args) (apply f x args))
 (exporting-definitions

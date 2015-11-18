@@ -2,15 +2,13 @@
 
 #+xcvb (module nil)
 
-(in-package #:cl-user)
-
 #|;; After a mismatch warning, regenerate with
 (write (fare-utils:make-defpackage-form :fare-utils :gensym) :pretty t :case :downcase)
 (terpri)
 |#
 
-(defpackage #:fare-utils
-  (:use #:common-lisp #:asdf/driver)
+(uiop:define-package #:fare-utils
+  (:use #:common-lisp #:uiop)
   #+genera (:import-from #:scl #:boolean)
   ;; #+clisp (:shadow :with-gensyms)
   (:export
@@ -37,7 +35,7 @@
    #:define*-condition #:define*-exporter
    #:define*-method-combination #:define*-modify-macro
    #:define*-setf-expander #:define*-symbol-macro
-   #:define-abbrevs #:define-enclosing-macro #:define-exporter
+   #:define-abbrevs #:define-exporter
    #:define-magic-special-variable #:define-post-modify-macro
    #:define-values-modify-macro
    #:define-values-post-modify-macro #:defmsv #:defsubst
