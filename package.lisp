@@ -107,6 +107,7 @@
    #:portable-namestring-p
    ;;#:ensure-absolute-pathname ;; use ASDF:ENSURE-PATHNAME-ABSOLUTE
    #:portable-namestring-prefix<=
+   #:sorted
    ;;#:ensure-pathname-is-directory
    #:unwilden
    #:append1 #:append1f #:funcallf ;; #:appendf #:nconcf

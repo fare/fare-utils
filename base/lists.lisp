@@ -247,3 +247,6 @@ May alter the cons cells that constitute the spine of the alist"
     :else
     :collect e :into no
     :finally (return (values yes no))))
+
+(defun sorted (sequence predicate &rest keys &key &allow-other-keys)
+  (apply 'sort (copy-seq sequence) predicate keys))
