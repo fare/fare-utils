@@ -118,6 +118,7 @@
    ;; #:parse-body
    #:parse-defsetf-lambda-list
    #:identifierp
+   #:package-function
    #:package-functions
    #:trace-package-functions
    #:untrace-package-functions
