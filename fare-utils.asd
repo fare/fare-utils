@@ -1,6 +1,6 @@
 ;;; -*- Mode: Lisp ; Base: 10 ; Syntax: ANSI-Common-Lisp -*-
 (defsystem "fare-utils"
-  :version "1.0.0.4"
+  :version "1.0.0.5"
   :description "Basic functions and macros, interfaces, pure and stateful datastructures"
   :long-description "fare-utils is a small collection of utilities.
 It contains a lot of basic everyday functions and macros"
@@ -15,6 +15,7 @@ It contains a lot of basic everyday functions and macros"
     :depends-on ("package")
     :components
     ((:file "utils")
+     (:file "character-classes" :depends-on ("utils"))
      (:file "strings" :depends-on ("utils"))
      (:file "symbols" :depends-on ("strings"))
      (:file "macros" :depends-on ("symbols"))

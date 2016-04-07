@@ -16,7 +16,11 @@
    #:*safe-package* #:*standard-readtable*
    #:+all-chars-base-feature+ ;; #:absolute-pathname-p
    #:accessors-equal-p #:acond #:acond2 #:adjust-size #:aif
-   #:aif2 #:alist->hash-table #:association
+   #:aif2 #:alist->hash-table
+   #:ascii-char-p #:ascii-uppercase-letter-p #:ascii-lowercase-letter-p
+   #:ascii-letter-p #:ascii-digit-p #:ascii-alphanumeric-p #:ascii-non-alphanumeric-p
+   #:ascii-alphanumeric-or-underscore-p
+   #:association
    #:base-char-p #:binary-heap #:binomial-heap #:boolean
    #:cached-size-mixin
    #:check-not-empty
