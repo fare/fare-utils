@@ -62,6 +62,7 @@
    #:maybe-adjust-size-down #:maybe-adjust-size-up
    #:msg #:multiple-value-quote #:mvbind
    #:mvcall #:mvlist #:mvprog1 #:mvquote #:mvsetq
+   #:n-stream-has-char-p #:n-stream-eol-p
    #:ndolist-with-rest #:ndolist-with-rest-fun #:nilf #:niy
    #:node-item #:node-mixin #:nop
    #:null-string-p #:plist->alist #:pop-last-item

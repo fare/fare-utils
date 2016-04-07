@@ -309,7 +309,7 @@ outputs a tag plus a list of variable and their values, returns the last value"
 ;;; Streams
 
 (defun n-stream-has-char-p (c s)
-  (and (eql (peek-char nil s) c) (read-char s)))
+  (and (eql (peek-char nil s nil) c) (read-char s)))
 
 (defun n-stream-eol-p (s)
   (let* ((cr (n-stream-has-char-p #\return s))
