@@ -7,6 +7,8 @@
   :author "Francois-Rene Rideau"
   :depends-on ("fare-utils" "hu.dwim.stefil")
   :components
-  ((:file "package")
-   (:file "strings" :depends-on ("package")))
+  ((:module "test"
+    :components
+    ((:file "package")
+     (:file "strings" :depends-on ("package")))))
   :perform (test-op (o c) (symbol-call :fare-utils-test :test-suite)))
